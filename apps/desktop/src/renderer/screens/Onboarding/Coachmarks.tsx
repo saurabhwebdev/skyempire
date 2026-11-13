@@ -15,6 +15,9 @@ const STEPS = [
 export function Coachmarks() {
   const view = useGameStore((s) => s.view);
   const settings = useGameStore((s) => s.settings);
+  const section = useUi((s) => s.section);
+  // Over the map (Network/Fleet) sit top-left; on full-page sections sit bottom-left, clear of titles.
+  const onMap = section === 'network' || section === 'fleet';
   const done = view?.player.completedObjectives ?? [];
   const step = STEPS.find((s) => !done.includes(s.id));
   const finished = !step;
@@ -36,7 +39,7 @@ export function Coachmarks() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0, transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] } }}
           exit={{ opacity: 0, transition: { duration: 0.15 } }}
-          className="absolute top-3 left-3 z-20 w-[320px] rounded-xl border border-accent/40 bg-surface-1/95 p-4 shadow-overlay backdrop-blur-md"
+          className={`absolute ${onMap ? 'top-3' : 'bottom-4'} left-3 z-20 w-[320px] rounded-xl border border-accent/40 bg-surface-1/95 p-4 shadow-overlay backdrop-blur-md`}
         >
           <div className="mb-2 flex items-center gap-2 text-[12px] font-semibold text-accent">
             <GraduationCap className="size-4" /> Step {index + 1} of {STEPS.length}

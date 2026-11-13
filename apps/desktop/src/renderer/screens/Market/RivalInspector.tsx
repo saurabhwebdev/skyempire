@@ -1,3 +1,4 @@
+import { AirlineLogo } from '../../components/AirlineLogo';
 import { catalog } from '../../lib/catalog';
 import { useGameStore } from '../../store';
 import { PERSONALITY_LABEL } from './Market';
@@ -13,7 +14,7 @@ export function RivalInspector({ id }: { id: string }) {
       <header>
         <span className="label-caps">{PERSONALITY_LABEL[r.personality]} airline</span>
         <h2 className="mt-1 flex items-center gap-2 text-[24px] font-semibold tracking-[-0.02em]">
-          <span className="size-3 rounded-full" style={{ background: r.color }} aria-hidden />{r.name}
+          <AirlineLogo code={r.code} name={r.name} color={r.color} size={40} />{r.name}
         </h2>
         <p className="text-muted"><span className="font-mono">{r.code}</span>{data ? ` · based at ${catalog.airports[data.hubId]?.city ?? data.hubId}` : ''}</p>
       </header>

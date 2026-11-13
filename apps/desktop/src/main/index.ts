@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { registerIpc } from './ipc';
 import { SaveStore } from './saves/saves';
 import { SimHost } from './simHost';
-import { registerAppScheme, serveRenderer } from './protocol';
+import { registerAppScheme, serveLogos, serveRenderer } from './protocol';
 import { createMainWindow } from './window';
 
 app.setAppUserModelId('com.skyempire.game');
@@ -14,9 +14,11 @@ if (process.env.SKYEMPIRE_USER_DATA) app.setPath('userData', process.env.SKYEMPI
 void app.whenReady().then(() => {
   serveRenderer(join(import.meta.dirname, '../renderer'));
   const userData = app.getPath('userData');
+  const logosDir = join(userData, 'logos');
+  serveLogos(logosDir);
   const host = new SimHost(join(import.meta.dirname, 'simWorker.js'));
   const win = createMainWindow();
-  const session = registerIpc(win, host, new SaveStore(join(userData, 'saves')), userData);
+  const session = registerIpc(win, host, new SaveStore(join(userData, 'saves')), userData, logosDir);
 
   let quitting = false;
   app.on('before-quit', (e) => {

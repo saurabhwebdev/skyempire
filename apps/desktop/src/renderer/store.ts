@@ -77,6 +77,9 @@ interface GameStoreState {
   unread: number;
   cashDelta: number | null;
   settings: Settings;
+  /** Bumped after logos change so <img> URLs refresh. */
+  logoVersion: number;
+  bumpLogos(): void;
   applyPush(p: TickPush): void;
   setView(v: ClientView | null): void;
   markRead(): void;
@@ -90,6 +93,8 @@ export const useGameStore = create<GameStoreState>()((set, get) => ({
   unread: 0,
   cashDelta: null,
   settings: DEFAULT_SETTINGS,
+  logoVersion: 0,
+  bumpLogos: () => set({ logoVersion: get().logoVersion + 1 }),
   applyPush: (p) => {
     const prev = get().view;
     const fresh = p.summary?.notifications ?? [];

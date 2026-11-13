@@ -21,6 +21,13 @@ const api: GameApi = {
   view: () => ipcRenderer.invoke(IPC.view),
   history: (airlineId, from, to) => ipcRenderer.invoke(IPC.history, airlineId, from, to),
   routeDemand: (from, to) => ipcRenderer.invoke(IPC.routeDemand, from, to),
+  logos: {
+    status: () => ipcRenderer.invoke(IPC.logoStatus),
+    download: () => ipcRenderer.invoke(IPC.logoDownload),
+    cancel: () => ipcRenderer.send(IPC.logoCancel),
+    onProgress: (cb) => on<[number, number]>(IPC.logoProgress, ([d, t]) => cb(d, t)),
+    setPlayerLogo: (data) => ipcRenderer.invoke(IPC.logoPlayer, data),
+  },
   getSettings: () => ipcRenderer.invoke(IPC.getSettings),
   setSettings: (s) => ipcRenderer.invoke(IPC.setSettings, s),
 };

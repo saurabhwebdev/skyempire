@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { catalog } from '../../lib/catalog';
 import { useGameStore } from '../../store';
 import { LogoMark } from '../NewAirline/LogoPreview';
+import { AirlineLogo } from '../../components/AirlineLogo';
+import { useGameStore as useStore } from '../../store';
 
 const SERVICE = ['', 'Basic', 'Simple', 'Standard', 'Premium', 'Luxury'];
 const TIER = { startup: 'Startup', regional: 'Regional', national: 'National' };
@@ -23,11 +25,29 @@ export function Airline() {
       <Panel title="Brand">
         <div className="flex items-center gap-4">
           <LogoMark shape={al.logoShape} primary={al.colors.primary} secondary={al.colors.secondary} size={56} />
+          <AirlineLogo code={al.code} name={`${al.name} custom logo`} color={al.colors.primary} size={56} file="__player" />
           <div>
             <div className="text-[20px] font-semibold">{al.name}</div>
             <div className="text-muted"><span className="font-mono">{al.code}</span> · {TIER[al.tier]} airline</div>
           </div>
         </div>
+      </Panel>
+      <Panel title="Custom logo">
+        <p className="mb-3 text-[13px] text-muted">Upload a PNG (under 1 MB) to replace the code badge in the top bar.</p>
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-border-strong bg-surface-2 px-4 py-2 text-sm font-semibold hover:bg-surface-3">
+          Upload logo
+          <input type="file" accept="image/png" className="sr-only" onChange={async (e) => {
+            const f = e.target.files?.[0];
+            if (!f) return;
+            try {
+              await window.game.logos.setPlayerLogo(new Uint8Array(await f.arrayBuffer()));
+              useStore.getState().bumpLogos();
+              toast({ title: 'Logo updated', tone: 'success' });
+            } catch (err) {
+              toast({ title: err instanceof Error ? err.message.replace(/^.*Error: /, '') : 'Couldn’t use that file', tone: 'danger' });
+            }
+          }} />
+        </label>
       </Panel>
       <Panel title="Reputation">
         <div className="num mb-2 text-[30px] font-semibold">{Math.round(al.reputation)}<span className="text-[14px] text-muted"> / 100</span></div>

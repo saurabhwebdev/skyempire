@@ -3,6 +3,10 @@ import { IPC, parseCommand, type NewGameOptions, type Settings, type Speed, type
 import { GameLoop } from './gameLoop';
 import { SaveLoadError, type SaveStore } from './saves/saves';
 import { loadSettings, saveSettings } from './settings';
+import { loadCatalog } from '@skyempire/data';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { countLogos, downloadLogos } from './logos';
 import type { SimHost } from './simHost';
 
 export interface GameSession {
@@ -11,7 +15,7 @@ export interface GameSession {
   save(kind?: 'auto' | 'manual'): Promise<void>;
 }
 
-export function registerIpc(win: BrowserWindow, host: SimHost, store: SaveStore, settingsDir: string): GameSession {
+export function registerIpc(win: BrowserWindow, host: SimHost, store: SaveStore, settingsDir: string, logosDir: string): GameSession {
   let saveId: string | null = null;
   let settings: Settings = loadSettings(settingsDir);
   const send = (channel: string, payload: unknown) => {
@@ -87,6 +91,23 @@ export function registerIpc(win: BrowserWindow, host: SimHost, store: SaveStore,
   ipcMain.handle(IPC.routeDemand, async (_e, from: string, to: string) => host.request({ kind: 'routeDemand', from, to }));
   ipcMain.on(IPC.setSpeed, (_e, speed: Speed) => {
     if (saveId && [0, 1, 2, 4, 8].includes(speed)) loop.setSpeed(speed);
+  });
+
+  const airlines = loadCatalog('world').airlines;
+  let logoAbort: AbortController | null = null;
+  ipcMain.handle(IPC.logoStatus, async () => ({ have: countLogos(airlines, logosDir), total: airlines.length }));
+  ipcMain.handle(IPC.logoDownload, async () => {
+    logoAbort?.abort();
+    logoAbort = new AbortController();
+    return downloadLogos(airlines, logosDir, { signal: logoAbort.signal, onProgress: (done, total) => send(IPC.logoProgress, [done, total]) });
+  });
+  ipcMain.on(IPC.logoCancel, () => logoAbort?.abort());
+  ipcMain.handle(IPC.logoPlayer, async (_e, data: Uint8Array) => {
+    if (!(data instanceof Uint8Array) || data.byteLength > 1_000_000) throw new Error('Logo must be an image under 1 MB');
+    const png = data[0] === 0x89 && data[1] === 0x50;
+    if (!png) throw new Error('Logo must be a PNG image');
+    mkdirSync(logosDir, { recursive: true });
+    writeFileSync(join(logosDir, '__player.png'), data);
   });
 
   return { loop, save };

@@ -36,7 +36,10 @@ describe('Settings', () => {
   it('reduce motion marks the document', async () => {
     const user = userEvent.setup();
     useGameStore.setState({ settings: DEFAULT_SETTINGS });
-    window.game = { setSettings: vi.fn(async (s) => ({ ...DEFAULT_SETTINGS, ...s })) } as unknown as typeof window.game;
+    window.game = {
+      setSettings: vi.fn(async (s) => ({ ...DEFAULT_SETTINGS, ...s })),
+      logos: { status: vi.fn().mockResolvedValue({ have: 0, total: 145 }), onProgress: () => () => {} },
+    } as unknown as typeof window.game;
     wrap(<SettingsDialog open onOpenChange={() => {}} />);
     await user.click(screen.getByRole('switch', { name: 'Reduce motion' }));
     expect(document.documentElement).toHaveAttribute('data-reduce-motion');

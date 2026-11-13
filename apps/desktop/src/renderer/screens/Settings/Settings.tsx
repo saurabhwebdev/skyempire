@@ -2,6 +2,7 @@ import type { Settings } from '@skyempire/shared';
 import { cn, Modal } from '@skyempire/ui';
 import { useEffect, useState } from 'react';
 import { Switch } from '../../components/Switch';
+import { LogoPackSection } from './LogoPackSection';
 import { useGameStore } from '../../store';
 
 export function applySettingsToDocument(s: Settings) {
@@ -34,6 +35,7 @@ export function SettingsDialog({ open, onOpenChange }: { open: boolean; onOpenCh
             ))}
           </div>
         </div>
+        <LogoPackSection />
         <div className="py-3 text-[13px] text-muted">
           <p className="font-semibold text-text">About SkyEmpire 0.1</p>
           <p>SkyEmpire is not affiliated with any airline or aircraft manufacturer. Names are used for identification only.</p>

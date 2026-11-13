@@ -4,6 +4,7 @@ import { cn, Tooltip } from '@skyempire/ui';
 import { Bell, Menu, Pause, Play } from 'lucide-react';
 import { motion } from 'motion/react';
 import { SPEEDS, useGameStore, useUi } from '../store';
+import { AirlineLogo } from '../components/AirlineLogo';
 import { t } from '../strings/en';
 
 export function TopBar() {
@@ -17,9 +18,7 @@ export function TopBar() {
     <header className="flex h-12 shrink-0 items-center gap-4 border-b border-border bg-surface-1 px-4">
       <div className="flex min-w-0 items-center gap-2">
         <span aria-hidden className="text-accent">◆</span>
-        <span className="rounded-sm px-1.5 py-0.5 font-mono text-[12px] font-semibold" style={{ background: al.colors.primary, color: '#fff' }}>
-          {al.code}
-        </span>
+        <AirlineLogo code={al.code} name={al.name} color={al.colors.primary} size={24} file="__player" />
         <span className="truncate font-semibold">{al.name}</span>
       </div>
 

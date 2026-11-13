@@ -6,6 +6,7 @@ import { motion } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useGameStore, useUi } from '../../store';
 import { Profit } from '../Network/NetworkTray';
+import { AirlineLogo } from '../../components/AirlineLogo';
 import { deriveAlerts } from './alerts';
 
 const card = (i: number) => ({
@@ -103,7 +104,7 @@ export function Overview() {
           <ul className="flex flex-col gap-2">
             {rivals.map((r) => (
               <li key={r.id} className="flex items-center gap-3">
-                <span className="size-2.5 rounded-full" style={{ background: r.color }} aria-hidden />
+                <AirlineLogo code={r.code} name={r.name} color={r.color} size={24} />
                 <span className="flex-1 truncate">{r.name}</span>
                 <span className="num text-[13px] text-muted">{r.routeCount} routes{r.overlapRoutes ? ` · ${r.overlapRoutes} vs you` : ''}</span>
               </li>

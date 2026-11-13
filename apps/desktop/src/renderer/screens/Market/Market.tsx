@@ -2,6 +2,7 @@ import type { Airport, PreviewResult, RivalSummary } from '@skyempire/shared';
 import { formatPax } from '@skyempire/shared';
 import { Combobox, DataTable, Panel } from '@skyempire/ui';
 import { useEffect, useState } from 'react';
+import { AirlineLogo } from '../../components/AirlineLogo';
 import { catalog } from '../../lib/catalog';
 import { useGameStore, useUi } from '../../store';
 import { airportFilter, airportRank } from '../NewAirline/NewAirline';
@@ -44,7 +45,7 @@ export function Market() {
           onRowClick={(r) => useUi.setState({ selection: { kind: 'airline', id: r.id }, section: 'network' })}
           maxHeight={420}
           columns={[
-            { key: 'name', header: 'Airline', cell: (r) => <span className="inline-flex items-center gap-2"><span className="size-2.5 rounded-full" style={{ background: r.color }} aria-hidden />{r.name}<span className="font-mono text-faint">{r.code}</span></span>, sortValue: (r) => r.name },
+            { key: 'name', header: 'Airline', cell: (r) => <span className="inline-flex items-center gap-2"><AirlineLogo code={r.code} name={r.name} color={r.color} size={24} />{r.name}<span className="font-mono text-faint">{r.code}</span></span>, sortValue: (r) => r.name },
             { key: 'type', header: 'Type', cell: (r) => PERSONALITY_LABEL[r.personality], sortValue: (r) => r.personality },
             { key: 'fleet', header: 'Fleet', numeric: true, cell: (r) => r.fleetSize, sortValue: (r) => r.fleetSize },
             { key: 'routes', header: 'Routes', numeric: true, cell: (r) => r.routeCount, sortValue: (r) => r.routeCount },

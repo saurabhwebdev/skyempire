@@ -53,6 +53,13 @@ export interface GameApi {
   view(): Promise<ClientView | null>;
   history(airlineId: string, fromDay: number, toDay: number): Promise<AirlineDaily[]>;
   routeDemand(from: string, to: string): Promise<PreviewResult>;
+  logos: {
+    status(): Promise<{ have: number; total: number }>;
+    download(): Promise<{ ok: number; failed: string[] }>;
+    cancel(): void;
+    onProgress(cb: (done: number, total: number) => void): () => void;
+    setPlayerLogo(data: Uint8Array): Promise<void>;
+  };
   getSettings(): Promise<Settings>;
   setSettings(s: Partial<Settings>): Promise<Settings>;
 }
@@ -74,4 +81,9 @@ export const IPC = {
   getSettings: 'game:getSettings',
   setSettings: 'game:setSettings',
   view: 'game:view',
+  logoStatus: 'logos:status',
+  logoDownload: 'logos:download',
+  logoCancel: 'logos:cancel',
+  logoProgress: 'logos:progress',
+  logoPlayer: 'logos:player',
 } as const;
