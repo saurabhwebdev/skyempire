@@ -1,18 +1,33 @@
 import { app, BrowserWindow } from 'electron';
 import { join } from 'node:path';
 import { registerIpc } from './ipc';
+import { SaveStore } from './saves/saves';
 import { SimHost } from './simHost';
 import { createMainWindow } from './window';
 
 app.setAppUserModelId('com.skyempire.game');
+// E2E runs use a throwaway profile so they never touch real saves.
+if (process.env.SKYEMPIRE_USER_DATA) app.setPath('userData', process.env.SKYEMPIRE_USER_DATA);
 
 void app.whenReady().then(() => {
+  const userData = app.getPath('userData');
   const host = new SimHost(join(import.meta.dirname, 'simWorker.js'));
   const win = createMainWindow();
-  const loop = registerIpc(win, host);
-  app.on('before-quit', () => {
-    loop.stop();
-    host.kill();
+  const session = registerIpc(win, host, new SaveStore(join(userData, 'saves')), userData);
+
+  let quitting = false;
+  app.on('before-quit', (e) => {
+    if (quitting) return;
+    e.preventDefault();
+    quitting = true;
+    session.loop.stop();
+    session
+      .save('auto')
+      .catch((err) => console.error('Save on quit failed', err))
+      .finally(() => {
+        host.kill();
+        app.quit();
+      });
   });
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
