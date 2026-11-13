@@ -7,6 +7,8 @@ import { Inspector } from './shell/Inspector';
 import { InspectorContent } from './shell/InspectorContent';
 import { NetworkTray } from './screens/Network/NetworkTray';
 import { RouteEditor } from './screens/Network/RouteEditor';
+import { AircraftMarket } from './screens/Fleet/AircraftMarket';
+import { FleetTray } from './screens/Fleet/FleetTray';
 import { Button } from '@skyempire/ui';
 import { Plus } from 'lucide-react';
 import { NavRail } from './shell/NavRail';
@@ -21,12 +23,14 @@ import { t } from './strings/en';
 function TrayContent() {
   const section = useUi((s) => s.section);
   if (section === 'network') return <NetworkTray />;
+  if (section === 'fleet') return <FleetTray />;
   return <div className="p-4 text-muted">{t.sections[section]}</div>;
 }
 
 function GameScreen() {
   const section = useUi((s) => s.section);
   const editor = useUi((s) => s.routeEditor);
+  const marketOpen = useUi((s) => s.marketOpen);
   return (
     <div className="flex h-screen flex-col">
       <TopBar />
@@ -37,11 +41,18 @@ function GameScreen() {
             <WorldMap />
             <BottomTray
               title={t.sections[section]}
-              action={<Button size="sm" variant="primary" onClick={() => useUi.getState().openRouteEditor({})}><Plus className="size-4" /> New route</Button>}
+              action={
+                section === 'fleet' ? (
+                  <Button size="sm" variant="primary" onClick={() => useUi.getState().setMarketOpen(true)}><Plus className="size-4" /> Get aircraft</Button>
+                ) : (
+                  <Button size="sm" variant="primary" onClick={() => useUi.getState().openRouteEditor({})}><Plus className="size-4" /> New route</Button>
+                )
+              }
             >
               <TrayContent />
             </BottomTray>
             {editor && <RouteEditor key={editor.routeId ?? 'new'} />}
+            {marketOpen && <AircraftMarket />}
           </div>
           <Inspector>
             <InspectorContent />
