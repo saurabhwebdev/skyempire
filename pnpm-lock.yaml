@@ -35,7 +35,14 @@ importers:
 
   apps/desktop: {}
 
-  packages/data: {}
+  packages/data:
+    dependencies:
+      '@skyempire/shared':
+        specifier: workspace:^
+        version: link:../shared
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
 
   packages/shared:
     dependencies:
