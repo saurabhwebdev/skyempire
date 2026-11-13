@@ -5,7 +5,8 @@
 | Version | Name | Contents | Platform |
 |---|---|---|---|
 | **v0.1** | First Flight | Offline career: whole world, ~1,000 airports, ~19 real aircraft with silhouettes, 19 real AI airlines per world from a ~150-airline database, logo-pack download, routes with shared aircraft, fares, cabins, slots, bases, demand & competition, all 5 AI personalities, reputation, 5 events, tiers 1–3, objectives, finance & loans, save/load, tutorial, installer + auto-update | Windows (GitHub Releases) |
-| v0.2 | Open Skies | Hub connections, ~40 aircraft, sandbox mode, achievements, cargo (simple), light theme, undo, UI scale | + itch.io, Microsoft Store |
+| v0.2 | Living World | Real/simulated **weather** disruptions, **geopolitical tensions** (airspace closures, detours, route bans), **holidays & festivals** demand peaks on a real calendar, **~40 aircraft** + Global tier — see `docs/superpowers/specs/2026-11-13-skyempire-v0.2-living-world-design.md` | + itch.io, Microsoft Store |
+| v0.2.5 | Open Skies | Hub connections, sandbox mode, achievements, cargo (simple), light theme, undo, UI scale | — |
 | v0.3 | Shared Skies | **Player-hosted multiplayer**: host/join, AI fill & retire, caretaker AI, world chat, seasons & leaderboard | Windows |
 | v0.4 | Alliances | Slots trading, alliances & codeshares, loyalty program, IPO & share price | Windows |
 | v0.5 | Always On | Official dedicated world on Oracle Cloud Always Free, optional lobby/relay | Windows |
