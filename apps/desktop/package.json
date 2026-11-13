@@ -3,5 +3,35 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "scripts": {}
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "e2e": "electron-vite build && playwright test",
+    "dist": "electron-vite build && electron-builder",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@skyempire/data": "workspace:^",
+    "@skyempire/shared": "workspace:^",
+    "@skyempire/sim": "workspace:^",
+    "@skyempire/ui": "workspace:^",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "@tailwindcss/vite": "^4.3.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "electron": "^45.3.2",
+    "electron-builder": "^26.18.0",
+    "electron-vite": "^6.0.0",
+    "tailwindcss": "^4.3.5",
+    "vite": "^8.3.8"
+  },
+  "main": "out/main/index.js",
+  "description": "SkyEmpire — airline management game",
+  "author": "SkyEmpire contributors"
 }
