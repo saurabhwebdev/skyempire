@@ -114,10 +114,20 @@ export function simulatePair(ops: RouteOps[], state: GameState, catalog: Catalog
         }));
       const withSeats = offers.filter((x) => x.seats > 0);
       if (withSeats.length === 0) continue;
+      // "Other airlines": real carriers not in this world. They soak up demand the game's airlines don't serve,
+      // so no player is ever a true monopolist on a big market.
+      const classDemand = base * split[cls];
+      const gameSeats = withSeats.reduce((s, x) => s + x.seats, 0);
+      const bgSeats = Math.max(BALANCE.backgroundMinShare * classDemand, BALANCE.backgroundShare * classDemand - gameSeats);
+      offers.push({
+        airlineId: '__others', routeId: '__others', fare: Math.round(ref * BALANCE.backgroundFareFactor),
+        weeklyFrequency: Math.max(1, Math.round((bgSeats / BALANCE.backgroundSeatsPerFlight) * 7 / Math.max(split[cls], 0.05))),
+        quality: BALANCE.backgroundQuality, reputation: BALANCE.backgroundReputation, stops: 0, seats: bgSeats,
+      });
       const seatSum = withSeats.reduce((s, x) => s + x.seats, 0);
-      const avgFare = withSeats.reduce((s, x) => s + x.fare * x.seats, 0) / seatSum;
+      const avgFare = (withSeats.reduce((s, x) => s + x.fare * x.seats, 0) + ref * BALANCE.backgroundFareFactor * Math.max(0, BALANCE.backgroundShare * base * split[cls] - seatSum)) / Math.max(seatSum, BALANCE.backgroundShare * base * split[cls]);
       const demand = elasticDemand(base * split[cls], avgFare, ref, cls);
-      for (const [routeId, n] of allocate(demand, offers, ref, cls)) pax.get(routeId)![cls] += n;
+      for (const [routeId, n] of allocate(demand, offers, ref, cls)) if (routeId !== '__others') pax.get(routeId)![cls] += n;
     }
   }
   return { pax, demand: demandTotal };

@@ -26,7 +26,7 @@ export function legCost(
     fuel: Math.round(type.fuelKgPerH * block * fuelPrice),
     crew: Math.round(type.crewPerH * block * crewMaintFactor * crewFactor),
     maintenance: Math.round(type.maintPerH * block * (1 + ageYears * 0.03) * crewMaintFactor * maintFactor),
-    fees: Math.round(arrival.landingFeePerTonne * type.mtowT),
+    fees: Math.round(arrival.landingFeePerTonne * type.mtowT + BALANCE.navFeePerKm * distKm * Math.sqrt(type.mtowT / 50)),
   };
 }
 
@@ -60,7 +60,9 @@ export function routeDayCosts(
     }
   }
   const totalPax = CABIN_CLASSES.reduce((s, c) => s + pax[c], 0);
-  out.fees += Math.round(((a.paxFee + b.paxFee) / 2) * totalPax);
+  out.fees += Math.round(((a.paxFee + b.paxFee) / 2) * totalPax * BALANCE.paxFeeShare);
+  const ticketRevenue = CABIN_CLASSES.reduce((s, c) => s + pax[c] * route.fares[c], 0);
+  out.fees += Math.round(BALANCE.distributionShare * ticketRevenue);
   const perPax = BALANCE.serviceCostPerPax[al.serviceLevel]!;
   out.service = Math.round(CABIN_CLASSES.reduce((s, c) => s + pax[c] * perPax * BALANCE.serviceClassMultiplier[c], 0));
   return out;

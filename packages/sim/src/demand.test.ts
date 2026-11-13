@@ -35,9 +35,9 @@ describe('demand', () => {
     expect(s.business).toBeGreaterThan(0.05);
   });
   it('reference fare', () => {
-    expect(refFare(655, 'economy')).toBe(97);
-    expect(refFare(655, 'business')).toBe(Math.round(97.4 * 3.5));
-    expect(refFare(5540, 'economy')).toBe(Math.round(45 + 120 + 0.045 * 4040));
+    expect(refFare(655, 'economy')).toBe(68);
+    expect(refFare(655, 'business')).toBe(Math.round(67.575 * 3.5));
+    expect(refFare(5540, 'economy')).toBe(Math.round(25 + 97.5 + 0.04 * 4040));
   });
   it('cheap fares raise demand but are capped at 1.5×', () => expect(elasticDemand(1000, 50, 100, 'economy')).toBe(1500));
   it('doubling the fare cuts economy demand by 2^-1.2', () =>

@@ -9,8 +9,8 @@
   "rangeKm": 1326,
   "cruiseKmh": 556,
   "fuelKgPerH": 450,
-  "priceUsd": 20000000,
-  "leasePerMonth": 156000,
+  "priceUsd": 10000000,
+  "leasePerMonth": 75000,
   "maintPerH": 300,
   "crewPerH": 380,
   "minRunwayM": 1170,
@@ -21,7 +21,7 @@
   "sources": [
    "https://www.atr-aircraft.com/our-aircraft/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -36,8 +36,8 @@
   "rangeKm": 1528,
   "cruiseKmh": 510,
   "fuelKgPerH": 650,
-  "priceUsd": 26000000,
-  "leasePerMonth": 203000,
+  "priceUsd": 13000000,
+  "leasePerMonth": 98000,
   "maintPerH": 350,
   "crewPerH": 420,
   "minRunwayM": 1370,
@@ -48,7 +48,7 @@
   "sources": [
    "https://www.atr-aircraft.com/our-aircraft/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -63,8 +63,8 @@
   "rangeKm": 2040,
   "cruiseKmh": 667,
   "fuelKgPerH": 1000,
-  "priceUsd": 32000000,
-  "leasePerMonth": 250000,
+  "priceUsd": 16000000,
+  "leasePerMonth": 120000,
   "maintPerH": 420,
   "crewPerH": 480,
   "minRunwayM": 1430,
@@ -75,7 +75,7 @@
   "sources": [
    "https://dehavilland.com/en/dash-8-400",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -90,8 +90,8 @@
   "rangeKm": 4074,
   "cruiseKmh": 829,
   "fuelKgPerH": 1700,
-  "priceUsd": 47000000,
-  "leasePerMonth": 367000,
+  "priceUsd": 23500000,
+  "leasePerMonth": 176000,
   "maintPerH": 520,
   "crewPerH": 700,
   "minRunwayM": 2240,
@@ -102,7 +102,7 @@
   "sources": [
    "https://www.embraercommercialaviation.com/commercial-jets/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -117,8 +117,8 @@
   "rangeKm": 4815,
   "cruiseKmh": 833,
   "fuelKgPerH": 2000,
-  "priceUsd": 61000000,
-  "leasePerMonth": 476000,
+  "priceUsd": 30500000,
+  "leasePerMonth": 229000,
   "maintPerH": 600,
   "crewPerH": 820,
   "minRunwayM": 1970,
@@ -129,7 +129,7 @@
   "sources": [
    "https://www.embraercommercialaviation.com/commercial-jets/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -144,8 +144,8 @@
   "rangeKm": 6390,
   "cruiseKmh": 829,
   "fuelKgPerH": 1650,
-  "priceUsd": 81000000,
-  "leasePerMonth": 632000,
+  "priceUsd": 40500000,
+  "leasePerMonth": 304000,
   "maintPerH": 600,
   "crewPerH": 820,
   "minRunwayM": 1460,
@@ -156,7 +156,7 @@
   "sources": [
    "https://aircraft.airbus.com/en/aircraft/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -171,8 +171,8 @@
   "rangeKm": 6297,
   "cruiseKmh": 829,
   "fuelKgPerH": 1850,
-  "priceUsd": 91500000,
-  "leasePerMonth": 714000,
+  "priceUsd": 45800000,
+  "leasePerMonth": 344000,
   "maintPerH": 650,
   "crewPerH": 900,
   "minRunwayM": 1890,
@@ -183,7 +183,7 @@
   "sources": [
    "https://aircraft.airbus.com/en/aircraft/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -198,8 +198,8 @@
   "rangeKm": 6150,
   "cruiseKmh": 828,
   "fuelKgPerH": 2500,
-  "priceUsd": 101000000,
-  "leasePerMonth": 788000,
+  "priceUsd": 50500000,
+  "leasePerMonth": 379000,
   "maintPerH": 800,
   "crewPerH": 1050,
   "minRunwayM": 2100,
@@ -210,7 +210,7 @@
   "sources": [
    "https://aircraft.airbus.com/en/aircraft/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -225,8 +225,8 @@
   "rangeKm": 6950,
   "cruiseKmh": 828,
   "fuelKgPerH": 2100,
-  "priceUsd": 101500000,
-  "leasePerMonth": 792000,
+  "priceUsd": 50800000,
+  "leasePerMonth": 381000,
   "maintPerH": 720,
   "crewPerH": 1000,
   "minRunwayM": 2000,
@@ -237,7 +237,7 @@
   "sources": [
    "https://aircraft.airbus.com/en/aircraft/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -252,8 +252,8 @@
   "rangeKm": 6300,
   "cruiseKmh": 830,
   "fuelKgPerH": 2300,
-  "priceUsd": 110600000,
-  "leasePerMonth": 863000,
+  "priceUsd": 55300000,
+  "leasePerMonth": 415000,
   "maintPerH": 750,
   "crewPerH": 1100,
   "minRunwayM": 2100,
@@ -264,7 +264,7 @@
   "sources": [
    "https://aircraft.airbus.com/en/aircraft/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -279,8 +279,8 @@
   "rangeKm": 7400,
   "cruiseKmh": 830,
   "fuelKgPerH": 2700,
-  "priceUsd": 129500000,
-  "leasePerMonth": 1010000,
+  "priceUsd": 64800000,
+  "leasePerMonth": 486000,
   "maintPerH": 850,
   "crewPerH": 1250,
   "minRunwayM": 2400,
@@ -291,7 +291,7 @@
   "sources": [
    "https://aircraft.airbus.com/en/aircraft/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -306,8 +306,8 @@
   "rangeKm": 5436,
   "cruiseKmh": 842,
   "fuelKgPerH": 2530,
-  "priceUsd": 106100000,
-  "leasePerMonth": 828000,
+  "priceUsd": 53000000,
+  "leasePerMonth": 398000,
   "maintPerH": 820,
   "crewPerH": 1080,
   "minRunwayM": 2300,
@@ -318,7 +318,7 @@
   "sources": [
    "https://www.boeing.com/commercial/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -333,8 +333,8 @@
   "rangeKm": 6570,
   "cruiseKmh": 839,
   "fuelKgPerH": 2200,
-  "priceUsd": 121600000,
-  "leasePerMonth": 948000,
+  "priceUsd": 60800000,
+  "leasePerMonth": 456000,
   "maintPerH": 760,
   "crewPerH": 1100,
   "minRunwayM": 2500,
@@ -345,7 +345,7 @@
   "sources": [
    "https://www.boeing.com/commercial/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -360,8 +360,8 @@
   "rangeKm": 8700,
   "cruiseKmh": 830,
   "fuelKgPerH": 2800,
-  "priceUsd": 142000000,
-  "leasePerMonth": 1108000,
+  "priceUsd": 71000000,
+  "leasePerMonth": 532000,
   "maintPerH": 880,
   "crewPerH": 1300,
   "minRunwayM": 2500,
@@ -372,7 +372,7 @@
   "sources": [
    "https://aircraft.airbus.com/en/aircraft/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -387,8 +387,8 @@
   "rangeKm": 11750,
   "cruiseKmh": 871,
   "fuelKgPerH": 5700,
-  "priceUsd": 264200000,
-  "leasePerMonth": 2061000,
+  "priceUsd": 132100000,
+  "leasePerMonth": 991000,
   "maintPerH": 1700,
   "crewPerH": 2300,
   "minRunwayM": 2770,
@@ -399,7 +399,7 @@
   "sources": [
    "https://aircraft.airbus.com/en/aircraft/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -414,8 +414,8 @@
   "rangeKm": 13334,
   "cruiseKmh": 871,
   "fuelKgPerH": 5400,
-  "priceUsd": 296400000,
-  "leasePerMonth": 2312000,
+  "priceUsd": 148200000,
+  "leasePerMonth": 1112000,
   "maintPerH": 1600,
   "crewPerH": 2300,
   "minRunwayM": 2770,
@@ -426,7 +426,7 @@
   "sources": [
    "https://aircraft.airbus.com/en/aircraft/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -441,8 +441,8 @@
   "rangeKm": 14140,
   "cruiseKmh": 903,
   "fuelKgPerH": 5600,
-  "priceUsd": 292500000,
-  "leasePerMonth": 2282000,
+  "priceUsd": 146200000,
+  "leasePerMonth": 1096000,
   "maintPerH": 1600,
   "crewPerH": 2400,
   "minRunwayM": 2800,
@@ -453,7 +453,7 @@
   "sources": [
    "https://www.boeing.com/commercial/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -468,8 +468,8 @@
   "rangeKm": 15372,
   "cruiseKmh": 903,
   "fuelKgPerH": 6000,
-  "priceUsd": 317400000,
-  "leasePerMonth": 2476000,
+  "priceUsd": 158700000,
+  "leasePerMonth": 1190000,
   "maintPerH": 1700,
   "crewPerH": 2500,
   "minRunwayM": 2600,
@@ -480,7 +480,7 @@
   "sources": [
    "https://aircraft.airbus.com/en/aircraft/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]
@@ -495,8 +495,8 @@
   "rangeKm": 13650,
   "cruiseKmh": 905,
   "fuelKgPerH": 7500,
-  "priceUsd": 375500000,
-  "leasePerMonth": 2929000,
+  "priceUsd": 187800000,
+  "leasePerMonth": 1408000,
   "maintPerH": 2200,
   "crewPerH": 2800,
   "minRunwayM": 3050,
@@ -507,7 +507,7 @@
   "sources": [
    "https://www.boeing.com/commercial/",
    "https://www.wikidata.org/",
-   "List price: last published manufacturer list price",
+   "Price: ~50% of the last published list price (typical market value after discounts); lease \u2248 0.75% of that per month",
    "Fuel burn, lease, maintenance and crew costs: SkyEmpire estimates from published industry figures",
    "Seats: high-density single-class (widebodies: practical high-density, below exit limit)"
   ]

@@ -3,6 +3,7 @@ import { isAirportClosed, rollEvents } from './events';
 import { stepMarket } from './market';
 import { Rng } from './rng';
 import { catalog, playerGame } from './testing';
+import { BALANCE } from './config/balance';
 
 function simulate(days: number, seed: number) {
   const s = playerGame('FRA', 1);
@@ -16,7 +17,7 @@ function simulate(days: number, seed: number) {
     stepMarket(s, catalog, rng);
     for (const e of s.events) if (!before.has(e.id)) started[e.kind] = (started[e.kind] ?? 0) + 1;
     const spike = s.events.some((e) => e.kind === 'fuelSpike');
-    if (!spike && (s.market.fuelPricePerKg < 0.7 || s.market.fuelPricePerKg > 1.4)) fuelOutOfRange++;
+    if (!spike && (s.market.fuelPricePerKg < BALANCE.fuelPriceMin || s.market.fuelPricePerKg > BALANCE.fuelPriceMax)) fuelOutOfRange++;
   }
   return { s, started, fuelOutOfRange };
 }

@@ -12,16 +12,25 @@ export const BALANCE = {
   businessShareBase: 0.05,
   businessShareSlope: 0.1,
   premiumShare: 0.06,
-  refFareBase: 45,
-  refFarePerKm: 0.08, // first refFareTaperKm km
+  // Real-world average yields: ~$0.065–0.08/km short haul, ~$0.04/km long haul.
+  refFareBase: 25,
+  refFarePerKm: 0.065, // first refFareTaperKm km
   refFareTaperKm: 1500,
-  refFarePerKmLong: 0.045, // beyond the taper
+  refFarePerKmLong: 0.04, // beyond the taper
+
+  // Background competition: real airlines that aren't in this game world.
+  backgroundShare: 0.9, // their seats cover this share of base demand, minus in-game capacity
+  backgroundMinShare: 0.2,
+  backgroundSeatsPerFlight: 150,
+  backgroundQuality: 65,
+  backgroundReputation: 60,
+  backgroundFareFactor: 1.0,
   classFareMultiplier: { economy: 1, premium: 1.8, business: 3.5 },
   elasticity: { economy: 1.2, premium: 0.8, business: 0.5 },
   demandCap: 1.5,
 
   // Passenger choice (§4)
-  betaPrice: { economy: 2.0, premium: 2.0, business: 1.0 },
+  betaPrice: { economy: 4.0, premium: 3.0, business: 1.5 }, // flights are close substitutes: travelers are price-sensitive
   betaFrequency: 0.6,
   betaQuality: 1.2,
   betaReputation: 1.0,
@@ -35,6 +44,9 @@ export const BALANCE = {
   baseOnTime: 85,
 
   // Costs (§6)
+  navFeePerKm: 0.4, // ATC/en-route charges, × sqrt(MTOW / 50 t)
+  paxFeeShare: 0.3, // most airport passenger charges are taxes passed on to travelers
+  distributionShare: 0.06, // sales, GDS, card fees: share of ticket revenue
   overheadBase: 50_000,
   overheadPerAircraft: 20_000,
   baseSetupPerSize: 2_000_000 / 3,
@@ -66,9 +78,9 @@ export const BALANCE = {
   usedValueDecay: 0.92,
 
   // Fuel & economy
-  fuelPriceStart: 0.95,
-  fuelPriceMin: 0.7,
-  fuelPriceMax: 1.4,
+  fuelPriceStart: 0.8, // USD/kg, recent real-world jet fuel
+  fuelPriceMin: 0.6,
+  fuelPriceMax: 1.2,
 
   // Game setup
   startingCash: { easy: 80_000_000, normal: 50_000_000, hard: 25_000_000 },
