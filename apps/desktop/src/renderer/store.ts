@@ -23,6 +23,8 @@ interface UiState {
   shortcutsOpen: boolean;
   routeEditor: RouteEditorState | null;
   marketOpen: boolean;
+  showRivals: boolean;
+  setShowRivals(v: boolean): void;
   setScreen(s: UiState['screen']): void;
   setSection(s: Section): void;
   select(s: Selection): void;
@@ -47,6 +49,8 @@ export const useUi = create<UiState>()((set, get) => ({
   shortcutsOpen: false,
   routeEditor: null,
   marketOpen: false,
+  showRivals: true,
+  setShowRivals: (showRivals) => set({ showRivals }),
   setScreen: (screen) => set({ screen }),
   setSection: (section) => set({ section }),
   select: (selection) => set({ selection }),

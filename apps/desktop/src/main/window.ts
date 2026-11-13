@@ -1,5 +1,6 @@
 import { BrowserWindow, shell } from 'electron';
 import { join } from 'node:path';
+import { APP_ORIGIN } from './protocol';
 
 export function createMainWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -26,6 +27,6 @@ export function createMainWindow(): BrowserWindow {
   });
   win.webContents.on('will-navigate', (e) => e.preventDefault());
   if (process.env.ELECTRON_RENDERER_URL) void win.loadURL(process.env.ELECTRON_RENDERER_URL);
-  else void win.loadFile(join(import.meta.dirname, '../renderer/index.html'));
+  else void win.loadURL(`${APP_ORIGIN}/index.html`);
   return win;
 }

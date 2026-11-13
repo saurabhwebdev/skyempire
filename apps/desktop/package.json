@@ -12,11 +12,15 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "@deck.gl/core": "^9.4.1",
+    "@deck.gl/layers": "^9.4.1",
+    "@deck.gl/mapbox": "^9.4.1",
     "@skyempire/data": "workspace:^",
     "@skyempire/shared": "workspace:^",
     "@skyempire/sim": "workspace:^",
     "@skyempire/ui": "workspace:^",
     "lucide-react": "^1.72.0",
+    "maplibre-gl": "^6.18.0",
     "motion": "^14.14.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

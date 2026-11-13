@@ -3,13 +3,16 @@ import { join } from 'node:path';
 import { registerIpc } from './ipc';
 import { SaveStore } from './saves/saves';
 import { SimHost } from './simHost';
+import { registerAppScheme, serveRenderer } from './protocol';
 import { createMainWindow } from './window';
 
 app.setAppUserModelId('com.skyempire.game');
+registerAppScheme();
 // E2E runs use a throwaway profile so they never touch real saves.
 if (process.env.SKYEMPIRE_USER_DATA) app.setPath('userData', process.env.SKYEMPIRE_USER_DATA);
 
 void app.whenReady().then(() => {
+  serveRenderer(join(import.meta.dirname, '../renderer'));
   const userData = app.getPath('userData');
   const host = new SimHost(join(import.meta.dirname, 'simWorker.js'));
   const win = createMainWindow();

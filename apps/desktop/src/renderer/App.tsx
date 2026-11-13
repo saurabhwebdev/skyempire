@@ -6,6 +6,7 @@ import { GameMenu, ShortcutSheet } from './shell/GameMenu';
 import { Inspector } from './shell/Inspector';
 import { NavRail } from './shell/NavRail';
 import { TopBar } from './shell/TopBar';
+import { WorldMap } from './map/WorldMap';
 import { useShortcuts } from './shortcuts';
 import { useGameStore, useUi } from './store';
 import { t } from './strings/en';
@@ -19,6 +20,7 @@ function GameScreen() {
         <NavRail />
         <main className="relative flex min-w-0 flex-1">
           <div className="relative min-w-0 flex-1 bg-[var(--map-water)]" id="map-area">
+            <WorldMap />
             <BottomTray title={t.sections[section]}>
               <div className="p-4 text-muted">{t.sections[section]}</div>
             </BottomTray>
