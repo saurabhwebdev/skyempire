@@ -26,7 +26,11 @@ export function classSplit(a: Airport, b: Airport): Cabin {
 }
 
 export function refFare(distKm: number, cls: CabinClass): Money {
-  return Math.round((BALANCE.refFareBase + BALANCE.refFarePerKm * distKm) * BALANCE.classFareMultiplier[cls]);
+  const short = Math.min(distKm, BALANCE.refFareTaperKm);
+  const long = Math.max(0, distKm - BALANCE.refFareTaperKm);
+  return Math.round(
+    (BALANCE.refFareBase + BALANCE.refFarePerKm * short + BALANCE.refFarePerKmLong * long) * BALANCE.classFareMultiplier[cls],
+  );
 }
 
 /** Demand after the average offered fare; capped at demandCap × base. */

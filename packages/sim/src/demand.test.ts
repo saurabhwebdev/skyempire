@@ -30,12 +30,13 @@ describe('demand', () => {
     expect(s.business).toBeGreaterThan(0.05);
   });
   it('reference fare', () => {
-    expect(refFare(655, 'economy')).toBe(112);
-    expect(refFare(655, 'business')).toBe(Math.round(112.05 * 3.5));
+    expect(refFare(655, 'economy')).toBe(97);
+    expect(refFare(655, 'business')).toBe(Math.round(97.4 * 3.5));
+    expect(refFare(5540, 'economy')).toBe(Math.round(45 + 120 + 0.045 * 4040));
   });
-  it('cheap fares raise demand but are capped at 1.5×', () => expect(elasticDemand(1000, 56, 112, 'economy')).toBe(1500));
+  it('cheap fares raise demand but are capped at 1.5×', () => expect(elasticDemand(1000, 50, 100, 'economy')).toBe(1500));
   it('doubling the fare cuts economy demand by 2^-1.2', () =>
-    expect(elasticDemand(1000, 224, 112, 'economy')).toBeCloseTo(1000 * 2 ** -1.2, 6));
+    expect(elasticDemand(1000, 200, 100, 'economy')).toBeCloseTo(1000 * 2 ** -1.2, 6));
   it('seasonality stays within 0.7–1.3', () => {
     for (let d = 0; d < 360; d += 5) {
       const s = seasonality(d, 1);

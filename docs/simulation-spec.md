@@ -45,7 +45,7 @@ D_AB = K × (P_A^α × P_B^α) × W_AB × T_AB × S(t) × E(t) / f(dist)
 
 **Price elasticity:** total demand also reacts to the **average offered fare** vs a reference fare:
 ```
-ref_fare(dist) = 40 + 0.11 × dist_km        (economy, USD)
+ref_fare(dist) = 45 + 0.08 × min(dist, 1500) + 0.045 × max(0, dist − 1500)   (economy, USD; tapers on long haul)
 premium ×1.8, business ×3.5
 D_effective = D × (avg_fare / ref_fare)^(-ε)   ε = 1.2 econ, 0.8 premium, 0.5 business
 ```

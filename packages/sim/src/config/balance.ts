@@ -9,8 +9,10 @@ export const BALANCE = {
   businessShareBase: 0.05,
   businessShareSlope: 0.1,
   premiumShare: 0.06,
-  refFareBase: 40,
-  refFarePerKm: 0.11,
+  refFareBase: 45,
+  refFarePerKm: 0.08, // first refFareTaperKm km
+  refFareTaperKm: 1500,
+  refFarePerKmLong: 0.045, // beyond the taper
   classFareMultiplier: { economy: 1, premium: 1.8, business: 3.5 },
   elasticity: { economy: 1.2, premium: 0.8, business: 0.5 },
   demandCap: 1.5,

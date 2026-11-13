@@ -1,0 +1,126 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`golden run > seed 7, passive player, 365 days 1`] = `
+[
+  {
+    "cash": 42200000,
+    "id": "al_player",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -83416000,
+    "id": "al_BA",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -23104000,
+    "id": "al_U2",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -25408000,
+    "id": "al_LS",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -56632000,
+    "id": "al_BY",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -80764000,
+    "id": "al_AF",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -61804000,
+    "id": "al_SN",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -65356000,
+    "id": "al_KL",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -22864000,
+    "id": "al_HV",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -20776000,
+    "id": "al_FR",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -36256000,
+    "id": "al_EI",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -63460000,
+    "id": "al_AA",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -56164000,
+    "id": "al_DL",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -63460000,
+    "id": "al_UA",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -21976000,
+    "id": "al_WN",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -53224000,
+    "id": "al_CZ",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -53224000,
+    "id": "al_MU",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -53224000,
+    "id": "al_CA",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -99712000,
+    "id": "al_TK",
+    "pax": 0,
+    "revenue": 0,
+  },
+  {
+    "cash": -19924000,
+    "id": "al_6E",
+    "pax": 0,
+    "revenue": 0,
+  },
+]
+`;

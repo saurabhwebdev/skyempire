@@ -1,0 +1,38 @@
+import type { Catalog, ClientView, GameState } from '@skyempire/shared';
+import { pairKey } from './daySim';
+import { slotsFree } from './ops';
+import { objectivesView } from './progression';
+
+/** Player-scoped snapshot for the UI. Rival finances stay hidden. */
+export function buildClientView(state: GameState, playerId: string, catalog: Catalog): ClientView {
+  const player = state.airlines[playerId]!;
+  const routes = Object.values(state.routes);
+  const mine = routes.filter((r) => r.airlineId === playerId);
+  const myPairs = new Set(mine.map((r) => pairKey(r.from, r.to)));
+  const rivals = Object.values(state.airlines)
+    .filter((a) => a.id !== playerId && !a.bankrupt)
+    .map((a) => {
+      const theirs = routes.filter((r) => r.airlineId === a.id && r.status === 'active');
+      return {
+        id: a.id, name: a.name, code: a.code, color: a.colors.primary, personality: a.personality!,
+        fleetSize: Object.values(state.aircraft).filter((x) => x.ownerId === a.id).length,
+        routeCount: theirs.length, reputation: Math.round(a.reputation),
+        overlapRoutes: theirs.filter((r) => myPairs.has(pairKey(r.from, r.to))).length,
+      };
+    });
+  const free: Record<string, number> = {};
+  for (const id of Object.keys(catalog.airports)) free[id] = slotsFree(state, catalog, id);
+  return {
+    day: state.day,
+    player,
+    aircraft: Object.values(state.aircraft).filter((a) => a.ownerId === playerId),
+    routes: mine,
+    rivals,
+    rivalRoutes: routes.filter((r) => r.airlineId !== playerId && r.status === 'active').map((r) => ({ airlineId: r.airlineId, from: r.from, to: r.to })),
+    market: state.market,
+    events: state.events,
+    slotsFree: free,
+    objectives: objectivesView(state, playerId, catalog),
+    gameOver: state.gameOver,
+  };
+}
