@@ -60,6 +60,8 @@ export interface GameApi {
     onProgress(cb: (done: number, total: number) => void): () => void;
     setPlayerLogo(data: Uint8Array): Promise<void>;
   };
+  onUpdateReady(cb: (version: string) => void): () => void;
+  installUpdate(): void;
   getSettings(): Promise<Settings>;
   setSettings(s: Partial<Settings>): Promise<Settings>;
 }

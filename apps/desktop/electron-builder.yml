@@ -1,9 +1,11 @@
 appId: com.skyempire.game
 productName: SkyEmpire
+executableName: SkyEmpire
 copyright: Copyright © 2026 SkyEmpire contributors
 directories:
   output: dist
   buildResources: build
+icon: build/icon.png
 files:
   - out/**/*
   - package.json

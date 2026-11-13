@@ -5,6 +5,7 @@ import { SaveStore } from './saves/saves';
 import { SimHost } from './simHost';
 import { registerAppScheme, serveLogos, serveRenderer } from './protocol';
 import { createMainWindow } from './window';
+import { initUpdater } from './updater';
 
 app.setAppUserModelId('com.skyempire.game');
 registerAppScheme();
@@ -18,6 +19,7 @@ void app.whenReady().then(() => {
   serveLogos(logosDir);
   const host = new SimHost(join(import.meta.dirname, 'simWorker.js'));
   const win = createMainWindow();
+  initUpdater(win);
   const session = registerIpc(win, host, new SaveStore(join(userData, 'saves')), userData, logosDir);
 
   let quitting = false;

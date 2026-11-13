@@ -1,6 +1,6 @@
 import { Toaster, TooltipProvider } from '@skyempire/ui';
 import { useEffect } from 'react';
-import { useGameBridge } from './hooks/useGame';
+import { useGameBridge, useUpdateNotice } from './hooks/useGame';
 import { BottomTray } from './shell/BottomTray';
 import { GameMenu, ShortcutSheet } from './shell/GameMenu';
 import { Inspector } from './shell/Inspector';
@@ -100,6 +100,7 @@ function GameScreen() {
 
 function Root() {
   useGameBridge();
+  useUpdateNotice();
   useShortcuts();
   const screen = useUi((s) => s.screen);
   const settings = useGameStore((s) => s.settings);

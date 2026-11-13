@@ -22,6 +22,19 @@ export function useGameBridge(): void {
   }, []);
 }
 
+/** Offer to restart when a downloaded update is ready (non-blocking). */
+export function useUpdateNotice(): void {
+  const toast = useToast();
+  useEffect(
+    () =>
+      window.game.onUpdateReady((version) =>
+        toast({ title: `Update ${version} ready`, body: 'Restart to install it. Your game is saved first.', tone: 'info',
+          action: { label: 'Restart now', onClick: async () => { await window.game.save(); window.game.installUpdate(); } } }),
+      ),
+    [toast],
+  );
+}
+
 /** Send a command; failures show their reason as a toast. */
 export function useCommand(): (cmd: Command) => Promise<CommandResult> {
   const toast = useToast();

@@ -28,6 +28,8 @@ const api: GameApi = {
     onProgress: (cb) => on<[number, number]>(IPC.logoProgress, ([d, t]) => cb(d, t)),
     setPlayerLogo: (data) => ipcRenderer.invoke(IPC.logoPlayer, data),
   },
+  onUpdateReady: (cb) => on<string>('app:update-ready', cb),
+  installUpdate: () => ipcRenderer.send('app:install-update'),
   getSettings: () => ipcRenderer.invoke(IPC.getSettings),
   setSettings: (s) => ipcRenderer.invoke(IPC.setSettings, s),
 };
