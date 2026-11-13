@@ -9,10 +9,15 @@ const synthetic = (id: string, lat: number, lon: number): Airport => ({
 });
 
 describe('demand', () => {
-  it('LHR–CDG mid-July is 3,000–6,000 pax/day', () => {
+  it('LHR–CDG mid-July is 1,500–4,000 pax/day (real ≈ 2,000)', () => {
     const d = baseDemand(airport('LHR'), airport('CDG'), JULY, 1.0);
-    expect(d).toBeGreaterThanOrEqual(3000);
-    expect(d).toBeLessThanOrEqual(6000);
+    expect(d).toBeGreaterThanOrEqual(1500);
+    expect(d).toBeLessThanOrEqual(4000);
+  });
+  it('domestic pairs get a boost', () => {
+    const intl = baseDemand(airport('DEL'), airport('DXB'), JULY, 1);
+    const dom = baseDemand(airport('DEL'), airport('BOM'), JULY, 1);
+    expect(dom).toBeGreaterThan(intl);
   });
   it('summer beats winter', () =>
     expect(baseDemand(airport('LHR'), airport('CDG'), JANUARY, 1)).toBeLessThan(baseDemand(airport('LHR'), airport('CDG'), JULY, 1)));

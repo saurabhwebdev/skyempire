@@ -104,6 +104,7 @@ export function newGame(opts: NewGameOptions, catalog: Catalog): GameState {
       homeBaseId: data.hubId,
       baseIds: [data.hubId],
       reputation: p.startReputation,
+      serviceLevel: p.serviceLevel,
       tier: p.startTier,
       creditRating: 'A',
       nextAiDecisionDay: rng.int(0, 6),

@@ -28,18 +28,15 @@ Performance target: a 20-airline, ~2,000-route world ticks in **< 200 ms** on a 
 Daily base demand (one direction) between airports A and B:
 
 ```
-D_AB = K × (P_A^α × P_B^α) × W_AB × T_AB × S(t) × E(t) / f(dist)
+D_AB = K × (P_A × P_B)^α × (W_A × W_B)^ω × Dom × T_AB × S(t) × E(t) / f(dist)
 ```
-- `P` = catchment population (millions) — city population, airports near each other share catchment.
-- `α = 0.8`
-- `W_AB` = wealth factor = `sqrt(wealth_A × wealth_B)` (wealth index 0.3–2.0)
-- `T_AB` = tourism/business pull = `1 + 0.5 × (tourism_B + business_B)` (indices 0–1)
-- `S(t)` = seasonality (0.75–1.3; summer peak for leisure routes)
-- `E(t)` = economy index (0.7–1.2, drifts slowly; recessions/booms via events)
-- `f(dist)`:
-  - dist < 150 km → demand heavily reduced (rail/road competition): `×0.2`
-  - otherwise `dist^0.6`
-- `K` = global scale constant (tune so a large-city pair ≈ 3,000–6,000 pax/day).
+- `P` = catchment population (millions, cities within 80 km).
+- `α = 0.3`, `ω = 0.125` (wealth index 0.3–2.0 from GDP per capita), `Dom = 3.5` when both airports are in the same country.
+- `T_AB` = destination pull = `1 + 0.5 × (tourism_B + business_B)` (indices 0–1)
+- `S(t)` = seasonality `1 + (0.05 + 0.25 × tourism) × cos(2π (dayOfYear − 195) / 360)` (0.7–1.3)
+- `E(t)` = economy index (0.7–1.2)
+- `f(dist)` = 1, except dist < 150 km → ÷ 0.2 (rail/road competition). Longer trips are discouraged through fares (price elasticity), not through f.
+- `K = 206`. α, ω, Dom and K were fitted by log least squares to ~24 real city pairs' annual traffic (each within ~2×); e.g. LHR–CDG ≈ 2,700/day, DEL–BOM ≈ 7,300/day.
 
 **Class split** of demand: business share = `0.05 + 0.10 × business_index_avg`; premium = `0.06`; economy = rest.
 

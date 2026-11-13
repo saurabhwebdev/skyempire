@@ -11,12 +11,13 @@ export function seasonality(dayOfYear: number, tourism: number): number {
 export function baseDemand(a: Airport, b: Airport, dayOfYear: number, economyIndex: number): number {
   const dist = Math.max(distanceKm(a, b), 1);
   const gravity = (a.population ** BALANCE.alpha) * (b.population ** BALANCE.alpha);
-  const wealth = Math.sqrt(a.wealth * b.wealth);
+  const wealth = (a.wealth * b.wealth) ** BALANCE.wealthExponent;
+  const domestic = a.country === b.country ? BALANCE.domesticFactor : 1;
   const pull = 1 + 0.5 * (b.tourism + b.business);
   const season = seasonality(dayOfYear, (a.tourism + b.tourism) / 2);
   let f = dist ** BALANCE.distanceExponent;
   if (dist < BALANCE.shortHaulKm) f /= BALANCE.shortHaulFactor;
-  return (BALANCE.demandK * gravity * wealth * pull * season * economyIndex) / f;
+  return (BALANCE.demandK * gravity * wealth * domestic * pull * season * economyIndex) / f;
 }
 
 export function classSplit(a: Airport, b: Airport): Cabin {

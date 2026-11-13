@@ -1,11 +1,14 @@
 /** Every tunable number in the simulation. Values from docs/simulation-spec.md. */
 export const BALANCE = {
   // Demand (§3)
-  demandK: 600, // tuned so LHR–CDG mid-July ≈ 3,000–6,000 pax/day
-  alpha: 0.8,
+  // Fitted (log least squares) to ~24 real city pairs' annual traffic: within ~2× each.
+  demandK: 206,
+  alpha: 0.3,
+  wealthExponent: 0.125,
+  domesticFactor: 3.5,
   shortHaulKm: 150,
   shortHaulFactor: 0.2,
-  distanceExponent: 0.6,
+  distanceExponent: 0,
   businessShareBase: 0.05,
   businessShareSlope: 0.1,
   premiumShare: 0.06,

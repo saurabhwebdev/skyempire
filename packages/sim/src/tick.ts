@@ -50,7 +50,7 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
   // 3. AI decisions
   for (const al of Object.values(s.airlines)) {
     if (al.isPlayer || al.bankrupt || !al.personality || s.day < al.nextAiDecisionDay) continue;
-    for (const cmd of runAi(s, al.id, catalog, rng)) applyCommand(s, al.id, cmd, catalog);
+    runAi(s, al.id, catalog, rng); // applies its own commands
     al.nextAiDecisionDay = s.day + cadenceFor(al.personality, s.difficulty);
   }
 

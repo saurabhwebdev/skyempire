@@ -40,15 +40,20 @@ export function creditRating(debtRatio: number, opMargin90: number): Airline['cr
 export interface MonthlyCosts { leases: Money; overhead: Money; bases: Money; marketing: Money }
 
 /** Month-start charges: leases, overhead, base upkeep, marketing. Deducts from cash. */
-export function applyMonthly(state: GameState, airlineId: string, catalog: Catalog): MonthlyCosts {
+/** Monthly fixed costs without charging them. */
+export function monthlyFixedCosts(state: GameState, airlineId: string, catalog: Catalog): MonthlyCosts {
   const al = state.airlines[airlineId]!;
   const fleet = Object.values(state.aircraft).filter((a) => a.ownerId === airlineId);
   const leases = fleet.filter((a) => a.ownership === 'leased').reduce((s, a) => s + catalog.aircraftTypes[a.typeId]!.leasePerMonth, 0);
   const overhead = BALANCE.overheadBase + BALANCE.overheadPerAircraft * fleet.length;
   const bases = al.baseIds.reduce((s, id) => s + BALANCE.baseUpkeepPerSize * (catalog.airports[id]?.sizeClass ?? 1), 0);
-  const marketing = al.marketingPerMonth;
-  al.cash -= leases + overhead + bases + marketing;
-  return { leases, overhead, bases, marketing };
+  return { leases, overhead, bases, marketing: al.marketingPerMonth };
+}
+
+export function applyMonthly(state: GameState, airlineId: string, catalog: Catalog): MonthlyCosts {
+  const m = monthlyFixedCosts(state, airlineId, catalog);
+  state.airlines[airlineId]!.cash -= m.leases + m.overhead + m.bases + m.marketing;
+  return m;
 }
 
 /** Bankruptcy check (simulation-spec §9): cash < 0 with no credit for 30 consecutive days. */
