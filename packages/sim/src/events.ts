@@ -23,6 +23,8 @@ function note(state: GameState, level: Notification['level'], title: string, bod
 export function rollEvents(state: GameState, catalog: Catalog, rng: Rng): Notification[] {
   const out: Notification[] = [];
   const ended = state.events.filter((e) => state.day > e.endDay);
+  // An ending fuel spike takes its markup with it.
+  for (const e of ended) if (e.kind === 'fuelSpike') state.market.fuelPricePerKg = Math.round((state.market.fuelPricePerKg / e.magnitude) * 10000) / 10000;
   state.events = state.events.filter((e) => state.day <= e.endDay);
   for (const e of ended) {
     const where = e.airportId ? ` at ${e.airportId}` : '';

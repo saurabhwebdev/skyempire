@@ -61,6 +61,8 @@ export interface GameApi {
     setPlayerLogo(data: Uint8Array): Promise<void>;
   };
   onUpdateReady(cb: (version: string) => void): () => void;
+  /** Messages from the main process (save failures, recovered saves, simulation errors). */
+  onNotice(cb: (n: { title: string; body?: string; tone: 'info' | 'warning' | 'danger' }) => void): () => void;
   installUpdate(): void;
   getSettings(): Promise<Settings>;
   setSettings(s: Partial<Settings>): Promise<Settings>;
@@ -83,6 +85,7 @@ export const IPC = {
   getSettings: 'game:getSettings',
   setSettings: 'game:setSettings',
   view: 'game:view',
+  notice: 'app:notice',
   logoStatus: 'logos:status',
   logoDownload: 'logos:download',
   logoCancel: 'logos:cancel',

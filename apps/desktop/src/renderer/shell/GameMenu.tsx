@@ -9,10 +9,10 @@ export function GameMenu() {
     <Modal open={menuOpen} onOpenChange={setMenu} title="Menu">
       <div className="flex flex-col gap-2">
         <Button variant="primary" onClick={() => setMenu(false)}>{t.menu.resume}</Button>
-        <Button onClick={async () => { await window.game.save(); toast({ title: t.saved, tone: 'success' }); setMenu(false); }}>{t.menu.save}</Button>
+        <Button onClick={async () => { try { await window.game.save(); toast({ title: t.saved, tone: 'success' }); setMenu(false); } catch { /* main shows the reason */ } }}>{t.menu.save}</Button>
         <Button onClick={() => { setMenu(false); useUi.getState().setSection('overview'); window.dispatchEvent(new CustomEvent('se:open-settings')); }}>{t.menu.settings}</Button>
         <Button onClick={() => { setMenu(false); setShortcuts(true); }}>{t.menu.shortcuts}</Button>
-        <Button variant="ghost" onClick={async () => { await window.game.save(); setMenu(false); setScreen('title'); }}>{t.menu.quit}</Button>
+        <Button variant="ghost" onClick={async () => { try { await window.game.save(); setMenu(false); setScreen('title'); } catch { /* stay: the save failed and main shows why */ } }}>{t.menu.quit}</Button>
       </div>
     </Modal>
   );

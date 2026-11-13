@@ -22,6 +22,12 @@ export function useGameBridge(): void {
   }, []);
 }
 
+/** Show messages from the main process as toasts. */
+export function useNotices(): void {
+  const toast = useToast();
+  useEffect(() => window.game.onNotice((n) => toast({ title: n.title, body: n.body, tone: n.tone })), [toast]);
+}
+
 /** Offer to restart when a downloaded update is ready (non-blocking). */
 export function useUpdateNotice(): void {
   const toast = useToast();

@@ -22,6 +22,7 @@ export function registerIpc(win: BrowserWindow, host: SimHost, store: SaveStore,
     if (!win.isDestroyed()) win.webContents.send(channel, payload);
   };
 
+  const notice = (title: string, tone: 'info' | 'warning' | 'danger', body?: string) => send(IPC.notice, { title, tone, body });
   const save = async (kind: 'auto' | 'manual' = 'manual') => {
     if (!saveId) return;
     const state = await host.request({ kind: 'snapshot' });
@@ -35,28 +36,31 @@ export function registerIpc(win: BrowserWindow, host: SimHost, store: SaveStore,
       if (!saveId || !push.summary) return;
       try {
         store.appendDaily(saveId, push.summary.daily);
-        if (push.view.day % settings.autosaveDays === 0) void save('auto');
       } catch (e) {
-        console.error('Autosave failed', e);
+        console.error('History write failed', e);
       }
+      if (push.view.day % settings.autosaveDays === 0 || push.view.gameOver)
+        save('auto').catch((e) => notice('Autosave failed', 'danger', e instanceof Error ? e.message : String(e)));
     },
     (speed) => send(IPC.speed, speed),
+    (message) => notice('The simulation stopped', 'danger', `${message} — your last save is safe. Try loading it again.`),
   );
   loop.autoPause = settings.autoPauseMajor;
 
   ipcMain.handle(IPC.newGame, async (_e, opts: NewGameOptions) => {
-    loop.setSpeed(0);
+    loop.reset();
     const view = await host.request({ kind: 'newGame', opts });
     const state = await host.request({ kind: 'snapshot' });
     saveId = store.createSave(opts.airline.name, state).id;
     return view;
   });
   ipcMain.handle(IPC.loadSave, async (_e, id: string) => {
-    loop.setSpeed(0);
+    loop.reset();
     try {
-      const state = store.loadLatest(id);
+      const { state, fellBack } = store.loadLatestWithFallback(id);
       const view = await host.request({ kind: 'load', state });
       saveId = id;
+      if (fellBack) notice('Loaded an earlier autosave', 'warning', 'The latest save in this career was damaged, so the most recent good one was opened.');
       return view;
     } catch (e) {
       // Surface the reason as a stable message the renderer can map to friendly copy.
@@ -64,7 +68,14 @@ export function registerIpc(win: BrowserWindow, host: SimHost, store: SaveStore,
     }
   });
   ipcMain.handle(IPC.listSaves, async () => store.listSaves());
-  ipcMain.handle(IPC.save, async () => save('manual'));
+  ipcMain.handle(IPC.save, async () => {
+    try {
+      await save('manual');
+    } catch (e) {
+      notice('Couldn’t save the game', 'danger', e instanceof Error ? e.message : String(e));
+      throw e;
+    }
+  });
   ipcMain.handle(IPC.saveAs, async (_e, name: string) => {
     const state = await host.request({ kind: 'snapshot' });
     const info = store.createSave(name, state);
@@ -83,7 +94,7 @@ export function registerIpc(win: BrowserWindow, host: SimHost, store: SaveStore,
   ipcMain.handle(IPC.view, async () => (saveId ? host.request({ kind: 'view' }) : null));
   ipcMain.handle(IPC.command, async (_e, raw: unknown) => {
     const cmd = parseCommand(raw);
-    const { result, view } = await host.request({ kind: 'command', cmd, immediate: loop.speed === 0 });
+    const { result, view } = await host.request({ kind: 'command', cmd });
     if (view) send(IPC.tick, { view, summary: null } satisfies TickPush);
     return result;
   });

@@ -3,6 +3,7 @@ import type { GameState } from '@skyempire/shared';
 import { newGame } from '@skyempire/sim';
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { DatabaseSync } from 'node:sqlite';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { SaveLoadError, SaveStore } from './saves';
@@ -63,5 +64,17 @@ describe('SaveStore', () => {
     const costs = { fuel: 1, crew: 0, maintenance: 0, fees: 0, service: 0, leases: 0, interest: 0, overhead: 0, bases: 0, marketing: 0 };
     st.appendDaily(info.id, [1, 2, 3].map((day) => ({ day, airlineId: 'al_player', cash: day, revenue: day * 10, pax: 1, costs })));
     expect(st.history(info.id, 'al_player', 2, 3).map((d) => d.revenue)).toEqual([20, 30]);
+  });
+
+  it('falls back to an older snapshot when the newest is damaged', () => {
+    const st = store();
+    const info = st.createSave('c', state(10));
+    st.writeSnapshot(info.id, state(40), 'auto');
+    const db = new DatabaseSync(st.pathOf(info.id));
+    db.prepare('UPDATE snapshots SET state = ? WHERE id = (SELECT MAX(id) FROM snapshots)').run(new Uint8Array([1, 2, 3]));
+    db.close();
+    const loaded = st.loadLatestWithFallback(info.id);
+    expect(loaded.state.day).toBe(10);
+    expect(loaded.fellBack).toBe(true);
   });
 });

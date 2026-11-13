@@ -9,9 +9,11 @@ export interface DownloadOptions {
   retries?: number;
   /** Pause between image downloads (Wikimedia asks clients to throttle). */
   gapMs?: number;
+  /** Injectable for tests. */
+  sleepFn?(ms: number, signal?: AbortSignal): Promise<void>;
 }
 
-const UA = 'SkyEmpire/0.1 (open-source game; logo pack downloader)';
+const UA = 'SkyEmpire/0.1 (https://github.com/saurabhwebdev/skyempire; open-source game logo downloader)';
 const BATCH = 50;
 const sleep = (ms: number, signal?: AbortSignal) =>
   new Promise<void>((resolve) => {
@@ -21,23 +23,24 @@ const sleep = (ms: number, signal?: AbortSignal) =>
   });
 
 /** GET with retries; on 429/503 waits for Retry-After (or exponential backoff). */
-async function politeGet(fetchFn: typeof fetch, url: string, retries: number, signal?: AbortSignal): Promise<Response> {
+async function politeGet(fetchFn: typeof fetch, url: string, retries: number, signal?: AbortSignal, wait = sleep): Promise<Response> {
   for (let attempt = 0; ; attempt++) {
     const r = await fetchFn(url, { headers: { 'User-Agent': UA }, signal });
     if (r.ok) return r;
     const retryable = r.status === 429 || r.status === 503;
     if (!retryable || attempt >= retries || signal?.aborted) throw new Error(`HTTP ${r.status}`);
-    const after = Number(r.headers.get('retry-after'));
-    await sleep(Number.isFinite(after) && after >= 0 ? after * 1000 : 1000 * 2 ** attempt, signal);
+    const header = r.headers.get('retry-after');
+    const after = header === null ? NaN : Number(header);
+    await wait(Number.isFinite(after) && after >= 0 ? after * 1000 : 1000 * 2 ** attempt, signal);
   }
 }
 
 /** Logo filenames (Wikidata P154) for many items, 50 per request. */
-async function logoFiles(fetchFn: typeof fetch, qids: string[], retries: number, signal?: AbortSignal): Promise<Map<string, string>> {
+async function logoFiles(fetchFn: typeof fetch, qids: string[], retries: number, signal?: AbortSignal, wait = sleep): Promise<Map<string, string>> {
   const out = new Map<string, string>();
   for (let i = 0; i < qids.length && !signal?.aborted; i += BATCH) {
     const ids = qids.slice(i, i + BATCH).join('|');
-    const r = await politeGet(fetchFn, `https://www.wikidata.org/w/api.php?action=wbgetentities&props=claims&format=json&ids=${ids}`, retries, signal);
+    const r = await politeGet(fetchFn, `https://www.wikidata.org/w/api.php?action=wbgetentities&props=claims&format=json&ids=${ids}`, retries, signal, wait);
     const json = (await r.json()) as { entities?: Record<string, { claims?: Record<string, { mainsnak?: { datavalue?: { value?: string } } }[]> }> };
     for (const [qid, e] of Object.entries(json.entities ?? {})) {
       const file = e.claims?.P154?.[0]?.mainsnak?.datavalue?.value;
@@ -55,6 +58,7 @@ export async function downloadLogos(airlines: LogoAirline[], dir: string, opts: 
   const fetchFn = opts.fetchFn ?? fetch;
   const retries = opts.retries ?? 4;
   const gap = opts.gapMs ?? 250;
+  const wait = opts.sleepFn ?? sleep;
   mkdirSync(dir, { recursive: true });
   const failed: string[] = [];
   let ok = 0, done = 0;
@@ -70,7 +74,7 @@ export async function downloadLogos(airlines: LogoAirline[], dir: string, opts: 
 
   let files: Map<string, string>;
   try {
-    files = await logoFiles(fetchFn, todo.map((a) => a.wikidata), retries, opts.signal);
+    files = await logoFiles(fetchFn, todo.map((a) => a.wikidata), retries, opts.signal, wait);
   } catch {
     return { ok, failed: opts.signal?.aborted ? [] : todo.map((a) => a.iata) };
   }
@@ -82,7 +86,7 @@ export async function downloadLogos(airlines: LogoAirline[], dir: string, opts: 
     try {
       const file = files.get(a.wikidata);
       if (!file) throw new Error('no logo on Wikidata');
-      const r = await politeGet(fetchFn, `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(file)}?width=256`, retries, opts.signal);
+      const r = await politeGet(fetchFn, `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(file)}?width=256`, retries, opts.signal, wait);
       writeFileSync(tmp, new Uint8Array(await r.arrayBuffer()));
       renameSync(tmp, target);
       ok++;
@@ -92,7 +96,7 @@ export async function downloadLogos(airlines: LogoAirline[], dir: string, opts: 
     } finally {
       tick();
     }
-    await sleep(gap, opts.signal);
+    await wait(gap, opts.signal);
   }
   return { ok, failed };
 }

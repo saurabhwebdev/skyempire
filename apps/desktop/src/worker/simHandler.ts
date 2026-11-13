@@ -6,7 +6,7 @@ export type SimRequest =
   | { kind: 'newGame'; opts: NewGameOptions }
   | { kind: 'load'; state: GameState }
   | { kind: 'tick' }
-  | { kind: 'command'; cmd: Command; immediate: boolean }
+  | { kind: 'command'; cmd: Command }
   | { kind: 'preview'; cmd: Command }
   | { kind: 'routeDemand'; from: string; to: string }
   | { kind: 'view' }
@@ -30,7 +30,6 @@ export interface SimHandler {
 /** Pure game host: owns the GameState and the player's queued commands. */
 export function createSimHandler(catalog: Catalog): SimHandler {
   let state: GameState | null = null;
-  let queue: Command[] = [];
   const need = (): GameState => {
     if (!state) throw new Error('No game loaded');
     return state;
@@ -40,30 +39,24 @@ export function createSimHandler(catalog: Catalog): SimHandler {
   const handlers: { [K in SimRequest['kind']]: (req: Extract<SimRequest, { kind: K }>) => SimResponses[K] } = {
     newGame: (r) => {
       state = newGame(r.opts, catalog);
-      queue = [];
       return view();
     },
     load: (r) => {
+      // Build the view from the candidate first: a structurally broken save must not replace the running game.
+      const v = buildClientView(r.state, r.state.playerId, catalog);
       state = r.state;
-      queue = [];
-      return view();
+      return v;
     },
     tick: () => {
-      const s = need();
-      const res = tick(s, queue.map((cmd) => ({ airlineId: s.playerId, cmd })), catalog);
+      const res = tick(need(), [], catalog);
       state = res.state;
-      queue = [];
       return { view: view(), summary: res.summary };
     },
     command: (r) => {
+      // Commands apply at once (the worker is single-threaded), so the player sees the result immediately.
       const s = need();
-      if (r.immediate) {
-        const result = applyCommand(s, s.playerId, r.cmd, catalog); // validates before mutating
-        return { result, view: result.ok ? view() : null };
-      }
-      const result = applyCommand(structuredClone(s), s.playerId, r.cmd, catalog); // dry run for instant feedback
-      if (result.ok) queue.push(r.cmd);
-      return { result, view: null };
+      const result = applyCommand(s, s.playerId, r.cmd, catalog); // validates before mutating
+      return { result, view: result.ok ? view() : null };
     },
     preview: (r) => preview(need(), need().playerId, r.cmd, catalog),
     routeDemand: (r) => {

@@ -85,7 +85,34 @@ export class SaveStore {
     }
   }
 
+  /** Newest loadable snapshot; falls back to older ones if the newest is damaged. */
+  loadLatestWithFallback(id: string): { state: GameState; fellBack: boolean } {
+    const db = this.open(id);
+    let ids: number[];
+    try {
+      ids = (db.prepare('SELECT id FROM snapshots ORDER BY id DESC').all() as { id: number }[]).map((r) => r.id);
+    } catch (e) {
+      throw new SaveLoadError('corrupt', String(e));
+    } finally {
+      db.close();
+    }
+    let first: unknown = null;
+    for (const [i, snap] of ids.entries()) {
+      try {
+        return { state: this.loadSnapshot(id, snap), fellBack: i > 0 };
+      } catch (e) {
+        if (e instanceof SaveLoadError && e.reason === 'newerVersion') throw e;
+        first ??= e;
+      }
+    }
+    throw first instanceof SaveLoadError ? first : new SaveLoadError('corrupt', 'no snapshots');
+  }
+
   loadLatest(id: string): GameState {
+    return this.loadSnapshot(id);
+  }
+
+  private loadSnapshot(id: string, snapshotId?: number): GameState {
     let db: DatabaseSync;
     try {
       db = this.open(id);
@@ -94,7 +121,9 @@ export class SaveStore {
       throw new SaveLoadError('corrupt', String(e));
     }
     try {
-      const row = db.prepare('SELECT state FROM snapshots ORDER BY id DESC LIMIT 1').get() as { state: Uint8Array } | undefined;
+      const row = (snapshotId === undefined
+        ? db.prepare('SELECT state FROM snapshots ORDER BY id DESC LIMIT 1').get()
+        : db.prepare('SELECT state FROM snapshots WHERE id = ?').get(snapshotId)) as { state: Uint8Array } | undefined;
       if (!row) throw new SaveLoadError('corrupt', 'no snapshots');
       let state = JSON.parse(gunzipSync(row.state).toString('utf8')) as Record<string, unknown>;
       const version = Number(state.schemaVersion);

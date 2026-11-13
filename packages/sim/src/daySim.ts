@@ -69,7 +69,9 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
     (state.slotsUsed[a.id] ?? 0) / Math.max(1, slotCapacity(state, catalog, a.id)),
     (state.slotsUsed[b.id] ?? 0) / Math.max(1, slotCapacity(state, catalog, b.id)),
   );
-  const onTime = n
+  const onTime = closed
+    ? 40 // flights cancelled: counts as a bad day for punctuality
+    : n
     ? onTimeFor(condSum / n, congestion, utilSum / n, isStormAffected(state, a.id) || isStormAffected(state, b.id))
     : BALANCE.baseOnTime;
   for (const asg of route.assignments) {

@@ -5,6 +5,7 @@ import type { SimRequest, SimResponses } from '../worker/simHandler';
 export class SimHost {
   private proc: UtilityProcess;
   private seq = 0;
+  private dead = false;
   private pending = new Map<number, { resolve: (v: unknown) => void; reject: (e: Error) => void }>();
 
   constructor(workerPath: string) {
@@ -17,12 +18,14 @@ export class SimHost {
       else p.reject(new Error(msg.error));
     });
     this.proc.on('exit', (code) => {
+      this.dead = true;
       for (const p of this.pending.values()) p.reject(new Error(`Simulation stopped (code ${code})`));
       this.pending.clear();
     });
   }
 
   request<R extends SimRequest>(req: R): Promise<SimResponses[R['kind']]> {
+    if (this.dead) return Promise.reject(new Error('The simulation has stopped. Please restart SkyEmpire.'));
     const id = ++this.seq;
     return new Promise((resolve, reject) => {
       this.pending.set(id, { resolve: resolve as (v: unknown) => void, reject });

@@ -7,7 +7,7 @@ const seeds = Number(process.argv[3] ?? 1);
 const catalog = loadCatalog('world');
 const pct = (x: number | undefined) => `${((x ?? 0) * 100).toFixed(1)}%`;
 
-for (let seed = 1; seed <= seeds; seed++) {
+for (let seed = Number(process.argv[4] ?? 1); seed < Number(process.argv[4] ?? 1) + seeds; seed++) {
   for (const style of ['balanced', 'cheap'] as const) {
     const t0 = Date.now();
     const r = simulate(catalog, seed, years * 360, style);

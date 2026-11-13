@@ -60,4 +60,26 @@ describe('GameLoop', () => {
     expect(day).toBe(2);
     loop.stop();
   });
+
+  it('stops and reports when a tick fails', async () => {
+    const errors: string[] = [];
+    const src: TickSource = { tick: async () => { throw new Error('worker died'); } };
+    const loop = new GameLoop(src, () => {}, () => {}, (e) => errors.push(e));
+    loop.setSpeed(8);
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(loop.speed).toBe(0);
+    expect(errors).toEqual(['worker died']);
+  });
+
+  it('stops for good when the game is over', async () => {
+    let day = 0;
+    const src: TickSource = { tick: async () => ({ ...push(++day), view: { day, gameOver: { reason: 'bankrupt', day } } as TickPush['view'] }) };
+    const loop = new GameLoop(src, () => {});
+    loop.autoPause = false;
+    loop.setSpeed(8);
+    await vi.advanceTimersByTimeAsync(2000);
+    expect(day).toBe(1);
+    loop.setSpeed(4);
+    expect(loop.speed).toBe(0);
+  });
 });

@@ -20,20 +20,23 @@ describe('sim worker handler', () => {
     const h = createSimHandler(catalog);
     h.handle({ kind: 'newGame', opts });
     const before = h.handle({ kind: 'snapshot' });
-    const r = h.handle({ kind: 'command', cmd: { type: 'leaseAircraft', typeId: 'B77W', cabin: { economy: 400, premium: 0, business: 0 } }, immediate: true });
+    const r = h.handle({ kind: 'command', cmd: { type: 'leaseAircraft', typeId: 'B77W', cabin: { economy: 400, premium: 0, business: 0 } } });
     expect(r.result.ok).toBe(false);
     expect(h.handle({ kind: 'snapshot' })).toEqual(before);
   });
-  it('applies immediately when paused, queues otherwise', () => {
+  it('applies commands immediately, even while the clock runs', () => {
     const h = createSimHandler(catalog);
     h.handle({ kind: 'newGame', opts });
     const cmd = { type: 'leaseAircraft' as const, typeId: 'A20N', cabin: { economy: 194, premium: 0, business: 0 } };
-    expect(h.handle({ kind: 'command', cmd, immediate: true }).view!.aircraft).toHaveLength(1);
-    expect(h.handle({ kind: 'command', cmd, immediate: false }).view).toBeNull();
-    expect(h.handle({ kind: 'view' }).aircraft).toHaveLength(1);
-    const t = h.handle({ kind: 'tick' });
-    expect(t.view.aircraft).toHaveLength(2);
-    expect(t.view.day).toBe(1);
+    expect(h.handle({ kind: 'command', cmd }).view!.aircraft).toHaveLength(1);
+    expect(h.handle({ kind: 'command', cmd }).view!.aircraft).toHaveLength(2);
+    expect(h.handle({ kind: 'tick' }).view.aircraft).toHaveLength(2);
+  });
+  it('a failed load keeps the current game', () => {
+    const h = createSimHandler(catalog);
+    h.handle({ kind: 'newGame', opts });
+    expect(() => h.handle({ kind: 'load', state: { schemaVersion: 1 } as never })).toThrow();
+    expect(h.handle({ kind: 'view' }).player.name).toBe('Worker Test Air');
   });
   it('previews and reports route demand', () => {
     const h = createSimHandler(catalog);

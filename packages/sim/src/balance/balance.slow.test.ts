@@ -3,9 +3,9 @@ import { catalog } from '../testing';
 import { margin, simulate } from './bots';
 
 // Slow (≈3 min): run with `pnpm --filter @skyempire/sim test:balance`. Targets from simulation-spec §13.
-describe('balance targets (2 game years)', () => {
-  const balanced = simulate(catalog, 1, 720, 'balanced');
-  const cheap = simulate(catalog, 1, 720, 'cheap');
+describe.each([1, 2])('balance targets (2 game years, seed %i)', (seed) => {
+  const balanced = simulate(catalog, seed, 720, 'balanced');
+  const cheap = simulate(catalog, seed, 720, 'cheap');
 
   it('AI airlines earn a realistic 3–15% median operating margin in year 2', () => {
     const m = Object.entries(balanced.yearly)

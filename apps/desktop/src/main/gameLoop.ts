@@ -13,14 +13,18 @@ export class GameLoop {
   private timer: ReturnType<typeof setTimeout> | null = null;
   private running = false;
   private next = 0;
+  /** Set once the game has ended: the clock can never restart. */
+  private over = false;
 
   constructor(
     private readonly source: TickSource,
     private readonly onTick: (push: TickPush) => void,
     private readonly onSpeed: (speed: Speed) => void = () => {},
+    private readonly onError: (message: string) => void = () => {},
   ) {}
 
   setSpeed(speed: Speed): void {
+    if (this.over) speed = 0;
     this.speed = speed;
     this.clear();
     this.onSpeed(speed);
@@ -33,6 +37,12 @@ export class GameLoop {
   stop(): void {
     this.speed = 0;
     this.clear();
+  }
+
+  /** A new or loaded game resets the game-over lock. */
+  reset(): void {
+    this.over = false;
+    this.setSpeed(0);
   }
 
   private clear() {
@@ -61,10 +71,19 @@ export class GameLoop {
     try {
       const push = await this.source.tick();
       this.onTick(push);
+      if (push.view.gameOver) {
+        this.over = true;
+        this.setSpeed(0);
+        return;
+      }
       if (push.summary?.autoPause && this.autoPause) {
         this.setSpeed(0);
         return;
       }
+    } catch (e) {
+      this.setSpeed(0);
+      this.onError(e instanceof Error ? e.message : String(e));
+      return;
     } finally {
       this.running = false;
     }

@@ -28,8 +28,7 @@ void app.whenReady().then(() => {
     e.preventDefault();
     quitting = true;
     session.loop.stop();
-    session
-      .save('auto')
+    Promise.race([session.save('auto'), new Promise((_, reject) => setTimeout(() => reject(new Error('save timed out')), 5000))])
       .catch((err) => console.error('Save on quit failed', err))
       .finally(() => {
         host.kill();

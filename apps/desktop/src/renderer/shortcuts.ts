@@ -11,7 +11,10 @@ export function handleShortcut(e: KeyboardEvent): boolean {
   const ui = useUi.getState();
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
     e.preventDefault();
-    void window.game?.save();
+    void window.game?.save().then(
+      () => window.dispatchEvent(new CustomEvent('se:saved')),
+      () => {}, // main process shows the reason
+    );
     return true;
   }
   if (e.ctrlKey || e.metaKey || e.altKey || isTyping(e.target)) return false;

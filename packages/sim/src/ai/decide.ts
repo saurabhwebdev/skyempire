@@ -17,7 +17,7 @@ const MIN_KM = 150;
 
 /** Fares an AI sets on a new route of this length. */
 export function aiFares(distKm: number, p: Personality): Route['fares'] {
-  const k = 1 - 0.3 * p.priceAggressiveness;
+  const k = 1 - 0.2 * p.priceAggressiveness;
   return {
     economy: Math.round(refFare(distKm, 'economy') * k),
     premium: Math.round(refFare(distKm, 'premium') * (k + 0.1)),
@@ -113,6 +113,22 @@ export function runAi(state: GameState, airlineId: string, catalog: Catalog, rng
   if (al.cash < monthlyTotal && p.riskTolerance >= 0.3) {
     const amount = Math.round(Math.min(availableCredit(state, airlineId, catalog), 3 * monthlyTotal));
     if (amount > 0) act({ type: 'takeLoan', amount });
+  }
+
+  // 3b. Survival: when cash covers less than two months of fixed bills, cut costs instead of growing.
+  const survival = al.cash < 2 * monthlyTotal && availableCredit(state, airlineId, catalog) < 2 * monthlyTotal;
+  if (survival) {
+    const busy = hoursByAircraft(state, catalog);
+    for (const ac of Object.values(state.aircraft)) {
+      if (ac.ownerId === airlineId && !busy.get(ac.id)) act({ type: 'sellAircraft', aircraftId: ac.id });
+    }
+    const losers = myRoutes()
+      .filter((r) => r.status === 'active' && r.profit30.length >= 7)
+      .map((r) => ({ r, p: r.profit30.reduce((a, b) => a + b, 0) }))
+      .filter((x) => x.p < 0)
+      .sort((a, b) => a.p - b.p);
+    if (losers[0]) act({ type: 'closeRoute', routeId: losers[0].r.id });
+    return done;
   }
 
   // 4. Expansion

@@ -79,4 +79,16 @@ describe('downloadLogos', () => {
     expect(existsSync(join(d, 'LH.png'))).toBe(false);
     expect(readdirSync(d)).toEqual([]);
   });
+
+  it('backs off when rate-limited without a Retry-After header', async () => {
+    const sleeps: number[] = [];
+    let n = 0;
+    const fetchFn = (async (url: string) => {
+      if (url.includes('wbgetentities')) return new Response(JSON.stringify(entity('Q9325', 'x.svg')));
+      return ++n === 1 ? new Response('slow down', { status: 429 }) : new Response(new Blob([PNG as Uint8Array<ArrayBuffer>]));
+    }) as typeof fetch;
+    const res = await downloadLogos([airline('LH', 'Q9325')], dir(), { ...fast, fetchFn, sleepFn: async (ms) => void sleeps.push(ms) });
+    expect(res.ok).toBe(1);
+    expect(sleeps[0]).toBeGreaterThanOrEqual(1000);
+  });
 });

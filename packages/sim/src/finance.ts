@@ -60,7 +60,8 @@ export function applyMonthly(state: GameState, airlineId: string, catalog: Catal
 export function updateSolvency(state: GameState, airlineId: string, catalog: Catalog): void {
   const al = state.airlines[airlineId]!;
   if (al.bankrupt) return;
-  if (al.cash < 0 && availableCredit(state, airlineId, catalog) <= 0) al.daysInsolvent += 1;
+  // Insolvent when the remaining credit line can't cover the cash hole.
+  if (al.cash < 0 && availableCredit(state, airlineId, catalog) < -al.cash) al.daysInsolvent += 1;
   else al.daysInsolvent = 0;
   if (al.daysInsolvent >= BALANCE.bankruptcyDays) {
     al.bankrupt = true;

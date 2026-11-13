@@ -51,3 +51,20 @@ describe('AI airlines', () => {
   });
   it('is deterministic', () => expect(world(4, 30)).toEqual(world(4, 30)));
 });
+
+describe('AI in trouble', () => {
+  it('stops expanding and returns idle aircraft when cash runs low', () => {
+    const s = world(5, 30);
+    const al = ais(s)[0]!;
+    const fleetBefore = Object.values(s.aircraft).filter((a) => a.ownerId === al.id);
+    // Leave one aircraft idle by removing it from all routes.
+    const idle = fleetBefore[0]!;
+    for (const r of Object.values(s.routes)) r.assignments = r.assignments.filter((a) => a.aircraftId !== idle.id);
+    al.cash = 100_000;
+    al.loans = [{ id: 'big', principal: 1e10, annualRate: 0.1, takenDay: 0 }]; // no credit left
+    runAi(s, al.id, catalog, new Rng(2));
+    const after = Object.values(s.aircraft).filter((a) => a.ownerId === al.id);
+    expect(after.length).toBeLessThan(fleetBefore.length);
+    expect(s.aircraft[idle.id]).toBeUndefined();
+  });
+});
