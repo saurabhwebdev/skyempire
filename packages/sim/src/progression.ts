@@ -44,14 +44,14 @@ export function updateProgression(state: GameState, airlineId: string, catalog: 
     if (met < 2) break;
     al.tier = t.id;
     if (al.isPlayer)
-      notes.push({ id: nextId(state, 'n'), day: state.day, level: 'major', title: `You’re now a ${t.name} airline`,
+      notes.push({ id: nextId(state, 'n'), day: state.day, level: 'major', category: 'airline', title: `You’re now a ${t.name} airline`,
         body: `${unlockedTypes(catalog, t.id)} unlocked.`, link: { kind: 'airline', id: al.id } });
   }
   if (!al.isPlayer) return notes;
   for (const o of OBJECTIVES) {
     if (al.completedObjectives.includes(o.id) || !o.check(state, al)) continue;
     al.completedObjectives.push(o.id);
-    notes.push({ id: nextId(state, 'n'), day: state.day, level: 'info', title: `Goal complete: ${o.title}`, body: 'Nice work. Your next goal is on the Overview.' });
+    notes.push({ id: nextId(state, 'n'), day: state.day, level: 'info', category: 'goal', title: `Goal complete: ${o.title}`, body: 'Nice work. Your next goal is on the Overview.' });
   }
   return notes;
 }

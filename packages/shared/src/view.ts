@@ -4,6 +4,7 @@ export interface Notification {
   id: string;
   day: number;
   level: 'info' | 'warning' | 'major';
+  category: 'event' | 'rival' | 'airline' | 'goal';
   title: string;
   body: string;
   link?: { kind: 'route' | 'aircraft' | 'airport' | 'airline'; id: string };

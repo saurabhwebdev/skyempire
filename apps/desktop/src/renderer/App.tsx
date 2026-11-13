@@ -11,6 +11,10 @@ import { AircraftMarket } from './screens/Fleet/AircraftMarket';
 import { FleetTray } from './screens/Fleet/FleetTray';
 import { Overview } from './screens/Overview/Overview';
 import { Finance } from './screens/Finance/Finance';
+import { Market } from './screens/Market/Market';
+import { Airline } from './screens/Airline/Airline';
+import { News } from './screens/News/News';
+import { NotificationCenter } from './notifications/NotificationCenter';
 import { Button } from '@skyempire/ui';
 import { Plus } from 'lucide-react';
 import { NavRail } from './shell/NavRail';
@@ -32,6 +36,9 @@ function TrayContent() {
 const FULL_PAGE: Partial<Record<string, () => React.ReactElement>> = {
   overview: () => <Overview />,
   finance: () => <Finance />,
+  market: () => <Market />,
+  airline: () => <Airline />,
+  news: () => <News />,
 };
 
 function FullPage({ section }: { section: string }) {
@@ -82,6 +89,7 @@ function GameScreen() {
       </div>
       <GameMenu />
       <ShortcutSheet />
+      <NotificationCenter />
     </div>
   );
 }

@@ -72,6 +72,8 @@ export const useUi = create<UiState>()((set, get) => ({
 interface GameStoreState {
   view: ClientView | null;
   notifications: Notification[];
+  /** Notifications from the most recent tick (for toasts/modals). */
+  latest: Notification[];
   unread: number;
   cashDelta: number | null;
   settings: Settings;
@@ -84,6 +86,7 @@ interface GameStoreState {
 export const useGameStore = create<GameStoreState>()((set, get) => ({
   view: null,
   notifications: [],
+  latest: [],
   unread: 0,
   cashDelta: null,
   settings: DEFAULT_SETTINGS,
@@ -94,10 +97,11 @@ export const useGameStore = create<GameStoreState>()((set, get) => ({
       view: p.view,
       cashDelta: p.summary && prev ? p.view.player.cash - prev.player.cash : get().cashDelta,
       notifications: [...fresh.slice().reverse(), ...get().notifications].slice(0, 200),
+      latest: fresh,
       unread: get().unread + fresh.length,
     });
   },
-  setView: (view) => set({ view, cashDelta: null, notifications: [], unread: 0 }),
+  setView: (view) => set({ view, cashDelta: null, notifications: [], latest: [], unread: 0 }),
   markRead: () => set({ unread: 0 }),
   setSettings: (settings) => set({ settings }),
 }));

@@ -16,7 +16,7 @@ export function isStormAffected(state: GameState, airportId: string): boolean {
 const playerBases = (state: GameState) => state.airlines[state.playerId]?.baseIds ?? [];
 
 function note(state: GameState, level: Notification['level'], title: string, body: string, airportId?: string): Notification {
-  return { id: nextId(state, 'n'), day: state.day, level, title, body, ...(airportId ? { link: { kind: 'airport' as const, id: airportId } } : {}) };
+  return { id: nextId(state, 'n'), day: state.day, level, category: 'event', title, body, ...(airportId ? { link: { kind: 'airport' as const, id: airportId } } : {}) };
 }
 
 /** End expired events, then roll new ones (simulation-spec §11). Returns notifications. */

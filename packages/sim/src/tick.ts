@@ -120,13 +120,13 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
     if (d) d.costs.maintenance += checkCost;
     if (check && ac.ownerId === s.playerId) {
       const t = catalog.aircraftTypes[ac.typeId]!;
-      notes.push({ id: nextId(s, 'n'), day: s.day, level: 'info', title: `${t.name} in for a ${check}-check`,
+      notes.push({ id: nextId(s, 'n'), day: s.day, level: 'info', category: 'airline', title: `${t.name} in for a ${check}-check`,
         body: `Out of service for ${ac.maintenanceDaysLeft} day${ac.maintenanceDaysLeft > 1 ? 's' : ''}.`, link: { kind: 'aircraft', id: ac.id } });
     }
     if (flown > 0 && incidentChance(ac.condition) > 0 && rng.chance(incidentChance(ac.condition) * Math.max(1, flown))) {
       incidents.set(ac.ownerId, (incidents.get(ac.ownerId) ?? 0) + 15);
       const al = s.airlines[ac.ownerId]!;
-      notes.push({ id: nextId(s, 'n'), day: s.day, level: al.isPlayer ? 'major' : 'info', title: `Safety incident at ${al.name}`,
+      notes.push({ id: nextId(s, 'n'), day: s.day, level: al.isPlayer ? 'major' : 'info', category: al.isPlayer ? 'airline' : 'rival', title: `Safety incident at ${al.name}`,
         body: 'A poorly maintained aircraft had a serious incident. Reputation takes a hit.', link: { kind: 'aircraft', id: ac.id } });
     }
   }
@@ -176,7 +176,7 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
       for (const r of Object.values(s.routes)) if (r.airlineId === al.id) delete s.routes[r.id];
       for (const ac of Object.values(s.aircraft)) if (ac.ownerId === al.id) delete s.aircraft[ac.id];
       recomputeSlots(s);
-      notes.push({ id: nextId(s, 'n'), day: s.day, level: al.isPlayer ? 'major' : 'info', title: `${al.name} has gone bankrupt`,
+      notes.push({ id: nextId(s, 'n'), day: s.day, level: al.isPlayer ? 'major' : 'info', category: al.isPlayer ? 'airline' : 'rival', title: `${al.name} has gone bankrupt`,
         body: al.isPlayer ? 'Your airline ran out of cash and credit.' : 'Its routes and slots are now free.', link: { kind: 'airline', id: al.id } });
     }
     d.cash = al.cash;

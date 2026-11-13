@@ -49,12 +49,14 @@ export function buildLayers(m: MapInput): Layer[] {
       if (!from || !to) return;
       used.add(r.from).add(r.to);
       const c = rivalColor.get(r.airlineId) ?? RIVAL_PALETTE[7]!;
-      arcs.push({ id: `${r.airlineId}:${i}`, from, to, color: [c[0], c[1], c[2], 90], width: 1 });
+      const focus = m.selection?.kind === 'airline' ? (m.selection.id === r.airlineId ? 1 : 0) : 0.5;
+      arcs.push({ id: `${r.airlineId}:${i}`, from, to, color: [c[0], c[1], c[2], focus === 1 ? 230 : focus === 0 ? 30 : 90], width: focus === 1 ? 2 : 1 });
     });
     layers.push(
       new ArcLayer<Arc>({
         id: 'rival-routes', data: arcs, greatCircle: true, getSourcePosition: (d) => [d.from.lon, d.from.lat], getTargetPosition: (d) => [d.to.lon, d.to.lat],
-        getSourceColor: (d) => d.color, getTargetColor: (d) => d.color, getWidth: 1, widthUnits: 'pixels', getHeight: 0.3,
+        getSourceColor: (d) => d.color, getTargetColor: (d) => d.color, getWidth: (d) => d.width, widthUnits: 'pixels', getHeight: 0.3,
+        updateTriggers: { getSourceColor: [m.selection], getTargetColor: [m.selection], getWidth: [m.selection] },
       }),
     );
   }
