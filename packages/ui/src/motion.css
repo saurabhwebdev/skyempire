@@ -1,0 +1,28 @@
+/* Motion tokens — docs/ui-ux-design.md §6. Only transform/opacity animate. */
+:root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-1: 120ms;
+  --dur-2: 200ms;
+  --dur-3: 320ms;
+  --dur-4: 450ms;
+}
+
+@keyframes se-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes se-pop-in { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: none; } }
+@keyframes se-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes se-shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+.se-enter { animation: se-fade-in var(--dur-2) var(--ease-out) both; }
+.se-pop { animation: se-pop-in 250ms var(--ease-out) both; }
+
+[data-state='open'].se-overlay, [data-state='open'].se-content { animation: se-pop-in var(--dur-3) var(--ease-out) both; }
+[data-state='closed'].se-overlay, [data-state='closed'].se-content { animation: se-fade-out var(--dur-2) var(--ease-in) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+html[data-reduce-motion] *, html[data-reduce-motion] *::before, html[data-reduce-motion] *::after {
+  animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important;
+}

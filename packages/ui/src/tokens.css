@@ -1,0 +1,83 @@
+/* SkyEmpire design tokens — docs/ui-ux-design.md §5. Dark theme (v0.1). */
+@import "@fontsource-variable/inter";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/600.css";
+
+:root {
+  color-scheme: dark;
+  --bg: oklch(0.16 0.012 250);
+  --surface-1: oklch(0.2 0.012 250);
+  --surface-2: oklch(0.24 0.014 250);
+  --surface-3: oklch(0.28 0.016 250);
+  --text: oklch(0.93 0.008 250);
+  --text-muted: oklch(0.72 0.012 250);
+  --text-faint: oklch(0.58 0.012 250);
+  --border: color-mix(in oklch, var(--text) 10%, transparent);
+  --border-strong: color-mix(in oklch, var(--text) 18%, transparent);
+  --accent: oklch(0.72 0.14 230);
+  --accent-hover: color-mix(in oklch, var(--accent), white 10%);
+  --accent-press: color-mix(in oklch, var(--accent), black 10%);
+  --accent-contrast: oklch(0.18 0.02 250);
+  --success: oklch(0.74 0.15 155);
+  --warning: oklch(0.8 0.14 80);
+  --danger: oklch(0.66 0.19 25);
+  --map-water: oklch(0.14 0.015 250);
+  --map-land: oklch(0.21 0.01 250);
+  --map-border: oklch(0.3 0.012 250);
+
+  /* Color-blind-safe rival palette (Okabe–Ito derived, muted). */
+  --rival-1: oklch(0.72 0.12 60);
+  --rival-2: oklch(0.7 0.1 200);
+  --rival-3: oklch(0.68 0.13 150);
+  --rival-4: oklch(0.82 0.12 95);
+  --rival-5: oklch(0.6 0.12 255);
+  --rival-6: oklch(0.65 0.14 35);
+  --rival-7: oklch(0.7 0.11 330);
+  --rival-8: oklch(0.6 0.02 250);
+
+  --shadow-overlay: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.35);
+  --font-sans: 'Inter Variable', Inter, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-press: var(--accent-press);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --shadow-overlay: var(--shadow-overlay);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.num { font-variant-numeric: tabular-nums; }
+.label-caps { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint); }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@import "./motion.css";
