@@ -23,6 +23,9 @@ await win.evaluate(async () => {
 });
 await win.reload();
 await win.waitForTimeout(1500);
+await win.keyboard.press('1');
+await win.waitForTimeout(600);
+await win.screenshot({ path: join(dir, 'overview.png') });
 await win.keyboard.press('2');
 await win.waitForTimeout(400);
 await win.getByText('LHR → MAD').click();
