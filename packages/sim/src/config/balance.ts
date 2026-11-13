@@ -1,7 +1,7 @@
 /** Every tunable number in the simulation. Values from docs/simulation-spec.md. */
 export const BALANCE = {
   // Demand (§3)
-  demandK: 900, // tuned so LHR–CDG mid-July ≈ 3,000–6,000 pax/day
+  demandK: 600, // tuned so LHR–CDG mid-July ≈ 3,000–6,000 pax/day
   alpha: 0.8,
   shortHaulKm: 150,
   shortHaulFactor: 0.2,
