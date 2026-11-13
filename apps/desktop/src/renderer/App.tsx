@@ -15,6 +15,9 @@ import { Market } from './screens/Market/Market';
 import { Airline } from './screens/Airline/Airline';
 import { News } from './screens/News/News';
 import { NotificationCenter } from './notifications/NotificationCenter';
+import { Coachmarks } from './screens/Onboarding/Coachmarks';
+import { GameOver } from './screens/GameOver/GameOver';
+import { applySettingsToDocument, SettingsHost } from './screens/Settings/Settings';
 import { Button } from '@skyempire/ui';
 import { Plus } from 'lucide-react';
 import { NavRail } from './shell/NavRail';
@@ -66,6 +69,7 @@ function GameScreen() {
         <main className="relative flex min-w-0 flex-1">
           <div className="relative min-w-0 flex-1 bg-[var(--map-water)]" id="map-area">
             <WorldMap />
+            <Coachmarks />
             <FullPage section={section} />
             {!FULL_PAGE[section] && <BottomTray
               title={t.sections[section]}
@@ -99,13 +103,13 @@ function Root() {
   useShortcuts();
   const screen = useUi((s) => s.screen);
   const settings = useGameStore((s) => s.settings);
-  useEffect(() => {
-    document.documentElement.toggleAttribute('data-reduce-motion', settings.reduceMotion);
-    document.documentElement.toggleAttribute('data-performance', settings.performanceMode);
-  }, [settings]);
-  if (screen === 'game') return <GameScreen />;
-  if (screen === 'newAirline') return <NewAirline />;
-  return <Title />;
+  useEffect(() => applySettingsToDocument(settings), [settings]);
+  return (
+    <>
+      {screen === 'game' ? <GameScreen /> : screen === 'newAirline' ? <NewAirline /> : screen === 'gameOver' ? <GameOver /> : <Title />}
+      <SettingsHost />
+    </>
+  );
 }
 
 export function App() {

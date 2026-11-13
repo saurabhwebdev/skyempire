@@ -6,10 +6,7 @@ import { useGameStore, useUi } from '../store';
 /** Subscribe to game pushes from the main process (mount once). */
 export function useGameBridge(): void {
   useEffect(() => {
-    const offTick = window.game.onTick((p) => {
-      useGameStore.getState().applyPush(p);
-      if (p.view.gameOver) useUi.getState().setScreen('gameOver');
-    });
+    const offTick = window.game.onTick((p) => useGameStore.getState().applyPush(p));
     const offSpeed = window.game.onSpeed((s) => useUi.getState().speedFromGame(s));
     void window.game.getSettings().then((s) => useGameStore.getState().setSettings(s));
     // Pick up a game that's already running (e.g. after a renderer reload).

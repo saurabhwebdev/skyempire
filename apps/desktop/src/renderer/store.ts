@@ -100,6 +100,7 @@ export const useGameStore = create<GameStoreState>()((set, get) => ({
       latest: fresh,
       unread: get().unread + fresh.length,
     });
+    if (p.view.gameOver && useUi.getState().screen === 'game') useUi.getState().setScreen('gameOver');
   },
   setView: (view) => set({ view, cashDelta: null, notifications: [], latest: [], unread: 0 }),
   markRead: () => set({ unread: 0 }),
