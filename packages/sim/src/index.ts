@@ -7,4 +7,4 @@ export { BALANCE } from './config/balance';
 export { PERSONALITIES } from './ai/personalities';
 export { formatDate, dateOf } from './calendar';
 export { distanceKm } from './geo';
-export { refFare } from './demand';
+export { baseDemand, refFare } from './demand';

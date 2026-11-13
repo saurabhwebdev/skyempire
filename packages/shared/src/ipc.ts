@@ -49,8 +49,29 @@ export interface GameApi {
   preview(cmd: Command): Promise<PreviewResult>;
   setSpeed(speed: Speed): void;
   onTick(cb: (push: TickPush) => void): () => void;
+  onSpeed(cb: (speed: Speed) => void): () => void;
+  view(): Promise<ClientView | null>;
   history(airlineId: string, fromDay: number, toDay: number): Promise<AirlineDaily[]>;
   routeDemand(from: string, to: string): Promise<PreviewResult>;
   getSettings(): Promise<Settings>;
   setSettings(s: Partial<Settings>): Promise<Settings>;
 }
+
+/** IPC channel names shared by main and preload. */
+export const IPC = {
+  newGame: 'game:newGame',
+  loadSave: 'game:loadSave',
+  listSaves: 'game:listSaves',
+  save: 'game:save',
+  saveAs: 'game:saveAs',
+  command: 'game:command',
+  preview: 'game:preview',
+  setSpeed: 'game:setSpeed',
+  tick: 'game:tick',
+  speed: 'game:speed',
+  history: 'game:history',
+  routeDemand: 'game:routeDemand',
+  getSettings: 'game:getSettings',
+  setSettings: 'game:setSettings',
+  view: 'game:view',
+} as const;
