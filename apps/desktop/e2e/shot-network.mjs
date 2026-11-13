@@ -19,13 +19,16 @@ await win.evaluate(async () => {
     const p = await window.game.preview(cmd);
     await window.game.command({ ...cmd, fares: p.suggestedFares });
   }
-  await new Promise((r) => { const off = window.game.onTick((p) => { if (p.view.day >= 6) { off(); window.game.setSpeed(0); r(); } }); window.game.setSpeed(8); });
+  await new Promise((r) => { const off = window.game.onTick((p) => { if (p.view.day >= 70) { off(); window.game.setSpeed(0); r(); } }); window.game.setSpeed(8); });
 });
 await win.reload();
 await win.waitForTimeout(1500);
 await win.keyboard.press('1');
 await win.waitForTimeout(600);
 await win.screenshot({ path: join(dir, 'overview.png') });
+await win.keyboard.press('4');
+await win.waitForTimeout(800);
+await win.screenshot({ path: join(dir, 'finance.png') });
 await win.keyboard.press('2');
 await win.waitForTimeout(400);
 await win.getByText('LHR → MAD').click();

@@ -1,6 +1,7 @@
 import type { Catalog, ClientView, GameState } from '@skyempire/shared';
 import { pairKey } from './daySim';
 import { slotsFree } from './ops';
+import { availableCredit, companyValue, monthlyFixedCosts } from './finance';
 import { objectivesView } from './progression';
 
 /** Player-scoped snapshot for the UI. Rival finances stay hidden. */
@@ -34,5 +35,13 @@ export function buildClientView(state: GameState, playerId: string, catalog: Cat
     slotsFree: free,
     objectives: objectivesView(state, playerId, catalog),
     gameOver: state.gameOver,
+    finance: (() => {
+      const m = monthlyFixedCosts(state, playerId, catalog);
+      return {
+        companyValue: companyValue(state, playerId, catalog),
+        availableCredit: availableCredit(state, playerId, catalog),
+        monthlyFixed: m.leases + m.overhead + m.bases + m.marketing,
+      };
+    })(),
   };
 }

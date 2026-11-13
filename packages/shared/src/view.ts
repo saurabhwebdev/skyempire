@@ -74,4 +74,5 @@ export interface ClientView {
   slotsFree: Record<string, number>;
   objectives: { id: string; title: string; done: boolean }[];
   gameOver: GameState['gameOver'];
+  finance: { companyValue: Money; availableCredit: Money; monthlyFixed: Money };
 }
