@@ -100,7 +100,15 @@ export function WorldMap() {
       view
         ? buildLayers({
             airports: AIRPORTS, view, selection, showRivals, reduceMotion, colorBlind: settings.colorBlindRivals, zoom, fresh,
-            onClick: (i) => select(i),
+            onClick: (i) => {
+              const ed = useUi.getState().routeEditor;
+              // While creating a route, clicking an airport fills From (if it's a base and empty) or To.
+              if (ed && !ed.routeId && i.kind === 'airport') {
+                useUi.getState().openRouteEditor({ ...ed, to: i.id });
+                return;
+              }
+              select(i);
+            },
             onHover: setHover,
           })
         : [],

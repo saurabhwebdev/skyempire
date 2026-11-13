@@ -4,6 +4,11 @@ import { useGameBridge } from './hooks/useGame';
 import { BottomTray } from './shell/BottomTray';
 import { GameMenu, ShortcutSheet } from './shell/GameMenu';
 import { Inspector } from './shell/Inspector';
+import { InspectorContent } from './shell/InspectorContent';
+import { NetworkTray } from './screens/Network/NetworkTray';
+import { RouteEditor } from './screens/Network/RouteEditor';
+import { Button } from '@skyempire/ui';
+import { Plus } from 'lucide-react';
 import { NavRail } from './shell/NavRail';
 import { TopBar } from './shell/TopBar';
 import { WorldMap } from './map/WorldMap';
@@ -13,8 +18,15 @@ import { useShortcuts } from './shortcuts';
 import { useGameStore, useUi } from './store';
 import { t } from './strings/en';
 
+function TrayContent() {
+  const section = useUi((s) => s.section);
+  if (section === 'network') return <NetworkTray />;
+  return <div className="p-4 text-muted">{t.sections[section]}</div>;
+}
+
 function GameScreen() {
   const section = useUi((s) => s.section);
+  const editor = useUi((s) => s.routeEditor);
   return (
     <div className="flex h-screen flex-col">
       <TopBar />
@@ -23,12 +35,16 @@ function GameScreen() {
         <main className="relative flex min-w-0 flex-1">
           <div className="relative min-w-0 flex-1 bg-[var(--map-water)]" id="map-area">
             <WorldMap />
-            <BottomTray title={t.sections[section]}>
-              <div className="p-4 text-muted">{t.sections[section]}</div>
+            <BottomTray
+              title={t.sections[section]}
+              action={<Button size="sm" variant="primary" onClick={() => useUi.getState().openRouteEditor({})}><Plus className="size-4" /> New route</Button>}
+            >
+              <TrayContent />
             </BottomTray>
+            {editor && <RouteEditor key={editor.routeId ?? 'new'} />}
           </div>
           <Inspector>
-            <div />
+            <InspectorContent />
           </Inspector>
         </main>
       </div>
