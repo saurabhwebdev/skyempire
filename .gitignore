@@ -1,0 +1,9 @@
+node_modules/
+dist/
+out/
+.turbo/
+*.sqlite
+.superpowers/
+packages/data/.cache/
+coverage/
+test-results/
