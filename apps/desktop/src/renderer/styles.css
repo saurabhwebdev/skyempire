@@ -1,1 +1,5 @@
 @import "tailwindcss";
+@import "@skyempire/ui/tokens.css";
+@source "../../../../packages/ui/src";
+
+html[data-performance] .backdrop-blur-md { backdrop-filter: none; }

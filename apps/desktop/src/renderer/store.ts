@@ -1,0 +1,99 @@
+import type { ClientView, Notification, Settings, Speed, TickPush } from '@skyempire/shared';
+import { DEFAULT_SETTINGS } from '@skyempire/shared';
+import { create } from 'zustand';
+
+export type Section = 'overview' | 'network' | 'fleet' | 'finance' | 'market' | 'airline' | 'news';
+export const SECTIONS: Section[] = ['overview', 'network', 'fleet', 'finance', 'market', 'airline', 'news'];
+export type Selection = { kind: 'airport' | 'route' | 'aircraft' | 'airline'; id: string } | null;
+export interface RouteEditorState {
+  routeId?: string;
+  from?: string;
+  to?: string;
+}
+export const SPEEDS: Speed[] = [0, 1, 2, 4, 8];
+
+interface UiState {
+  screen: 'title' | 'newAirline' | 'game' | 'gameOver';
+  section: Section;
+  selection: Selection;
+  trayOpen: boolean;
+  speed: Speed;
+  lastSpeed: Exclude<Speed, 0>;
+  menuOpen: boolean;
+  shortcutsOpen: boolean;
+  routeEditor: RouteEditorState | null;
+  marketOpen: boolean;
+  setScreen(s: UiState['screen']): void;
+  setSection(s: Section): void;
+  select(s: Selection): void;
+  setTray(open: boolean): void;
+  setSpeed(s: Speed): void;
+  /** Speed changed by the game loop (e.g. auto-pause): update UI without echoing back. */
+  speedFromGame(s: Speed): void;
+  setMenu(open: boolean): void;
+  setShortcuts(open: boolean): void;
+  openRouteEditor(s: RouteEditorState | null): void;
+  setMarketOpen(open: boolean): void;
+}
+
+export const useUi = create<UiState>()((set, get) => ({
+  screen: 'title',
+  section: 'overview',
+  selection: null,
+  trayOpen: true,
+  speed: 0,
+  lastSpeed: 1,
+  menuOpen: false,
+  shortcutsOpen: false,
+  routeEditor: null,
+  marketOpen: false,
+  setScreen: (screen) => set({ screen }),
+  setSection: (section) => set({ section }),
+  select: (selection) => set({ selection }),
+  setTray: (trayOpen) => set({ trayOpen }),
+  setSpeed: (speed) => {
+    set(speed === 0 ? { speed } : { speed, lastSpeed: speed });
+    if (typeof window !== 'undefined') window.game?.setSpeed(speed);
+  },
+  speedFromGame: (speed) => set(speed === 0 ? { speed } : { speed, lastSpeed: speed }),
+  setMenu: (menuOpen) => {
+    if (menuOpen && get().speed !== 0) get().setSpeed(0);
+    set({ menuOpen });
+  },
+  setShortcuts: (shortcutsOpen) => set({ shortcutsOpen }),
+  openRouteEditor: (routeEditor) => set({ routeEditor }),
+  setMarketOpen: (marketOpen) => set({ marketOpen }),
+}));
+
+interface GameStoreState {
+  view: ClientView | null;
+  notifications: Notification[];
+  unread: number;
+  cashDelta: number | null;
+  settings: Settings;
+  applyPush(p: TickPush): void;
+  setView(v: ClientView | null): void;
+  markRead(): void;
+  setSettings(s: Settings): void;
+}
+
+export const useGameStore = create<GameStoreState>()((set, get) => ({
+  view: null,
+  notifications: [],
+  unread: 0,
+  cashDelta: null,
+  settings: DEFAULT_SETTINGS,
+  applyPush: (p) => {
+    const prev = get().view;
+    const fresh = p.summary?.notifications ?? [];
+    set({
+      view: p.view,
+      cashDelta: p.summary && prev ? p.view.player.cash - prev.player.cash : get().cashDelta,
+      notifications: [...fresh.slice().reverse(), ...get().notifications].slice(0, 200),
+      unread: get().unread + fresh.length,
+    });
+  },
+  setView: (view) => set({ view, cashDelta: null, notifications: [], unread: 0 }),
+  markRead: () => set({ unread: 0 }),
+  setSettings: (settings) => set({ settings }),
+}));
