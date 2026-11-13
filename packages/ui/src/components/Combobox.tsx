@@ -7,6 +7,8 @@ export interface ComboboxProps<T> {
   getKey(item: T): string;
   render(item: T): ReactNode;
   filter(item: T, query: string): boolean;
+  /** Optional relevance for a query (lower = better), applied after recents. */
+  rank?(item: T, query: string): number;
   onSelect(item: T): void;
   recentKeys?: string[];
   placeholder?: string;
@@ -17,7 +19,7 @@ export interface ComboboxProps<T> {
 }
 
 /** Searchable select (ARIA combobox). Recent items first; type to filter. */
-export function Combobox<T>({ label, items, getKey, render, filter, onSelect, recentKeys = [], placeholder, value, renderValue, limit = 50, autoFocus }: ComboboxProps<T>) {
+export function Combobox<T>({ label, items, getKey, render, filter, rank: relevance, onSelect, recentKeys = [], placeholder, value, renderValue, limit = 50, autoFocus }: ComboboxProps<T>) {
   const id = useId();
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
@@ -30,8 +32,8 @@ export function Combobox<T>({ label, items, getKey, render, filter, onSelect, re
       const r = recentKeys.indexOf(getKey(i));
       return r === -1 ? Infinity : r;
     };
-    return [...matched].sort((a, b) => rank(a) - rank(b)).slice(0, limit);
-  }, [items, query, recentKeys, filter, getKey, limit]);
+    return [...matched].sort((a, b) => rank(a) - rank(b) || (q && relevance ? relevance(a, q) - relevance(b, q) : 0)).slice(0, limit);
+  }, [items, query, recentKeys, filter, relevance, getKey, limit]);
 
   const choose = (item: T) => {
     onSelect(item);

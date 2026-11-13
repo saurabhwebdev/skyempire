@@ -7,6 +7,8 @@ import { Inspector } from './shell/Inspector';
 import { NavRail } from './shell/NavRail';
 import { TopBar } from './shell/TopBar';
 import { WorldMap } from './map/WorldMap';
+import { NewAirline } from './screens/NewAirline/NewAirline';
+import { Title } from './screens/Title/Title';
 import { useShortcuts } from './shortcuts';
 import { useGameStore, useUi } from './store';
 import { t } from './strings/en';
@@ -46,11 +48,8 @@ function Root() {
     document.documentElement.toggleAttribute('data-performance', settings.performanceMode);
   }, [settings]);
   if (screen === 'game') return <GameScreen />;
-  return (
-    <main className="grid h-screen place-items-center">
-      <h1 className="text-[48px] font-semibold tracking-[-0.02em]">{t.app}</h1>
-    </main>
-  );
+  if (screen === 'newAirline') return <NewAirline />;
+  return <Title />;
 }
 
 export function App() {

@@ -1,0 +1,21 @@
+// Dev helper: screenshot the title and new-airline screens.
+import { _electron as electron } from '@playwright/test';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+const [dir] = process.argv.slice(2);
+const app = await electron.launch({ args: [join(import.meta.dirname, '..', 'out', 'main', 'index.js')], env: { ...process.env, SKYEMPIRE_USER_DATA: mkdtempSync(join(tmpdir(), 'se-shot-')) } });
+const win = await app.firstWindow();
+win.on('pageerror', (e) => console.log('[pageerror]', e.message));
+await win.setViewportSize({ width: 1440, height: 900 });
+await win.waitForTimeout(1000);
+await win.screenshot({ path: join(dir, 'title.png') });
+await win.getByRole('button', { name: 'New career' }).click();
+await win.getByLabel('Airline name').fill('Albion Skyways');
+await win.waitForTimeout(400);
+await win.screenshot({ path: join(dir, 'new1.png') });
+await win.getByRole('button', { name: 'Choose a hub' }).click();
+await win.getByLabel('Search airports').fill('del');
+await win.waitForTimeout(300);
+await win.screenshot({ path: join(dir, 'new2.png') });
+await app.close();

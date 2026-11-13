@@ -3,3 +3,6 @@
 @source "../../../../packages/ui/src";
 
 html[data-performance] .backdrop-blur-md { backdrop-filter: none; }
+
+@keyframes title-dash { to { stroke-dashoffset: -320; } }
+.title-arc { animation: title-dash 18s linear infinite; }
