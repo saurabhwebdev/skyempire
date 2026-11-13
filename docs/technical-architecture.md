@@ -24,7 +24,7 @@
 | Desktop shell | Electron (latest stable) + electron-vite |
 | UI | React 19, Vite, Tailwind CSS v4, Radix primitives (via shadcn/ui), lucide-react icons |
 | State | Zustand (UI state), TanStack Query (snapshot/queries over IPC) |
-| Map | MapLibre GL JS + deck.gl (ArcLayer, ScatterplotLayer), Protomaps PMTiles basemap bundled offline |
+| Map | MapLibre GL JS + deck.gl (ArcLayer, ScatterplotLayer, TextLayer); basemap = Natural Earth 1:50m countries GeoJSON bundled offline (no tiles, no glyph server) |
 | Charts | Recharts (or visx if needed) |
 | Motion | CSS transitions + Motion (`motion` / Framer Motion) for presence/layout |
 | Sim | Plain TS, seeded RNG (`pure-rand`), no DOM/Node APIs |
@@ -73,7 +73,7 @@ skyempire/
 ## 6. IPC contract (renderer ↔ main ↔ worker)
 - Preload exposes a **typed API**: `game.newGame(opts)`, `game.load(id)`, `game.save()`, `game.command(cmd)`, `game.setSpeed(n)`, `game.onTick(cb)`, `game.query(name, params)`.
 - `contextIsolation: true`, `nodeIntegration: false`, sandboxed renderer; no remote content loaded.
-- Tick updates are pushed as **diffs/summary**; heavy views (route list, financial history) are fetched via `query`.
+- After each tick the worker pushes a full player-scoped **`ClientView`** (< 500 KB) plus a summary — simpler than diffs for single-player; revisit for multiplayer; heavy views (route list, financial history) are fetched via `query`.
 
 ## 7. Multiplayer (v0.3) — player-hosted
 - Host clicks **Host World** → main process starts Fastify + WebSocket on a port; sim worker becomes authoritative for that world.
@@ -101,7 +101,7 @@ skyempire/
 - `silhouettes/<ICAO>.svg`: real aircraft silhouettes, free-licensed from Wikimedia Commons (credited) or traced by us from public 3-views.
 - **Logo pack:** at runtime, Settings → "Download real logos" queries Wikidata (P154 logo image) for each airline QID and downloads the file from Wikimedia Commons into `%APPDATA%/SkyEmpire/logos/<IATA>.(svg|png)`. Players can also drop files there. Missing logo → placeholder badge (IATA code on brand color).
 - `routes.world.json`: real routes for the roster airlines filtered from OpenFlights `routes.dat` (ODbL, 2014 snapshot) — used only as AI preferences.
-- Basemap: Protomaps world PMTiles extract at low zoom (0–6), bundled (~30–60 MB).
+- Basemap: Natural Earth `ne_50m_admin_0_countries` GeoJSON (public domain), simplified, bundled (< 5 MB).
 
 ## 11. Quality gates
 - Unit tests for every formula in `simulation-spec.md`.
