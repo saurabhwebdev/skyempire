@@ -1,0 +1,323 @@
+{
+ "ATL": {
+  "slotCapacity": 2200
+ },
+ "DXB": {
+  "slotCapacity": 1100,
+  "business": 1.0,
+  "tourism": 0.85
+ },
+ "DFW": {
+  "slotCapacity": 1900
+ },
+ "LHR": {
+  "slotCapacity": 1300,
+  "business": 1.0
+ },
+ "HND": {
+  "slotCapacity": 1250,
+  "business": 1.0
+ },
+ "ORD": {
+  "slotCapacity": 2200,
+  "business": 1.0
+ },
+ "DEN": {
+  "slotCapacity": 1800
+ },
+ "IST": {
+  "slotCapacity": 1450
+ },
+ "LAX": {
+  "slotCapacity": 1500
+ },
+ "CDG": {
+  "slotCapacity": 1400,
+  "business": 1.0
+ },
+ "DEL": {
+  "slotCapacity": 1450
+ },
+ "AMS": {
+  "slotCapacity": 1400
+ },
+ "FRA": {
+  "slotCapacity": 1300,
+  "business": 1.0
+ },
+ "JFK": {
+  "slotCapacity": 1250,
+  "business": 1.0
+ },
+ "PEK": {
+  "slotCapacity": 1200,
+  "business": 1.0
+ },
+ "PVG": {
+  "slotCapacity": 1400,
+  "business": 1.0
+ },
+ "CAN": {
+  "slotCapacity": 1400
+ },
+ "SIN": {
+  "slotCapacity": 1050,
+  "business": 1.0
+ },
+ "ICN": {
+  "slotCapacity": 1050,
+  "business": 1.0
+ },
+ "BKK": {
+  "slotCapacity": 1000,
+  "tourism": 0.85
+ },
+ "MAD": {
+  "slotCapacity": 1100
+ },
+ "BCN": {
+  "slotCapacity": 900,
+  "tourism": 0.85
+ },
+ "MUC": {
+  "slotCapacity": 1000
+ },
+ "SFO": {
+  "slotCapacity": 1250
+ },
+ "SEA": {
+  "slotCapacity": 1250
+ },
+ "LAS": {
+  "slotCapacity": 1500,
+  "tourism": 0.9
+ },
+ "MCO": {
+  "slotCapacity": 1200,
+  "tourism": 0.95
+ },
+ "MIA": {
+  "slotCapacity": 1250
+ },
+ "CLT": {
+  "slotCapacity": 1700
+ },
+ "PHX": {
+  "slotCapacity": 1300
+ },
+ "EWR": {
+  "slotCapacity": 1200
+ },
+ "IAH": {
+  "slotCapacity": 1300
+ },
+ "BOM": {
+  "slotCapacity": 950
+ },
+ "DOH": {
+  "slotCapacity": 750
+ },
+ "HKG": {
+  "slotCapacity": 1100,
+  "business": 1.0
+ },
+ "SYD": {
+  "slotCapacity": 900
+ },
+ "MEL": {
+  "slotCapacity": 650
+ },
+ "GRU": {
+  "slotCapacity": 800
+ },
+ "MEX": {
+  "slotCapacity": 1050
+ },
+ "YYZ": {
+  "slotCapacity": 1200
+ },
+ "NRT": {
+  "slotCapacity": 700
+ },
+ "KUL": {
+  "slotCapacity": 900
+ },
+ "CGK": {
+  "slotCapacity": 1100
+ },
+ "MNL": {
+  "slotCapacity": 750
+ },
+ "FCO": {
+  "slotCapacity": 800,
+  "tourism": 0.85
+ },
+ "ZRH": {
+  "slotCapacity": 700,
+  "business": 1.0
+ },
+ "VIE": {
+  "slotCapacity": 700
+ },
+ "CPH": {
+  "slotCapacity": 650
+ },
+ "OSL": {
+  "slotCapacity": 600
+ },
+ "ARN": {
+  "slotCapacity": 600
+ },
+ "DUB": {
+  "slotCapacity": 650
+ },
+ "LGW": {
+  "slotCapacity": 900
+ },
+ "STN": {
+  "slotCapacity": 550
+ },
+ "MAN": {
+  "slotCapacity": 550
+ },
+ "BLR": {
+  "slotCapacity": 900
+ },
+ "HYD": {
+  "slotCapacity": 600
+ },
+ "MAA": {
+  "slotCapacity": 500
+ },
+ "CCU": {
+  "slotCapacity": 500
+ },
+ "JNB": {
+  "slotCapacity": 550
+ },
+ "CAI": {
+  "slotCapacity": 500
+ },
+ "ADD": {
+  "slotCapacity": 450
+ },
+ "NBO": {
+  "slotCapacity": 350
+ },
+ "LOS": {
+  "slotCapacity": 300
+ },
+ "RUH": {
+  "slotCapacity": 650
+ },
+ "JED": {
+  "slotCapacity": 700
+ },
+ "AUH": {
+  "slotCapacity": 550
+ },
+ "SAW": {
+  "slotCapacity": 650
+ },
+ "ATH": {
+  "slotCapacity": 650,
+  "tourism": 0.8
+ },
+ "LIS": {
+  "slotCapacity": 650
+ },
+ "BRU": {
+  "slotCapacity": 600
+ },
+ "PMI": {
+  "slotCapacity": 650,
+  "tourism": 0.95
+ },
+ "BUD": {
+  "slotCapacity": 400
+ },
+ "WAW": {
+  "slotCapacity": 500
+ },
+ "PRG": {
+  "slotCapacity": 450
+ },
+ "CUN": {
+  "slotCapacity": 900,
+  "tourism": 0.95
+ },
+ "BOG": {
+  "slotCapacity": 1000
+ },
+ "LIM": {
+  "slotCapacity": 650
+ },
+ "SCL": {
+  "slotCapacity": 650
+ },
+ "EZE": {
+  "slotCapacity": 400
+ },
+ "GIG": {
+  "slotCapacity": 450
+ },
+ "YVR": {
+  "slotCapacity": 900
+ },
+ "YUL": {
+  "slotCapacity": 700
+ },
+ "BOS": {
+  "slotCapacity": 1100
+ },
+ "DCA": {
+  "slotCapacity": 900
+ },
+ "IAD": {
+  "slotCapacity": 750
+ },
+ "MSP": {
+  "slotCapacity": 1100
+ },
+ "DTW": {
+  "slotCapacity": 1100
+ },
+ "PHL": {
+  "slotCapacity": 1000
+ },
+ "SLC": {
+  "slotCapacity": 900
+ },
+ "AKL": {
+  "slotCapacity": 500
+ },
+ "PER": {
+  "slotCapacity": 400
+ },
+ "BNE": {
+  "slotCapacity": 600
+ },
+ "TPE": {
+  "slotCapacity": 650
+ },
+ "KIX": {
+  "slotCapacity": 650
+ },
+ "SGN": {
+  "slotCapacity": 750
+ },
+ "HAN": {
+  "slotCapacity": 600
+ },
+ "DPS": {
+  "slotCapacity": 450,
+  "tourism": 0.95
+ },
+ "MLE": {
+  "slotCapacity": 300,
+  "tourism": 1.0
+ },
+ "CMB": {
+  "slotCapacity": 300
+ }
+}

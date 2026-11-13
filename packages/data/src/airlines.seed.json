@@ -1,0 +1,2107 @@
+[
+ {
+  "iata": "AA",
+  "icao": "AAL",
+  "name": "American Airlines",
+  "hubId": "DFW",
+  "personality": "legacy",
+  "sizeRank": 1,
+  "brandColor": "#0078D2",
+  "fleetTypes": [
+   "A21N",
+   "A320",
+   "B738",
+   "B38M",
+   "B789",
+   "B77W",
+   "E175"
+  ]
+ },
+ {
+  "iata": "DL",
+  "icao": "DAL",
+  "name": "Delta Air Lines",
+  "hubId": "ATL",
+  "personality": "legacy",
+  "sizeRank": 2,
+  "brandColor": "#C8102E",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A320",
+   "B738",
+   "A339",
+   "A359",
+   "BCS1",
+   "BCS3",
+   "E175"
+  ]
+ },
+ {
+  "iata": "UA",
+  "icao": "UAL",
+  "name": "United Airlines",
+  "hubId": "ORD",
+  "personality": "legacy",
+  "sizeRank": 3,
+  "brandColor": "#005DAA",
+  "fleetTypes": [
+   "A320",
+   "A21N",
+   "B738",
+   "B38M",
+   "B789",
+   "B77W",
+   "E175"
+  ]
+ },
+ {
+  "iata": "WN",
+  "icao": "SWA",
+  "name": "Southwest Airlines",
+  "hubId": "DAL",
+  "personality": "budget",
+  "sizeRank": 4,
+  "brandColor": "#304CB2",
+  "fleetTypes": [
+   "B738",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "CZ",
+  "icao": "CSN",
+  "name": "China Southern Airlines",
+  "hubId": "CAN",
+  "personality": "legacy",
+  "sizeRank": 5,
+  "brandColor": "#0B6CB4",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A320",
+   "B738",
+   "A333",
+   "B789",
+   "A359",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "MU",
+  "icao": "CES",
+  "name": "China Eastern Airlines",
+  "hubId": "PVG",
+  "personality": "legacy",
+  "sizeRank": 6,
+  "brandColor": "#1A2D6E",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A320",
+   "B738",
+   "A333",
+   "B789",
+   "A359",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "CA",
+  "icao": "CCA",
+  "name": "Air China",
+  "hubId": "PEK",
+  "personality": "legacy",
+  "sizeRank": 7,
+  "brandColor": "#E60012",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A320",
+   "B738",
+   "A333",
+   "B789",
+   "B77W",
+   "A359"
+  ]
+ },
+ {
+  "iata": "FR",
+  "icao": "RYR",
+  "name": "Ryanair",
+  "hubId": "DUB",
+  "personality": "budget",
+  "sizeRank": 8,
+  "brandColor": "#073590",
+  "fleetTypes": [
+   "B738",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "TK",
+  "icao": "THY",
+  "name": "Turkish Airlines",
+  "hubId": "IST",
+  "personality": "gulf",
+  "sizeRank": 9,
+  "brandColor": "#C70A0C",
+  "fleetTypes": [
+   "A21N",
+   "A333",
+   "B789",
+   "A359",
+   "B77W",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "6E",
+  "icao": "IGO",
+  "name": "IndiGo",
+  "hubId": "DEL",
+  "personality": "budget",
+  "sizeRank": 10,
+  "brandColor": "#001B94",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "AT76",
+   "A21X"
+  ]
+ },
+ {
+  "iata": "EK",
+  "icao": "UAE",
+  "name": "Emirates",
+  "hubId": "DXB",
+  "personality": "gulf",
+  "sizeRank": 11,
+  "brandColor": "#D71921",
+  "fleetTypes": [
+   "B77W",
+   "A359"
+  ]
+ },
+ {
+  "iata": "U2",
+  "icao": "EZY",
+  "name": "easyJet",
+  "hubId": "LGW",
+  "personality": "budget",
+  "sizeRank": 12,
+  "brandColor": "#FF6600",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A21N"
+  ]
+ },
+ {
+  "iata": "LH",
+  "icao": "DLH",
+  "name": "Lufthansa",
+  "hubId": "FRA",
+  "personality": "legacy",
+  "sizeRank": 13,
+  "brandColor": "#05164D",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A339",
+   "A359",
+   "B789",
+   "A333"
+  ]
+ },
+ {
+  "iata": "AF",
+  "icao": "AFR",
+  "name": "Air France",
+  "hubId": "CDG",
+  "personality": "legacy",
+  "sizeRank": 14,
+  "brandColor": "#002157",
+  "fleetTypes": [
+   "A20N",
+   "BCS3",
+   "A359",
+   "B789",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "BA",
+  "icao": "BAW",
+  "name": "British Airways",
+  "hubId": "LHR",
+  "personality": "legacy",
+  "sizeRank": 15,
+  "brandColor": "#075AAA",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A320",
+   "B789",
+   "A359",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "QR",
+  "icao": "QTR",
+  "name": "Qatar Airways",
+  "hubId": "DOH",
+  "personality": "gulf",
+  "sizeRank": 16,
+  "brandColor": "#5C0632",
+  "fleetTypes": [
+   "A20N",
+   "A359",
+   "B789",
+   "B77W",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "AC",
+  "icao": "ACA",
+  "name": "Air Canada",
+  "hubId": "YYZ",
+  "personality": "legacy",
+  "sizeRank": 17,
+  "brandColor": "#F01428",
+  "fleetTypes": [
+   "BCS3",
+   "A320",
+   "B38M",
+   "B789",
+   "B77W",
+   "A333",
+   "E175"
+  ]
+ },
+ {
+  "iata": "LA",
+  "icao": "LAN",
+  "name": "LATAM Airlines",
+  "hubId": "SCL",
+  "personality": "legacy",
+  "sizeRank": 18,
+  "brandColor": "#1B0088",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A21N",
+   "B789",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "AI",
+  "icao": "AIC",
+  "name": "Air India",
+  "hubId": "DEL",
+  "personality": "legacy",
+  "sizeRank": 19,
+  "brandColor": "#DA0E29",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "B789",
+   "A359",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "NH",
+  "icao": "ANA",
+  "name": "All Nippon Airways",
+  "hubId": "HND",
+  "personality": "legacy",
+  "sizeRank": 20,
+  "brandColor": "#13448F",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "B38M",
+   "B789",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "AK",
+  "icao": "AXM",
+  "name": "AirAsia",
+  "hubId": "KUL",
+  "personality": "budget",
+  "sizeRank": 21,
+  "brandColor": "#E31B23",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A21N"
+  ]
+ },
+ {
+  "iata": "B6",
+  "icao": "JBU",
+  "name": "JetBlue",
+  "hubId": "JFK",
+  "personality": "budget",
+  "sizeRank": 22,
+  "brandColor": "#003876",
+  "fleetTypes": [
+   "A320",
+   "A21N",
+   "BCS3"
+  ]
+ },
+ {
+  "iata": "W6",
+  "icao": "WZZ",
+  "name": "Wizz Air",
+  "hubId": "BUD",
+  "personality": "expander",
+  "sizeRank": 23,
+  "brandColor": "#C6007E",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A21X"
+  ]
+ },
+ {
+  "iata": "AS",
+  "icao": "ASA",
+  "name": "Alaska Airlines",
+  "hubId": "SEA",
+  "personality": "legacy",
+  "sizeRank": 24,
+  "brandColor": "#01426A",
+  "fleetTypes": [
+   "B738",
+   "B38M",
+   "E175"
+  ]
+ },
+ {
+  "iata": "OO",
+  "icao": "SKW",
+  "name": "SkyWest Airlines",
+  "hubId": "SLC",
+  "personality": "regional",
+  "sizeRank": 25,
+  "brandColor": "#1D3F73",
+  "fleetTypes": [
+   "E175"
+  ]
+ },
+ {
+  "iata": "KL",
+  "icao": "KLM",
+  "name": "KLM",
+  "hubId": "AMS",
+  "personality": "legacy",
+  "sizeRank": 26,
+  "brandColor": "#00A1DE",
+  "fleetTypes": [
+   "B738",
+   "E295",
+   "E175",
+   "B789",
+   "A333",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "JL",
+  "icao": "JAL",
+  "name": "Japan Airlines",
+  "hubId": "HND",
+  "personality": "legacy",
+  "sizeRank": 27,
+  "brandColor": "#CC0000",
+  "fleetTypes": [
+   "B738",
+   "A359",
+   "B789",
+   "B77W",
+   "E175"
+  ]
+ },
+ {
+  "iata": "SQ",
+  "icao": "SIA",
+  "name": "Singapore Airlines",
+  "hubId": "SIN",
+  "personality": "legacy",
+  "sizeRank": 28,
+  "brandColor": "#F99F1C",
+  "fleetTypes": [
+   "B38M",
+   "A359",
+   "B789",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "QF",
+  "icao": "QFA",
+  "name": "Qantas",
+  "hubId": "SYD",
+  "personality": "legacy",
+  "sizeRank": 29,
+  "brandColor": "#E0001B",
+  "fleetTypes": [
+   "B738",
+   "A333",
+   "B789",
+   "A21X"
+  ]
+ },
+ {
+  "iata": "KE",
+  "icao": "KAL",
+  "name": "Korean Air",
+  "hubId": "ICN",
+  "personality": "legacy",
+  "sizeRank": 30,
+  "brandColor": "#1C4C9C",
+  "fleetTypes": [
+   "B38M",
+   "A333",
+   "B789",
+   "B77W",
+   "BCS3"
+  ]
+ },
+ {
+  "iata": "G3",
+  "icao": "GLO",
+  "name": "GOL",
+  "hubId": "GRU",
+  "personality": "budget",
+  "sizeRank": 31,
+  "brandColor": "#FF7020",
+  "fleetTypes": [
+   "B738",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "3U",
+  "icao": "CSC",
+  "name": "Sichuan Airlines",
+  "hubId": "CTU",
+  "personality": "legacy",
+  "sizeRank": 33,
+  "brandColor": "#A31F24",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A21N",
+   "A333",
+   "A359"
+  ]
+ },
+ {
+  "iata": "HU",
+  "icao": "CHH",
+  "name": "Hainan Airlines",
+  "hubId": "HAK",
+  "personality": "legacy",
+  "sizeRank": 34,
+  "brandColor": "#D2242A",
+  "fleetTypes": [
+   "B738",
+   "B38M",
+   "A333",
+   "B789"
+  ]
+ },
+ {
+  "iata": "ZH",
+  "icao": "CSZ",
+  "name": "Shenzhen Airlines",
+  "hubId": "SZX",
+  "personality": "legacy",
+  "sizeRank": 35,
+  "brandColor": "#C8161E",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "B738",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "MF",
+  "icao": "CXA",
+  "name": "XiamenAir",
+  "hubId": "XMN",
+  "personality": "legacy",
+  "sizeRank": 36,
+  "brandColor": "#1E5BA8",
+  "fleetTypes": [
+   "B738",
+   "B38M",
+   "B789"
+  ]
+ },
+ {
+  "iata": "VJ",
+  "icao": "VJC",
+  "name": "VietJet Air",
+  "hubId": "SGN",
+  "personality": "expander",
+  "sizeRank": 37,
+  "brandColor": "#E7241D",
+  "fleetTypes": [
+   "A320",
+   "A21N",
+   "A333"
+  ]
+ },
+ {
+  "iata": "JT",
+  "icao": "LNI",
+  "name": "Lion Air",
+  "hubId": "CGK",
+  "personality": "budget",
+  "sizeRank": 38,
+  "brandColor": "#ED1C24",
+  "fleetTypes": [
+   "B738",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "EY",
+  "icao": "ETD",
+  "name": "Etihad Airways",
+  "hubId": "AUH",
+  "personality": "gulf",
+  "sizeRank": 39,
+  "brandColor": "#BD8B13",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "B789",
+   "A359",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "CX",
+  "icao": "CPA",
+  "name": "Cathay Pacific",
+  "hubId": "HKG",
+  "personality": "legacy",
+  "sizeRank": 40,
+  "brandColor": "#006564",
+  "fleetTypes": [
+   "A21N",
+   "A333",
+   "A359",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "SV",
+  "icao": "SVA",
+  "name": "Saudia",
+  "hubId": "JED",
+  "personality": "legacy",
+  "sizeRank": 41,
+  "brandColor": "#0F5A3C",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A333",
+   "B789",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "AD",
+  "icao": "AZU",
+  "name": "Azul Brazilian Airlines",
+  "hubId": "VCP",
+  "personality": "expander",
+  "sizeRank": 42,
+  "brandColor": "#0E4D92",
+  "fleetTypes": [
+   "AT76",
+   "E295",
+   "A20N",
+   "A339"
+  ]
+ },
+ {
+  "iata": "F9",
+  "icao": "FFT",
+  "name": "Frontier Airlines",
+  "hubId": "DEN",
+  "personality": "budget",
+  "sizeRank": 43,
+  "brandColor": "#006341",
+  "fleetTypes": [
+   "A20N",
+   "A21N"
+  ]
+ },
+ {
+  "iata": "AM",
+  "icao": "AMX",
+  "name": "Aeroméxico",
+  "hubId": "MEX",
+  "personality": "legacy",
+  "sizeRank": 44,
+  "brandColor": "#0B2343",
+  "fleetTypes": [
+   "B738",
+   "B38M",
+   "B789",
+   "E175"
+  ]
+ },
+ {
+  "iata": "WS",
+  "icao": "WJA",
+  "name": "WestJet",
+  "hubId": "YYC",
+  "personality": "budget",
+  "sizeRank": 45,
+  "brandColor": "#00A4E4",
+  "fleetTypes": [
+   "B738",
+   "B38M",
+   "B789",
+   "DH8D"
+  ]
+ },
+ {
+  "iata": "IB",
+  "icao": "IBE",
+  "name": "Iberia",
+  "hubId": "MAD",
+  "personality": "legacy",
+  "sizeRank": 46,
+  "brandColor": "#D7192D",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A333",
+   "A359",
+   "A21X"
+  ]
+ },
+ {
+  "iata": "DY",
+  "icao": "NOZ",
+  "name": "Norwegian",
+  "hubId": "OSL",
+  "personality": "budget",
+  "sizeRank": 47,
+  "brandColor": "#D81939",
+  "fleetTypes": [
+   "B738",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "VY",
+  "icao": "VLG",
+  "name": "Vueling",
+  "hubId": "BCN",
+  "personality": "budget",
+  "sizeRank": 48,
+  "brandColor": "#FFCC00",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A21N"
+  ]
+ },
+ {
+  "iata": "PC",
+  "icao": "PGT",
+  "name": "Pegasus Airlines",
+  "hubId": "SAW",
+  "personality": "budget",
+  "sizeRank": 49,
+  "brandColor": "#FDC600",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "B738"
+  ]
+ },
+ {
+  "iata": "Y4",
+  "icao": "VOI",
+  "name": "Volaris",
+  "hubId": "MEX",
+  "personality": "budget",
+  "sizeRank": 50,
+  "brandColor": "#5F259F",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A21N"
+  ]
+ },
+ {
+  "iata": "AV",
+  "icao": "AVA",
+  "name": "Avianca",
+  "hubId": "BOG",
+  "personality": "legacy",
+  "sizeRank": 51,
+  "brandColor": "#DA291C",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "B789"
+  ]
+ },
+ {
+  "iata": "CM",
+  "icao": "CMP",
+  "name": "Copa Airlines",
+  "hubId": "PTY",
+  "personality": "legacy",
+  "sizeRank": 52,
+  "brandColor": "#0F3B7C",
+  "fleetTypes": [
+   "B738",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "LX",
+  "icao": "SWR",
+  "name": "Swiss",
+  "hubId": "ZRH",
+  "personality": "legacy",
+  "sizeRank": 53,
+  "brandColor": "#E2001A",
+  "fleetTypes": [
+   "BCS1",
+   "BCS3",
+   "A20N",
+   "A21N",
+   "A333",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "OS",
+  "icao": "AUA",
+  "name": "Austrian Airlines",
+  "hubId": "VIE",
+  "personality": "legacy",
+  "sizeRank": 54,
+  "brandColor": "#D81E05",
+  "fleetTypes": [
+   "A320",
+   "E295",
+   "B789"
+  ]
+ },
+ {
+  "iata": "SK",
+  "icao": "SAS",
+  "name": "SAS",
+  "hubId": "CPH",
+  "personality": "legacy",
+  "sizeRank": 55,
+  "brandColor": "#0C1E5B",
+  "fleetTypes": [
+   "A20N",
+   "A339",
+   "E175"
+  ]
+ },
+ {
+  "iata": "AY",
+  "icao": "FIN",
+  "name": "Finnair",
+  "hubId": "HEL",
+  "personality": "legacy",
+  "sizeRank": 56,
+  "brandColor": "#0B1560",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A333",
+   "A359",
+   "AT76"
+  ]
+ },
+ {
+  "iata": "TP",
+  "icao": "TAP",
+  "name": "TAP Air Portugal",
+  "hubId": "LIS",
+  "personality": "legacy",
+  "sizeRank": 57,
+  "brandColor": "#00A651",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A339",
+   "A21X",
+   "E295"
+  ]
+ },
+ {
+  "iata": "AZ",
+  "icao": "ITY",
+  "name": "ITA Airways",
+  "hubId": "FCO",
+  "personality": "legacy",
+  "sizeRank": 58,
+  "brandColor": "#0A3F8C",
+  "fleetTypes": [
+   "A20N",
+   "A339",
+   "A359",
+   "BCS3"
+  ]
+ },
+ {
+  "iata": "LO",
+  "icao": "LOT",
+  "name": "LOT Polish Airlines",
+  "hubId": "WAW",
+  "personality": "legacy",
+  "sizeRank": 59,
+  "brandColor": "#11397E",
+  "fleetTypes": [
+   "B38M",
+   "E175",
+   "E295",
+   "B789"
+  ]
+ },
+ {
+  "iata": "EI",
+  "icao": "EIN",
+  "name": "Aer Lingus",
+  "hubId": "DUB",
+  "personality": "legacy",
+  "sizeRank": 60,
+  "brandColor": "#006272",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A21N",
+   "A333",
+   "A21X"
+  ]
+ },
+ {
+  "iata": "EW",
+  "icao": "EWG",
+  "name": "Eurowings",
+  "hubId": "DUS",
+  "personality": "budget",
+  "sizeRank": 61,
+  "brandColor": "#A6004E",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A21N"
+  ]
+ },
+ {
+  "iata": "LS",
+  "icao": "EXS",
+  "name": "Jet2.com",
+  "hubId": "MAN",
+  "personality": "budget",
+  "sizeRank": 62,
+  "brandColor": "#EE3124",
+  "fleetTypes": [
+   "B738",
+   "A21N"
+  ]
+ },
+ {
+  "iata": "BY",
+  "icao": "TOM",
+  "name": "TUI Airways",
+  "hubId": "MAN",
+  "personality": "budget",
+  "sizeRank": 63,
+  "brandColor": "#092A5E",
+  "fleetTypes": [
+   "B738",
+   "B38M",
+   "B789"
+  ]
+ },
+ {
+  "iata": "SN",
+  "icao": "BEL",
+  "name": "Brussels Airlines",
+  "hubId": "BRU",
+  "personality": "legacy",
+  "sizeRank": 64,
+  "brandColor": "#00235F",
+  "fleetTypes": [
+   "A320",
+   "A333"
+  ]
+ },
+ {
+  "iata": "HV",
+  "icao": "TRA",
+  "name": "Transavia",
+  "hubId": "AMS",
+  "personality": "budget",
+  "sizeRank": 65,
+  "brandColor": "#00D66B",
+  "fleetTypes": [
+   "B738",
+   "A20N",
+   "A21N"
+  ]
+ },
+ {
+  "iata": "DE",
+  "icao": "CFG",
+  "name": "Condor",
+  "hubId": "FRA",
+  "personality": "budget",
+  "sizeRank": 66,
+  "brandColor": "#FDB813",
+  "fleetTypes": [
+   "A320",
+   "A21N",
+   "A339"
+  ]
+ },
+ {
+  "iata": "WK",
+  "icao": "EDW",
+  "name": "Edelweiss Air",
+  "hubId": "ZRH",
+  "personality": "budget",
+  "sizeRank": 67,
+  "brandColor": "#B8001F",
+  "fleetTypes": [
+   "A320",
+   "A333",
+   "A359"
+  ]
+ },
+ {
+  "iata": "BT",
+  "icao": "BTI",
+  "name": "airBaltic",
+  "hubId": "RIX",
+  "personality": "regional",
+  "sizeRank": 68,
+  "brandColor": "#CDDC29",
+  "fleetTypes": [
+   "BCS3"
+  ]
+ },
+ {
+  "iata": "WF",
+  "icao": "WIF",
+  "name": "Widerøe",
+  "hubId": "BOO",
+  "personality": "regional",
+  "sizeRank": 69,
+  "brandColor": "#009BDA",
+  "fleetTypes": [
+   "DH8D",
+   "E295"
+  ]
+ },
+ {
+  "iata": "YW",
+  "icao": "ANE",
+  "name": "Air Nostrum",
+  "hubId": "VLC",
+  "personality": "regional",
+  "sizeRank": 70,
+  "brandColor": "#E30613",
+  "fleetTypes": [
+   "AT76",
+   "E175"
+  ]
+ },
+ {
+  "iata": "LG",
+  "icao": "LGL",
+  "name": "Luxair",
+  "hubId": "LUX",
+  "personality": "regional",
+  "sizeRank": 71,
+  "brandColor": "#00A1E4",
+  "fleetTypes": [
+   "DH8D",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "EN",
+  "icao": "DLA",
+  "name": "Air Dolomiti",
+  "hubId": "VRN",
+  "personality": "regional",
+  "sizeRank": 72,
+  "brandColor": "#1C3F94",
+  "fleetTypes": [
+   "E295",
+   "E175"
+  ]
+ },
+ {
+  "iata": "OU",
+  "icao": "CTN",
+  "name": "Croatia Airlines",
+  "hubId": "ZAG",
+  "personality": "regional",
+  "sizeRank": 73,
+  "brandColor": "#003F87",
+  "fleetTypes": [
+   "DH8D",
+   "BCS1"
+  ]
+ },
+ {
+  "iata": "KM",
+  "icao": "KMM",
+  "name": "KM Malta Airlines",
+  "hubId": "MLA",
+  "personality": "regional",
+  "sizeRank": 74,
+  "brandColor": "#CE1126",
+  "fleetTypes": [
+   "A20N"
+  ]
+ },
+ {
+  "iata": "FI",
+  "icao": "ICE",
+  "name": "Icelandair",
+  "hubId": "KEF",
+  "personality": "legacy",
+  "sizeRank": 75,
+  "brandColor": "#002D72",
+  "fleetTypes": [
+   "B38M",
+   "A21N",
+   "A21X",
+   "DH8D"
+  ]
+ },
+ {
+  "iata": "A3",
+  "icao": "AEE",
+  "name": "Aegean Airlines",
+  "hubId": "ATH",
+  "personality": "legacy",
+  "sizeRank": 76,
+  "brandColor": "#00205B",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A21N",
+   "DH8D"
+  ]
+ },
+ {
+  "iata": "RO",
+  "icao": "ROT",
+  "name": "TAROM",
+  "hubId": "OTP",
+  "personality": "legacy",
+  "sizeRank": 77,
+  "brandColor": "#003876",
+  "fleetTypes": [
+   "B738",
+   "B38M",
+   "AT76"
+  ]
+ },
+ {
+  "iata": "JU",
+  "icao": "ASL",
+  "name": "Air Serbia",
+  "hubId": "BEG",
+  "personality": "legacy",
+  "sizeRank": 78,
+  "brandColor": "#1B3A6B",
+  "fleetTypes": [
+   "A320",
+   "AT76",
+   "A333"
+  ]
+ },
+ {
+  "iata": "SU",
+  "icao": "AFL",
+  "name": "Aeroflot",
+  "hubId": "SVO",
+  "personality": "legacy",
+  "sizeRank": 79,
+  "brandColor": "#02458D",
+  "fleetTypes": [
+   "A320",
+   "A21N",
+   "A333",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "J2",
+  "icao": "AHY",
+  "name": "Azerbaijan Airlines",
+  "hubId": "GYD",
+  "personality": "legacy",
+  "sizeRank": 80,
+  "brandColor": "#00B2E3",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "B789"
+  ]
+ },
+ {
+  "iata": "KC",
+  "icao": "KZR",
+  "name": "Air Astana",
+  "hubId": "ALA",
+  "personality": "legacy",
+  "sizeRank": 81,
+  "brandColor": "#00808A",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "B789",
+   "E295"
+  ]
+ },
+ {
+  "iata": "HY",
+  "icao": "UZB",
+  "name": "Uzbekistan Airways",
+  "hubId": "TAS",
+  "personality": "legacy",
+  "sizeRank": 82,
+  "brandColor": "#0072BB",
+  "fleetTypes": [
+   "A320",
+   "A21N",
+   "B789"
+  ]
+ },
+ {
+  "iata": "MS",
+  "icao": "MSR",
+  "name": "EgyptAir",
+  "hubId": "CAI",
+  "personality": "legacy",
+  "sizeRank": 83,
+  "brandColor": "#00265C",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A333",
+   "B789",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "ET",
+  "icao": "ETH",
+  "name": "Ethiopian Airlines",
+  "hubId": "ADD",
+  "personality": "gulf",
+  "sizeRank": 84,
+  "brandColor": "#078930",
+  "fleetTypes": [
+   "DH8D",
+   "B38M",
+   "B789",
+   "A359",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "KQ",
+  "icao": "KQA",
+  "name": "Kenya Airways",
+  "hubId": "NBO",
+  "personality": "legacy",
+  "sizeRank": 85,
+  "brandColor": "#CE1126",
+  "fleetTypes": [
+   "E175",
+   "B38M",
+   "B789"
+  ]
+ },
+ {
+  "iata": "SA",
+  "icao": "SAA",
+  "name": "South African Airways",
+  "hubId": "JNB",
+  "personality": "legacy",
+  "sizeRank": 86,
+  "brandColor": "#00205B",
+  "fleetTypes": [
+   "A320",
+   "A333",
+   "A359"
+  ]
+ },
+ {
+  "iata": "FA",
+  "icao": "SFR",
+  "name": "FlySafair",
+  "hubId": "JNB",
+  "personality": "budget",
+  "sizeRank": 87,
+  "brandColor": "#00A3E0",
+  "fleetTypes": [
+   "B738"
+  ]
+ },
+ {
+  "iata": "AT",
+  "icao": "RAM",
+  "name": "Royal Air Maroc",
+  "hubId": "CMN",
+  "personality": "legacy",
+  "sizeRank": 88,
+  "brandColor": "#C1272D",
+  "fleetTypes": [
+   "B738",
+   "B38M",
+   "B789",
+   "AT76",
+   "E175"
+  ]
+ },
+ {
+  "iata": "TU",
+  "icao": "TAR",
+  "name": "Tunisair",
+  "hubId": "TUN",
+  "personality": "legacy",
+  "sizeRank": 89,
+  "brandColor": "#E70013",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A333"
+  ]
+ },
+ {
+  "iata": "AH",
+  "icao": "DAH",
+  "name": "Air Algérie",
+  "hubId": "ALG",
+  "personality": "legacy",
+  "sizeRank": 90,
+  "brandColor": "#E40521",
+  "fleetTypes": [
+   "B738",
+   "A333",
+   "AT76"
+  ]
+ },
+ {
+  "iata": "P4",
+  "icao": "APK",
+  "name": "Air Peace",
+  "hubId": "LOS",
+  "personality": "expander",
+  "sizeRank": 91,
+  "brandColor": "#0B3D91",
+  "fleetTypes": [
+   "B738",
+   "E295",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "WB",
+  "icao": "RWD",
+  "name": "RwandAir",
+  "hubId": "KGL",
+  "personality": "legacy",
+  "sizeRank": 92,
+  "brandColor": "#00A1DE",
+  "fleetTypes": [
+   "B738",
+   "A333",
+   "DH8D"
+  ]
+ },
+ {
+  "iata": "HF",
+  "icao": "VRE",
+  "name": "Air Côte d'Ivoire",
+  "hubId": "ABJ",
+  "personality": "regional",
+  "sizeRank": 93,
+  "brandColor": "#F18A00",
+  "fleetTypes": [
+   "A20N",
+   "A333",
+   "DH8D"
+  ]
+ },
+ {
+  "iata": "MK",
+  "icao": "MAU",
+  "name": "Air Mauritius",
+  "hubId": "MRU",
+  "personality": "legacy",
+  "sizeRank": 94,
+  "brandColor": "#D71920",
+  "fleetTypes": [
+   "A339",
+   "A359",
+   "AT76"
+  ]
+ },
+ {
+  "iata": "RJ",
+  "icao": "RJA",
+  "name": "Royal Jordanian",
+  "hubId": "AMM",
+  "personality": "legacy",
+  "sizeRank": 95,
+  "brandColor": "#8D734A",
+  "fleetTypes": [
+   "A320",
+   "A21N",
+   "B789",
+   "E175"
+  ]
+ },
+ {
+  "iata": "ME",
+  "icao": "MEA",
+  "name": "Middle East Airlines",
+  "hubId": "BEY",
+  "personality": "legacy",
+  "sizeRank": 96,
+  "brandColor": "#00843D",
+  "fleetTypes": [
+   "A21N",
+   "A333"
+  ]
+ },
+ {
+  "iata": "KU",
+  "icao": "KAC",
+  "name": "Kuwait Airways",
+  "hubId": "KWI",
+  "personality": "legacy",
+  "sizeRank": 97,
+  "brandColor": "#00548B",
+  "fleetTypes": [
+   "A20N",
+   "A333",
+   "A339",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "GF",
+  "icao": "GFA",
+  "name": "Gulf Air",
+  "hubId": "BAH",
+  "personality": "legacy",
+  "sizeRank": 98,
+  "brandColor": "#B8975A",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "B789"
+  ]
+ },
+ {
+  "iata": "WY",
+  "icao": "OMA",
+  "name": "Oman Air",
+  "hubId": "MCT",
+  "personality": "legacy",
+  "sizeRank": 99,
+  "brandColor": "#826C34",
+  "fleetTypes": [
+   "B738",
+   "B38M",
+   "B789"
+  ]
+ },
+ {
+  "iata": "XY",
+  "icao": "KNE",
+  "name": "flynas",
+  "hubId": "RUH",
+  "personality": "budget",
+  "sizeRank": 100,
+  "brandColor": "#8DC63F",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A333"
+  ]
+ },
+ {
+  "iata": "FZ",
+  "icao": "FDB",
+  "name": "flydubai",
+  "hubId": "DXB",
+  "personality": "budget",
+  "sizeRank": 101,
+  "brandColor": "#F26522",
+  "fleetTypes": [
+   "B738",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "G9",
+  "icao": "ABY",
+  "name": "Air Arabia",
+  "hubId": "SHJ",
+  "personality": "budget",
+  "sizeRank": 102,
+  "brandColor": "#E31837",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A21N"
+  ]
+ },
+ {
+  "iata": "SG",
+  "icao": "SEJ",
+  "name": "SpiceJet",
+  "hubId": "DEL",
+  "personality": "budget",
+  "sizeRank": 103,
+  "brandColor": "#E21F26",
+  "fleetTypes": [
+   "B738",
+   "B38M",
+   "DH8D"
+  ]
+ },
+ {
+  "iata": "IX",
+  "icao": "AXB",
+  "name": "Air India Express",
+  "hubId": "BLR",
+  "personality": "budget",
+  "sizeRank": 104,
+  "brandColor": "#E35205",
+  "fleetTypes": [
+   "B738",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "QP",
+  "icao": "AKJ",
+  "name": "Akasa Air",
+  "hubId": "BOM",
+  "personality": "expander",
+  "sizeRank": 105,
+  "brandColor": "#FF6D38",
+  "fleetTypes": [
+   "B38M"
+  ]
+ },
+ {
+  "iata": "9I",
+  "icao": "LLR",
+  "name": "Alliance Air",
+  "hubId": "DEL",
+  "personality": "regional",
+  "sizeRank": 106,
+  "brandColor": "#D41F2F",
+  "fleetTypes": [
+   "AT46",
+   "AT76"
+  ]
+ },
+ {
+  "iata": "UL",
+  "icao": "ALK",
+  "name": "SriLankan Airlines",
+  "hubId": "CMB",
+  "personality": "legacy",
+  "sizeRank": 107,
+  "brandColor": "#0E3A7B",
+  "fleetTypes": [
+   "A320",
+   "A21N",
+   "A333"
+  ]
+ },
+ {
+  "iata": "BG",
+  "icao": "BBC",
+  "name": "Biman Bangladesh Airlines",
+  "hubId": "DAC",
+  "personality": "legacy",
+  "sizeRank": 108,
+  "brandColor": "#0A7B3E",
+  "fleetTypes": [
+   "B738",
+   "DH8D",
+   "B789",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "PK",
+  "icao": "PIA",
+  "name": "Pakistan International Airlines",
+  "hubId": "KHI",
+  "personality": "legacy",
+  "sizeRank": 109,
+  "brandColor": "#006747",
+  "fleetTypes": [
+   "A320",
+   "AT76",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "TG",
+  "icao": "THA",
+  "name": "Thai Airways",
+  "hubId": "BKK",
+  "personality": "legacy",
+  "sizeRank": 110,
+  "brandColor": "#5C2D91",
+  "fleetTypes": [
+   "A20N",
+   "A333",
+   "A359",
+   "B789",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "FD",
+  "icao": "AIQ",
+  "name": "Thai AirAsia",
+  "hubId": "DMK",
+  "personality": "budget",
+  "sizeRank": 111,
+  "brandColor": "#FF0000",
+  "fleetTypes": [
+   "A320",
+   "A20N"
+  ]
+ },
+ {
+  "iata": "DD",
+  "icao": "NOK",
+  "name": "Nok Air",
+  "hubId": "DMK",
+  "personality": "budget",
+  "sizeRank": 112,
+  "brandColor": "#FFD500",
+  "fleetTypes": [
+   "B738",
+   "DH8D"
+  ]
+ },
+ {
+  "iata": "PG",
+  "icao": "BKP",
+  "name": "Bangkok Airways",
+  "hubId": "BKK",
+  "personality": "regional",
+  "sizeRank": 113,
+  "brandColor": "#0067B1",
+  "fleetTypes": [
+   "A320",
+   "A19N",
+   "AT76"
+  ]
+ },
+ {
+  "iata": "MH",
+  "icao": "MAS",
+  "name": "Malaysia Airlines",
+  "hubId": "KUL",
+  "personality": "legacy",
+  "sizeRank": 114,
+  "brandColor": "#00205B",
+  "fleetTypes": [
+   "B738",
+   "B38M",
+   "A333",
+   "A359"
+  ]
+ },
+ {
+  "iata": "GA",
+  "icao": "GIA",
+  "name": "Garuda Indonesia",
+  "hubId": "CGK",
+  "personality": "legacy",
+  "sizeRank": 115,
+  "brandColor": "#00838F",
+  "fleetTypes": [
+   "B738",
+   "A333",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "ID",
+  "icao": "BTK",
+  "name": "Batik Air",
+  "hubId": "CGK",
+  "personality": "expander",
+  "sizeRank": 116,
+  "brandColor": "#A6192E",
+  "fleetTypes": [
+   "A320",
+   "B738",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "QG",
+  "icao": "CTV",
+  "name": "Citilink",
+  "hubId": "CGK",
+  "personality": "budget",
+  "sizeRank": 117,
+  "brandColor": "#8DC63F",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "AT76"
+  ]
+ },
+ {
+  "iata": "PR",
+  "icao": "PAL",
+  "name": "Philippine Airlines",
+  "hubId": "MNL",
+  "personality": "legacy",
+  "sizeRank": 118,
+  "brandColor": "#003D7C",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A333",
+   "A359",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "5J",
+  "icao": "CEB",
+  "name": "Cebu Pacific",
+  "hubId": "MNL",
+  "personality": "budget",
+  "sizeRank": 119,
+  "brandColor": "#FFD200",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A333",
+   "AT76"
+  ]
+ },
+ {
+  "iata": "VN",
+  "icao": "HVN",
+  "name": "Vietnam Airlines",
+  "hubId": "HAN",
+  "personality": "legacy",
+  "sizeRank": 120,
+  "brandColor": "#005E7B",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A359",
+   "B789"
+  ]
+ },
+ {
+  "iata": "TR",
+  "icao": "TGW",
+  "name": "Scoot",
+  "hubId": "SIN",
+  "personality": "budget",
+  "sizeRank": 121,
+  "brandColor": "#FFD700",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "E295",
+   "B789"
+  ]
+ },
+ {
+  "iata": "JQ",
+  "icao": "JST",
+  "name": "Jetstar Airways",
+  "hubId": "MEL",
+  "personality": "budget",
+  "sizeRank": 122,
+  "brandColor": "#FF5A00",
+  "fleetTypes": [
+   "A320",
+   "A21N",
+   "B789"
+  ]
+ },
+ {
+  "iata": "OZ",
+  "icao": "AAR",
+  "name": "Asiana Airlines",
+  "hubId": "ICN",
+  "personality": "legacy",
+  "sizeRank": 123,
+  "brandColor": "#C9302C",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A333",
+   "A359"
+  ]
+ },
+ {
+  "iata": "7C",
+  "icao": "JJA",
+  "name": "Jeju Air",
+  "hubId": "GMP",
+  "personality": "budget",
+  "sizeRank": 124,
+  "brandColor": "#F25A1D",
+  "fleetTypes": [
+   "B738",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "TW",
+  "icao": "TWB",
+  "name": "T'way Air",
+  "hubId": "ICN",
+  "personality": "budget",
+  "sizeRank": 125,
+  "brandColor": "#D7182A",
+  "fleetTypes": [
+   "B738",
+   "B38M",
+   "A333"
+  ]
+ },
+ {
+  "iata": "BX",
+  "icao": "ABL",
+  "name": "Air Busan",
+  "hubId": "PUS",
+  "personality": "budget",
+  "sizeRank": 126,
+  "brandColor": "#0D47A1",
+  "fleetTypes": [
+   "A320",
+   "A21N"
+  ]
+ },
+ {
+  "iata": "BR",
+  "icao": "EVA",
+  "name": "EVA Air",
+  "hubId": "TPE",
+  "personality": "legacy",
+  "sizeRank": 127,
+  "brandColor": "#00704A",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "A333",
+   "B789",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "CI",
+  "icao": "CAL",
+  "name": "China Airlines",
+  "hubId": "TPE",
+  "personality": "legacy",
+  "sizeRank": 128,
+  "brandColor": "#8E1A3D",
+  "fleetTypes": [
+   "A21N",
+   "A333",
+   "A359",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "JX",
+  "icao": "SJX",
+  "name": "Starlux Airlines",
+  "hubId": "TPE",
+  "personality": "legacy",
+  "sizeRank": 129,
+  "brandColor": "#AA8A55",
+  "fleetTypes": [
+   "A21N",
+   "A339",
+   "A359"
+  ]
+ },
+ {
+  "iata": "IT",
+  "icao": "TTW",
+  "name": "Tigerair Taiwan",
+  "hubId": "TPE",
+  "personality": "budget",
+  "sizeRank": 130,
+  "brandColor": "#F7A400",
+  "fleetTypes": [
+   "A320",
+   "A20N"
+  ]
+ },
+ {
+  "iata": "9C",
+  "icao": "CQH",
+  "name": "Spring Airlines",
+  "hubId": "PVG",
+  "personality": "budget",
+  "sizeRank": 131,
+  "brandColor": "#24A84B",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A21N"
+  ]
+ },
+ {
+  "iata": "HO",
+  "icao": "DKH",
+  "name": "Juneyao Air",
+  "hubId": "PVG",
+  "personality": "expander",
+  "sizeRank": 132,
+  "brandColor": "#8B1C2E",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "B789"
+  ]
+ },
+ {
+  "iata": "UO",
+  "icao": "HKE",
+  "name": "HK Express",
+  "hubId": "HKG",
+  "personality": "budget",
+  "sizeRank": 133,
+  "brandColor": "#6B2C91",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A21N"
+  ]
+ },
+ {
+  "iata": "MM",
+  "icao": "APJ",
+  "name": "Peach Aviation",
+  "hubId": "KIX",
+  "personality": "budget",
+  "sizeRank": 134,
+  "brandColor": "#E5007F",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A21N"
+  ]
+ },
+ {
+  "iata": "BC",
+  "icao": "SKY",
+  "name": "Skymark Airlines",
+  "hubId": "HND",
+  "personality": "budget",
+  "sizeRank": 135,
+  "brandColor": "#0D6AB7",
+  "fleetTypes": [
+   "B738"
+  ]
+ },
+ {
+  "iata": "NZ",
+  "icao": "ANZ",
+  "name": "Air New Zealand",
+  "hubId": "AKL",
+  "personality": "legacy",
+  "sizeRank": 136,
+  "brandColor": "#1B1B1B",
+  "fleetTypes": [
+   "A20N",
+   "A21N",
+   "AT76",
+   "DH8D",
+   "B789",
+   "B77W"
+  ]
+ },
+ {
+  "iata": "VA",
+  "icao": "VOZ",
+  "name": "Virgin Australia",
+  "hubId": "BNE",
+  "personality": "legacy",
+  "sizeRank": 137,
+  "brandColor": "#CC0033",
+  "fleetTypes": [
+   "B738",
+   "B38M",
+   "E295"
+  ]
+ },
+ {
+  "iata": "FJ",
+  "icao": "FJI",
+  "name": "Fiji Airways",
+  "hubId": "NAN",
+  "personality": "legacy",
+  "sizeRank": 138,
+  "brandColor": "#2A9DC8",
+  "fleetTypes": [
+   "B38M",
+   "A333",
+   "A339"
+  ]
+ },
+ {
+  "iata": "G4",
+  "icao": "AAY",
+  "name": "Allegiant Air",
+  "hubId": "LAS",
+  "personality": "budget",
+  "sizeRank": 139,
+  "brandColor": "#FDB813",
+  "fleetTypes": [
+   "A320",
+   "B38M"
+  ]
+ },
+ {
+  "iata": "HA",
+  "icao": "HAL",
+  "name": "Hawaiian Airlines",
+  "hubId": "HNL",
+  "personality": "legacy",
+  "sizeRank": 140,
+  "brandColor": "#4B1E78",
+  "fleetTypes": [
+   "A21N",
+   "A333",
+   "B789"
+  ]
+ },
+ {
+  "iata": "YX",
+  "icao": "RPA",
+  "name": "Republic Airways",
+  "hubId": "IND",
+  "personality": "regional",
+  "sizeRank": 141,
+  "brandColor": "#2B5797",
+  "fleetTypes": [
+   "E175"
+  ]
+ },
+ {
+  "iata": "PD",
+  "icao": "POE",
+  "name": "Porter Airlines",
+  "hubId": "YTZ",
+  "personality": "regional",
+  "sizeRank": 142,
+  "brandColor": "#002855",
+  "fleetTypes": [
+   "DH8D",
+   "E295"
+  ]
+ },
+ {
+  "iata": "TS",
+  "icao": "TSC",
+  "name": "Air Transat",
+  "hubId": "YUL",
+  "personality": "budget",
+  "sizeRank": 143,
+  "brandColor": "#00A5E3",
+  "fleetTypes": [
+   "A21N",
+   "A21X",
+   "A333"
+  ]
+ },
+ {
+  "iata": "VB",
+  "icao": "VIV",
+  "name": "Viva Aerobus",
+  "hubId": "MTY",
+  "personality": "budget",
+  "sizeRank": 144,
+  "brandColor": "#00A650",
+  "fleetTypes": [
+   "A320",
+   "A20N",
+   "A21N"
+  ]
+ },
+ {
+  "iata": "AR",
+  "icao": "ARG",
+  "name": "Aerolíneas Argentinas",
+  "hubId": "EZE",
+  "personality": "legacy",
+  "sizeRank": 145,
+  "brandColor": "#0A6FB7",
+  "fleetTypes": [
+   "B738",
+   "B38M",
+   "A333",
+   "E175"
+  ]
+ },
+ {
+  "iata": "H2",
+  "icao": "SKU",
+  "name": "SKY Airline",
+  "hubId": "SCL",
+  "personality": "budget",
+  "sizeRank": 146,
+  "brandColor": "#1E2A78",
+  "fleetTypes": [
+   "A20N",
+   "A21N"
+  ]
+ }
+]
