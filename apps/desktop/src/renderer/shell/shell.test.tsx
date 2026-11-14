@@ -55,3 +55,17 @@ describe('TopBar', () => {
     expect(screen.getByText('$312k')).toBeInTheDocument();
   });
 });
+
+describe('side menu', () => {
+  it('shows each section name with its keyboard shortcut as a key badge', async () => {
+    const { default: userEvent } = await import('@testing-library/user-event');
+    const { NavRail } = await import('./NavRail');
+    const user = userEvent.setup();
+    render(<TooltipProvider delayDuration={0}><NavRail /></TooltipProvider>);
+    await user.hover(screen.getByRole('button', { name: 'Fleet' }));
+    const tip = await screen.findByRole('tooltip');
+    expect(tip).toHaveTextContent(/^Fleet\s*3$/);
+    expect(tip.querySelector('kbd')).toHaveTextContent('3');
+    expect(tip).not.toHaveTextContent('·');
+  });
+});

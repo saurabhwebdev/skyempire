@@ -15,7 +15,12 @@ export function NavRail() {
         const Icon = ICONS[s];
         const active = section === s;
         return (
-          <Tooltip key={s} content={`${t.sections[s]}  ·  ${i + 1}`}>
+          <Tooltip key={s} content={
+            <span className="inline-flex items-center gap-2">
+              {t.sections[s]}
+              <kbd aria-label={`Shortcut ${i + 1}`} className="num rounded border border-border bg-surface-3 px-1.5 text-[11px] leading-[18px] text-muted">{i + 1}</kbd>
+            </span>
+          }>
             <button
               type="button"
               aria-label={t.sections[s]}
