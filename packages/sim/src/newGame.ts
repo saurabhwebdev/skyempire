@@ -105,13 +105,14 @@ export function newGame(opts: NewGameOptions, catalog: Catalog): GameState {
       baseIds: [data.hubId],
       reputation: p.startReputation,
       serviceLevel: p.serviceLevel,
-      tier: p.startTier,
+      // The biggest network and super-connector carriers start with the whole catalog open.
+      tier: data.sizeRank <= 10 && (data.personality === 'legacy' || data.personality === 'gulf') ? 'global' : p.startTier,
       creditRating: 'A',
       nextAiDecisionDay: rng.int(0, 6),
     };
     state.airlines[id] = al;
 
-    const allowed = data.fleetTypes.filter((t) => catalog.aircraftTypes[t] && tierAllows(al.tier, catalog.aircraftTypes[t]!.tier));
+    const allowed = data.fleetTypes.filter((t) => catalog.aircraftTypes[t] && !catalog.aircraftTypes[t]!.usedOnly && tierAllows(al.tier, catalog.aircraftTypes[t]!.tier));
     const types = allowed.length ? allowed : ['A20N'];
     for (let i = 0; i < BALANCE.aiStartingFleet[difficulty]; i++) {
       const type = catalog.aircraftTypes[types[i % types.length]!]!;

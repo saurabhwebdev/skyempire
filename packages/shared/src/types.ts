@@ -5,7 +5,7 @@ export type Cabin = Record<CabinClass, number>;
 export type AircraftClass = 'turboprop' | 'regional' | 'narrowbody' | 'longNarrowbody' | 'widebody';
 export type PersonalityId = 'budget' | 'legacy' | 'regional' | 'gulf' | 'expander';
 export type Difficulty = 'easy' | 'normal' | 'hard';
-export type TierId = 'startup' | 'regional' | 'national';
+export type TierId = 'startup' | 'regional' | 'national' | 'global';
 export type SizeClass = 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface Airport {
@@ -45,6 +45,8 @@ export interface AircraftType {
   mtowT: number;
   comfort: number;
   tier: TierId;
+  /** Out of production: only on the used market. */
+  usedOnly?: boolean;
 }
 
 export interface AirlineData {

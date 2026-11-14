@@ -28,6 +28,7 @@ export function applyFleet(state: GameState, airlineId: string, cmd: Command, ca
     case 'buyAircraft': {
       const t = catalog.aircraftTypes[cmd.typeId];
       if (!t) return fail(ERR.unknownType);
+      if (t.usedOnly) return fail(ERR.usedOnly);
       if (!tierAllows(al.tier, t.tier)) return fail(ERR.tierLocked(t.tier));
       const bad = checkCabin(cmd.cabin, t.maxSeats);
       if (bad) return bad;

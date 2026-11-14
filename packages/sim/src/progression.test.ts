@@ -25,6 +25,17 @@ describe('progression', () => {
     expect(s.airlines[s.playerId]!.tier).toBe('regional');
     expect(notes.find((n) => n.level === 'major')?.title).toBe('You’re now a Regional airline');
   });
+  it('promotes a National airline to Global with 40 aircraft and 20M passengers', () => {
+    const s = playerGame();
+    const al = s.airlines[s.playerId]!;
+    al.tier = 'national';
+    al.cash = 1e10;
+    for (let i = 0; i < 40; i++) applyCommand(s, s.playerId, lease('AT76'), catalog);
+    al.totals.pax = 20_000_000;
+    const notes = updateProgression(s, s.playerId, catalog);
+    expect(al.tier).toBe('global');
+    expect(notes.find((n) => n.level === 'major')?.title).toBe('You’re now a Global airline');
+  });
   it('never demotes', () => {
     const s = playerGame();
     s.airlines[s.playerId]!.tier = 'national';

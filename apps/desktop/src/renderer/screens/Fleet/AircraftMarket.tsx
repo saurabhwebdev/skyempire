@@ -11,7 +11,7 @@ import { useGameStore, useUi } from '../../store';
 import { CabinEditor } from './CabinEditor';
 
 const TYPES = Object.values(catalog.aircraftTypes).sort((a, b) => a.priceUsd - b.priceUsd);
-const TIER = { startup: 'Startup', regional: 'Regional', national: 'National' } as const;
+const TIER = { startup: 'Startup', regional: 'Regional', national: 'National', global: 'Global' } as const;
 type Pending = { kind: 'lease' | 'buy'; type: AircraftType } | { kind: 'used'; type: AircraftType; listing: UsedListing };
 
 function Spec({ label, value }: { label: string; value: string }) {
@@ -52,7 +52,7 @@ export function AircraftMarket() {
       <article key={extra?.listing.id ?? t.id} className={cn('flex flex-col gap-3 rounded-lg border bg-surface-1 p-4', compare.includes(t.id) ? 'border-accent' : 'border-border')}>
         <AircraftSilhouette typeId={t.id} className="h-12 w-full text-muted" />
         <header className="flex items-baseline justify-between gap-2">
-          <h3 className="font-semibold">{t.name}</h3>
+          <h3 className="font-semibold">{t.name}{t.usedOnly && !extra && <span className="ml-2 rounded-full border border-border px-2 py-0.5 text-[11px] font-normal text-muted">Used only</span>}</h3>
           <span className="text-[12px] text-faint">{t.class === 'longNarrowbody' ? 'long-range narrowbody' : t.class}</span>
         </header>
         <dl className="grid grid-cols-3 gap-2">
@@ -79,6 +79,8 @@ export function AircraftMarket() {
           <div className="mt-auto flex flex-wrap gap-2">
             {extra ? (
               <Button size="sm" variant="primary" onClick={() => setPending({ kind: 'used', type: t, listing: extra.listing })}>Buy for {formatMoney(extra.listing.price)}</Button>
+            ) : t.usedOnly ? (
+              <p className="text-[13px] text-muted">Out of production — look for it under Used.</p>
             ) : (
               <>
                 <Button size="sm" variant="primary" onClick={() => setPending({ kind: 'lease', type: t })}>Lease for {formatMoney(t.leasePerMonth)}/mo</Button>

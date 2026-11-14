@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const TierSchema = z.enum(['startup', 'regional', 'national']);
+export const TierSchema = z.enum(['startup', 'regional', 'national', 'global']);
 export const PersonalitySchema = z.enum(['budget', 'legacy', 'regional', 'gulf', 'expander']);
 
 export const AircraftTypeSchema = z.object({
@@ -22,6 +22,7 @@ export const AircraftTypeSchema = z.object({
   mtowT: z.number().positive(),
   comfort: z.number().min(0).max(100),
   tier: TierSchema,
+  usedOnly: z.boolean().optional(),
   sources: z.array(z.string()).min(1),
 });
 

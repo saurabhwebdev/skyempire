@@ -1,12 +1,13 @@
 import { formatMoney, type TierId } from '@skyempire/shared';
 
-const TIER_NAME: Record<TierId, string> = { startup: 'Startup', regional: 'Regional', national: 'National' };
+const TIER_NAME: Record<TierId, string> = { startup: 'Startup', regional: 'Regional', national: 'National', global: 'Global' };
 
 export const ERR = {
   notEnoughCash: (short: number) => `Not enough cash — you need ${formatMoney(short)} more`,
   tierLocked: (tier: TierId) => `Unlocks at ${TIER_NAME[tier]} tier`,
   tooManySeats: (max: number) => `Too many seats — max ${max} seat units`,
   unknownType: 'Unknown aircraft type',
+  usedOnly: 'Only available used',
   unknownAircraft: 'That aircraft isn’t in your fleet',
   unknownListing: 'That aircraft is no longer for sale',
   unknownAirport: (id: string) => `Unknown airport ${id}`,

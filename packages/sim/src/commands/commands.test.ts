@@ -1,5 +1,7 @@
 import { formatMoney } from '@skyempire/shared';
 import { describe, expect, it } from 'vitest';
+import { refreshUsedListings } from '../newGame';
+import { Rng } from '../rng';
 import { applyCommand } from './apply';
 import { catalog, fares, lease, playerAircraft, playerGame } from '../testing';
 
@@ -21,6 +23,22 @@ describe('fleet commands', () => {
   });
   it('locks widebodies at startup tier', () =>
     expect(run(playerGame(), lease('B789'))).toEqual({ ok: false, reason: 'Unlocks at Regional tier' }));
+  it('rejects leasing or buying new a used-only type', () => {
+    const s = playerGame();
+    s.airlines[P]!.tier = 'national';
+    expect(run(s, lease('B752'))).toEqual({ ok: false, reason: 'Only available used' });
+    expect(run(s, { type: 'buyAircraft', typeId: 'B763', cabin: { economy: 200, premium: 0, business: 0 } })).toEqual({ ok: false, reason: 'Only available used' });
+  });
+  it('the used market can list used-only types', () => {
+    const s = playerGame();
+    const seen = new Set<string>();
+    const rng = new Rng(5);
+    for (let i = 0; i < 40; i++) {
+      refreshUsedListings(s, catalog, rng);
+      for (const l of s.market.usedListings) seen.add(l.typeId);
+    }
+    expect(seen.has('B752')).toBe(true);
+  });
   it('rejects too many seats', () => {
     const r = run(playerGame(), { type: 'leaseAircraft', typeId: 'A20N', cabin: { economy: 180, premium: 0, business: 12 } });
     expect(r).toEqual({ ok: false, reason: 'Too many seats — max 194 seat units' });

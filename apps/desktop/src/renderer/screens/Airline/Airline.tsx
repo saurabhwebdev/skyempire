@@ -9,7 +9,7 @@ import { AirlineLogo } from '../../components/AirlineLogo';
 import { useGameStore as useStore } from '../../store';
 
 const SERVICE = ['', 'Basic', 'Simple', 'Standard', 'Premium', 'Luxury'];
-const TIER = { startup: 'Startup', regional: 'Regional', national: 'National' };
+const TIER = { startup: 'Startup', regional: 'Regional', national: 'National', global: 'Global' };
 
 export function Airline() {
   const view = useGameStore((s) => s.view)!;

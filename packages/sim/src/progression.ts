@@ -7,8 +7,9 @@ interface TierDef { id: TierId; name: string; aircraft: number; pax: number; rev
 export const TIERS: TierDef[] = [
   { id: 'regional', name: 'Regional', aircraft: 5, pax: 1_000_000, revenue360: 100_000_000 },
   { id: 'national', name: 'National', aircraft: 15, pax: 5_000_000, revenue360: 500_000_000 },
+  { id: 'global', name: 'Global', aircraft: 40, pax: 20_000_000, revenue360: 2_000_000_000 },
 ];
-const ORDER: TierId[] = ['startup', 'regional', 'national'];
+const ORDER: TierId[] = ['startup', 'regional', 'national', 'global'];
 
 interface Objective { id: string; title: string; check: (s: GameState, al: Airline) => boolean }
 const routesOf = (s: GameState, al: Airline) => Object.values(s.routes).filter((r) => r.airlineId === al.id);

@@ -1,7 +1,7 @@
 import type { AircraftType, Cabin, PersonalityId, TierId } from '@skyempire/shared';
 import { BALANCE } from './config/balance';
 
-const TIER_ORDER: TierId[] = ['startup', 'regional', 'national'];
+const TIER_ORDER: TierId[] = ['startup', 'regional', 'national', 'global'];
 export const tierAllows = (have: TierId, need: TierId): boolean => TIER_ORDER.indexOf(have) >= TIER_ORDER.indexOf(need);
 
 /** Market value of an aircraft (simulation-spec §9). */

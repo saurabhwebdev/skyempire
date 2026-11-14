@@ -16,7 +16,8 @@
    "B38M",
    "B789",
    "B77W",
-   "E175"
+   "E175",
+   "B788"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q32396",
@@ -42,7 +43,8 @@
    "A359",
    "BCS1",
    "BCS3",
-   "E175"
+   "E175",
+   "A332"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q188920",
@@ -66,7 +68,9 @@
    "B38M",
    "B789",
    "B77W",
-   "E175"
+   "E175",
+   "B788",
+   "B78X"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q174769",
@@ -110,7 +114,10 @@
    "A333",
    "B789",
    "A359",
-   "B77W"
+   "B77W",
+   "C919",
+   "AJ27",
+   "A332"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q291090",
@@ -135,7 +142,9 @@
    "A333",
    "B789",
    "A359",
-   "B77W"
+   "B77W",
+   "C919",
+   "AJ27"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q291796",
@@ -160,7 +169,9 @@
    "A333",
    "B789",
    "B77W",
-   "A359"
+   "A359",
+   "C919",
+   "B748"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q51747",
@@ -202,7 +213,9 @@
    "B789",
    "A359",
    "B77W",
-   "B38M"
+   "B38M",
+   "A332",
+   "B78X"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q4548",
@@ -242,7 +255,10 @@
   "brandColor": "#D71921",
   "fleetTypes": [
    "B77W",
-   "A359"
+   "A359",
+   "A388",
+   "B779",
+   "A35K"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q180432",
@@ -285,7 +301,10 @@
    "A339",
    "A359",
    "B789",
-   "A333"
+   "A333",
+   "A388",
+   "B748",
+   "B779"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q9325",
@@ -307,7 +326,9 @@
    "BCS3",
    "A359",
    "B789",
-   "B77W"
+   "B77W",
+   "A332",
+   "A35K"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q131005",
@@ -330,7 +351,10 @@
    "A320",
    "B789",
    "A359",
-   "B77W"
+   "B77W",
+   "A388",
+   "A35K",
+   "B788"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q8766",
@@ -352,7 +376,10 @@
    "A359",
    "B789",
    "B77W",
-   "B38M"
+   "B38M",
+   "A35K",
+   "B779",
+   "A388"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q208033",
@@ -442,7 +469,10 @@
    "A21N",
    "B38M",
    "B789",
-   "B77W"
+   "B77W",
+   "B788",
+   "B78X",
+   "B779"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q204284",
@@ -585,7 +615,9 @@
    "A359",
    "B789",
    "B77W",
-   "E175"
+   "E175",
+   "A35K",
+   "B788"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q213140",
@@ -606,7 +638,9 @@
    "B38M",
    "A359",
    "B789",
-   "B77W"
+   "B77W",
+   "A388",
+   "B78X"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q32245",
@@ -627,7 +661,9 @@
    "B738",
    "A333",
    "B789",
-   "A21X"
+   "A21X",
+   "A388",
+   "B788"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q32491",
@@ -649,7 +685,9 @@
    "A333",
    "B789",
    "B77W",
-   "BCS3"
+   "BCS3",
+   "A388",
+   "B748"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q213147",
@@ -813,7 +851,9 @@
    "A21N",
    "B789",
    "A359",
-   "B77W"
+   "B77W",
+   "B78X",
+   "A35K"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q212304",
@@ -834,7 +874,9 @@
    "A21N",
    "A333",
    "A359",
-   "B77W"
+   "B77W",
+   "A35K",
+   "B779"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q32141",
