@@ -1,7 +1,7 @@
 import type { ActiveTension, Airport, Catalog, GameState, Notification, Route, TensionKind } from '@skyempire/shared';
 import { nextId } from './ids';
 import type { Rng } from './rng';
-import { inRegion } from './routing';
+import { flightDistanceKm, inRegion } from './routing';
 
 /** Generic geopolitical events (v0.2 design §3): never names parties or causes. Daily chances. */
 export const TENSIONS = {
@@ -151,4 +151,16 @@ export function rollTensions(state: GameState, catalog: Catalog, rng: Rng): Noti
     }
   }
   return out;
+}
+
+/** Why a route can't fly today because of tensions (ban, no way around, detour beyond an aircraft's range), with its detour. */
+export function routeTensionStatus(state: GameState, catalog: Catalog, r: Route): { detourKm: number; blocked: string | null } {
+  const a = catalog.airports[r.from]!, b = catalog.airports[r.to]!;
+  const flight = flightDistanceKm(state, catalog, r.from, r.to);
+  const ban = isBanned(state, a.country, b.country);
+  const short = r.assignments.map((x) => state.aircraft[x.aircraftId]).find((ac) => ac && catalog.aircraftTypes[ac.typeId]!.rangeKm < flight.km);
+  return {
+    detourKm: flight.detourKm,
+    blocked: ban ? banMessage(catalog, ban) : flight.blocked ?? (short ? `Detour exceeds ${catalog.aircraftTypes[short.typeId]!.name} range` : null),
+  };
 }

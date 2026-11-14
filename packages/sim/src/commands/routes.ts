@@ -1,4 +1,4 @@
-import type { Assignment, Catalog, Command, CommandResult, GameState } from '@skyempire/shared';
+import type { SeasonalFare, Assignment, Catalog, Command, CommandResult, GameState } from '@skyempire/shared';
 import { flightDistanceKm } from '../routing';
 import { banMessage, isBanned } from '../tensions';
 import { nextId } from '../ids';
@@ -74,7 +74,9 @@ export function applyRoutes(state: GameState, airlineId: string, cmd: Command, c
         if (bad) return bad;
       }
       if (cmd.seasonalFares) {
-        if (cmd.seasonalFares.some((f) => f.startDay < state.day)) return fail(ERR.seasonalPast);
+        // Periods already on the route may have started; anything new must start today or later.
+        const kept = (f: SeasonalFare) => r.seasonalFares?.some((x) => x.startDay === f.startDay && x.endDay === f.endDay && x.pct === f.pct);
+        if (cmd.seasonalFares.some((f) => f.startDay < state.day && !kept(f))) return fail(ERR.seasonalPast);
         r.seasonalFares = cmd.seasonalFares.map((f) => ({ ...f }));
       }
       if (cmd.fares) r.fares = { ...cmd.fares };

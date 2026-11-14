@@ -6,6 +6,8 @@ const MS_PER_DAY = 86_400_000;
 const FIRST_YEAR = 2026;
 const YEARS = 20;
 const RAMP_DAYS = 3;
+/** Business travel falls during holidays (tuned in the balance pass: 0.25 × lift). */
+export const HOLIDAY_BUSINESS_DROP = 0.25;
 
 /** Holiday tables cover 2026–2045; other years reuse the matching year of that 20-year cycle. */
 const wrapYear = (y: number) => FIRST_YEAR + ((((y - FIRST_YEAR) % YEARS) + YEARS) % YEARS);
@@ -70,7 +72,7 @@ export function holidayDemandFactors(a: Airport, b: Airport, day: number, startY
   const lift = la > 0 || lb > 0 ? Math.max(la, lb) : Math.min(la, lb);
   if (lift === 0) return { leisure: 1, business: 1 };
   const tourism = (a.tourism + b.tourism) / 2;
-  return { leisure: 1 + lift * (0.6 + 0.4 * tourism), business: 1 - 0.5 * Math.max(0, lift) };
+  return { leisure: 1 + lift * (0.6 + 0.4 * tourism), business: 1 - HOLIDAY_BUSINESS_DROP * Math.max(0, lift) };
 }
 
 export interface UpcomingPeak {
@@ -82,7 +84,19 @@ export interface UpcomingPeak {
 }
 
 /** Festivals (positive peaks only) touching `countries` whose window overlaps [fromDay, toDay], soonest first. */
+const peakCache = new Map<string, UpcomingPeak[]>();
+
 export function upcomingPeaks(countries: string[], fromDay: number, toDay: number, startYear: number, catalog: Catalog): UpcomingPeak[] {
+  const key = `${startYear}:${fromDay}:${toDay}:${countries.join(',')}`;
+  const hit = peakCache.get(key);
+  if (hit) return hit;
+  if (peakCache.size > 20_000) peakCache.clear();
+  const res = computePeaks(countries, fromDay, toDay, startYear, catalog);
+  peakCache.set(key, res);
+  return res;
+}
+
+function computePeaks(countries: string[], fromDay: number, toDay: number, startYear: number, catalog: Catalog): UpcomingPeak[] {
   const from = dateOf(fromDay, startYear);
   const wy = wrapYear(from.year);
   const fromAbs = absDay(wy, from.month, from.dayOfMonth);

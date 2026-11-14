@@ -89,3 +89,21 @@ describe('rolling tensions', () => {
     expect(s.world.tensions.some((t) => t.kind === 'thawBonus' && t.countries?.join() === 'DE,ES')).toBe(true);
   });
 });
+
+describe('AI and tensions', () => {
+  it('an AI airline closes routes grounded by a ban', async () => {
+    const { runAi } = await import('./ai/decide');
+    const { tick } = await import('./tick');
+    let s = playerGame('FRA', 3);
+    const intl = () => Object.values(s.routes).find((x) => x.airlineId !== s.playerId && catalog.airports[x.from]!.country !== catalog.airports[x.to]!.country);
+    for (let i = 0; i < 30 && !intl(); i++) s = tick(s, [], catalog).state;
+    const r = intl()!;
+    const a = catalog.airports[r.from]!.country, b = catalog.airports[r.to]!.country;
+    s.world.tensions.push(ban(a, b));
+    runAi(s, r.airlineId, catalog, new Rng(1));
+    expect(Object.values(s.routes).filter((x) => x.airlineId === r.airlineId).some((x) => {
+      const ca = catalog.airports[x.from]!.country, cb = catalog.airports[x.to]!.country;
+      return (ca === a && cb === b) || (ca === b && cb === a);
+    })).toBe(false);
+  });
+});

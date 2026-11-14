@@ -10,6 +10,8 @@ import { defaultCabin, tierAllows } from '../fleet';
 import { distanceKm } from '../geo';
 import { maxRoundTripsPerWeek, roundTripHours } from '../ops';
 import type { Rng } from '../rng';
+import { upcomingPeaks } from '../holidays';
+import { routeTensionStatus } from '../tensions';
 import { PERSONALITIES, type Personality } from './personalities';
 
 const CANDIDATES_PER_BASE = 40;
@@ -79,7 +81,15 @@ export function runAi(state: GameState, airlineId: string, catalog: Catalog, rng
   };
   const myRoutes = () => Object.values(state.routes).filter((r) => r.airlineId === airlineId);
 
-  // 1. Fares
+  // 1. Fares (rivals' fares indexed once per decision, by airport pair)
+  const rivalFares = new Map<string, Route[]>();
+  for (const x of Object.values(state.routes)) {
+    if (x.airlineId === airlineId || x.status !== 'active') continue;
+    const k = pairKey(x.from, x.to);
+    const list = rivalFares.get(k);
+    if (list) list.push(x);
+    else rivalFares.set(k, [x]);
+  }
   for (const r of myRoutes()) {
     if (r.status !== 'active' || !r.last) continue;
     const dist = distanceKm(catalog.airports[r.from]!, catalog.airports[r.to]!);
@@ -90,9 +100,7 @@ export function runAi(state: GameState, airlineId: string, catalog: Catalog, rng
     for (const cls of CABIN_CLASSES) {
       const ref = refFare(dist, cls);
       let f = fares[cls] * k;
-      const rival = Object.values(state.routes)
-        .filter((x) => x.airlineId !== airlineId && x.status === 'active' && pairKey(x.from, x.to) === pairKey(r.from, r.to))
-        .map((x) => x.fares[cls]);
+      const rival = (rivalFares.get(pairKey(r.from, r.to)) ?? []).map((x) => x.fares[cls]);
       const cheapest = rival.length ? Math.min(...rival) : Infinity;
       if (cheapest <= f * 0.9) f -= (f - cheapest) * p.priceAggressiveness * 0.5;
       // Price ceiling by style: budget ≈ 0.9× ref, legacy ≈ 1.35× ref.
@@ -101,11 +109,26 @@ export function runAi(state: GameState, airlineId: string, catalog: Catalog, rng
     if (CABIN_CLASSES.some((c) => fares[c] !== r.fares[c])) act({ type: 'updateRoute', routeId: r.id, fares });
   }
 
+  // 1b. Peak pricing: raise fares for big festivals in the route's countries (the next 3 weeks).
+  for (const r of myRoutes()) {
+    if (r.status !== 'active') continue;
+    const countries = [...new Set([catalog.airports[r.from]!.country, catalog.airports[r.to]!.country])];
+    const current = (r.seasonalFares ?? []).filter((f) => f.endDay >= state.day);
+    const peak = upcomingPeaks(countries, state.day, state.day + 21, state.world.startYear, catalog)
+      .find((pk) => pk.peak >= 0.3 && !current.some((f) => f.endDay >= pk.startDay && f.startDay <= pk.endDay));
+    if (!peak || current.length >= 4) continue;
+    const pct = Math.round((10 + 15 * peak.peak) * (1 - 0.5 * p.priceAggressiveness));
+    act({ type: 'updateRoute', routeId: r.id, seasonalFares: [...current, { startDay: Math.max(state.day, peak.startDay), endDay: peak.endDay, pct }] });
+  }
+
   // 2. Close persistent losers
   for (const r of myRoutes()) {
     if (state.day - r.openedDay >= 60 && r.profit30.length >= 30 && r.profit30.reduce((a, b) => a + b, 0) < 0)
       act({ type: 'closeRoute', routeId: r.id });
   }
+
+  // 2b. Drop routes grounded by tensions (bans, closed airspace, detours beyond range): free the aircraft for elsewhere.
+  for (const r of myRoutes()) if (routeTensionStatus(state, catalog, r).blocked) act({ type: 'closeRoute', routeId: r.id });
 
   // 3. Liquidity
   const monthly = monthlyFixedCosts(state, airlineId, catalog);

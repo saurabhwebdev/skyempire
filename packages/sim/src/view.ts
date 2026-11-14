@@ -4,8 +4,7 @@ import { slotsFree } from './ops';
 import { availableCredit, companyValue, monthlyFixedCosts } from './finance';
 import { upcomingPeaks } from './holidays';
 import { weatherAt } from './weather';
-import { flightDistanceKm } from './routing';
-import { banMessage, isBanned, tensionLabel } from './tensions';
+import { routeTensionStatus, tensionLabel } from './tensions';
 import { objectivesView } from './progression';
 
 /** Player-scoped snapshot for the UI. Rival finances stay hidden. */
@@ -42,16 +41,7 @@ export function buildClientView(state: GameState, playerId: string, catalog: Cat
   for (const r of mine) playerAirports.add(r.from).add(r.to);
   for (const id of playerAirports) forecast[id] = [1, 2, 3].map((k) => weatherAt(state, catalog, id, state.day + k));
   const routeStatus: ClientView['routeStatus'] = {};
-  for (const r of mine) {
-    const a = catalog.airports[r.from]!, b = catalog.airports[r.to]!;
-    const flight = flightDistanceKm(state, catalog, r.from, r.to);
-    const ban = isBanned(state, a.country, b.country);
-    const short = r.assignments.map((x) => state.aircraft[x.aircraftId]).find((ac) => ac && catalog.aircraftTypes[ac.typeId]!.rangeKm < flight.km);
-    routeStatus[r.id] = {
-      detourKm: flight.detourKm,
-      blocked: ban ? banMessage(catalog, ban) : flight.blocked ?? (short ? `Detour exceeds ${catalog.aircraftTypes[short.typeId]!.name} range` : null),
-    };
-  }
+  for (const r of mine) routeStatus[r.id] = routeTensionStatus(state, catalog, r);
   const tensions = state.world.tensions
     .filter((t) => t.kind !== 'thawBonus' || state.day >= t.startDay)
     .map((t) => ({

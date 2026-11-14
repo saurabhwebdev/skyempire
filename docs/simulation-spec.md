@@ -137,7 +137,6 @@ Difficulty scales AI starting cash, decision quality (noise added to scores), an
 | Fuel spike | ~1/yr | fuel ×1.3–1.8 for 30–120 days |
 | Recession / boom | ~1/3 yrs | economy index ±0.2 over 180 days |
 | Airport strike | ~4/yr | airport closed 1–5 days |
-| Storm | seasonal | airport closed 1–3 days, on-time −10% regionally |
 | New aircraft launch | by entry year | new type available |
 | Airport expansion | ~2/yr | +20–50% slots |
 | Pandemic | very rare, off on Easy | demand ×0.2–0.5, recovers over 1–2 yrs |
@@ -146,12 +145,61 @@ Difficulty scales AI starting cash, decision quality (noise added to scores), an
 
 **Aircraft prices** are ~50% of last published list prices (typical market value); leases ≈ 0.75% of that per month.
 
-## 12. Tiers (v0.1: first three)
+## 11a. Weather (v0.2)
+Each airport has a daily condition, simulated from climate unless live data is available.
+- **Simulated:** a pure function of (seed, airport, day) over climatology by latitude band, hemisphere and month:
+  - snow beyond 40° latitude in local winter: 4–12%;
+  - thunderstorms: 10% in the tropical wet season, 4% in temperate summer, otherwise 1%;
+  - fog: 3%, or 6% in the temperate cold season;
+  - rain 15%; wind 8%;
+  - tropical cyclones at 8–30° latitude in season: they start on 0.4% of days and last 1–3 days.
+- **Live:** Open-Meteo daily WMO codes and gusts, mapped onto game days +1…+3, at most one fetch per real minute, stored in the save.
+
+Effects at each end of a route (the worse end wins):
+
+| Condition | Capacity | On-time | Cancelled | Other |
+|---|---|---|---|---|
+| Wind / rain | −10% | −5 | — | — |
+| Thunderstorm | −30% | −15 | 5% (turboprops 7.5%) | — |
+| Snow | −40% | −20 | 10% | de-icing $300/departure |
+| Fog | −35% | −15 | 5% (15% if runway < 2,500 m) | — |
+| Cyclone | airport closed | | | |
+
+- When reduced capacity can't handle the flights scheduled, the overflow is cancelled too.
+- Seats cancelled on the day cost $20 each in passenger care. Cancelling 1–3 days ahead costs $5 per seat.
+- Aircraft under 85% utilisation take half the on-time penalty (spare buffer).
+- Previews show a typical day and ignore weather.
+
+## 11b. Geopolitical tensions (v0.2)
+These are generic and region-level: names are geographic and no cause is ever given. About 40 airspace regions are built from Natural Earth country shapes (`packages/data/src/airspace.json`).
+
+| Event | Chance/day | Duration | Effect |
+|---|---|---|---|
+| Airspace closure | 1.5/360 | 30–360 d | Routes crossing it detour via the region's hull (Dijkstra; great-circle sampled every 50 km). Longer block time, fuel and crew; out-of-range aircraft are grounded. |
+| Route ban | 1/360 | 60–720 d | Routes between the two countries fly nothing and keep their slots; new routes are rejected. |
+| Travel advisory | 2/360 | 30–120 d | Demand to the country −20–50%. |
+| Thaw | 1/180 per active ban | — | Ends the ban; +20% demand between the pair for 90 days. |
+
+- Every event except a thaw warns 7–30 days ahead.
+- A closure over an endpoint's own region is ignored for that route.
+- Weekly hour budgets use great-circle planning distance.
+
+## 11c. Holidays & festivals (v0.2)
+The calendar is the real Gregorian one: game day 0 is Jan 1 of the start year.
+- **Lift per country and day:**
+  - public holidays (date-holidays, 2026–2045; later years wrap) give 0.1 on the day and 0.05 on the days either side;
+  - festivals give their peak inside the window, ramping over 3 days outside it, with ×1.25 on the window's last 2 days. Peaks: Christmas 0.8, Lunar New Year 0.8, Golden Week CN 0.6, Diwali 0.5, Eid al-Fitr 0.5, Golden Week JP 0.5, Eid al-Adha 0.4, Thanksgiving 0.4, Easter 0.3, southern summer 0.2. Ramadan is −0.15.
+  - The strongest lift wins.
+- **Per direction:** lift = the stronger of the two countries'. Economy and premium demand are multiplied by 1 + lift × (0.6 + 0.4 × tourism); business by 1 − 0.5 × lift.
+- **Seasonality** peaks in mid-July in the north and mid-January in the south.
+
+## 12. Tiers
 | Tier | Unlock condition (any 2 of 3) | Unlocks |
 |---|---|---|
 | Startup | start | turboprop, regional jet, narrowbodies |
 | Regional | 5 aircraft · 1M pax total · $100M yearly revenue | A321XLR, A330-900, 787-9, 50% base-setup discount |
-| National | 15 aircraft · 5M pax · $500M yearly revenue | A350-900 (v0.2: more widebodies, more regions) |
+| National | 15 aircraft · 5M pax · $500M yearly revenue | A350-900, 787-10, 777-200ER (used) |
+| Global | 40 aircraft · 20M pax · $2B yearly revenue | A350-1000, 777-9, A380, 747-8 |
 
 ## 13. Balance targets (tested in `packages/sim/src/balance/`)
 - A well-run first route (e.g. LHR–MAD, A320neo) covers its flying costs within 30 game days.

@@ -4,15 +4,16 @@
 
 A free, open-source airline-management game for Windows. Found an airline with $50M and a dream, lease your first A320neo, build a network across ~1,000 real airports, and take on 19 real rival airlines — Emirates, IndiGo, Lufthansa, Ryanair, Delta and more — in a world with real demand, real aircraft and real costs.
 
-**Status:** v0.1 "First Flight" — single-player, offline.
+**Status:** v0.2 "Living World" — single-player; works offline.
 
 ## Features
 
 - **The whole world** — ~1,000 airports from OurAirports, demand calibrated against real city-pair traffic.
-- **19 real aircraft** — ATR 72 to 777-300ER, with real specs and silhouettes; lease, buy new or buy used; set your own cabin.
+- **38 real aircraft** — ATR 42 to A380, with real specs and silhouettes; lease, buy new or buy used (some classics are used-only); set your own cabin.
 - **Real rival airlines** — 19 per game, picked from 145 real airlines: the incumbents near your hub plus global majors. Each flies like its real self: low-cost, network or super-connector.
 - **Living economy** — fuel price swings, recessions, strikes, storms, airport expansions; slots, bases, loans, credit ratings.
-- **Grow your airline** — Startup → Regional → National, with goals along the way.
+- **A living world** — real and simulated weather (snow, fog, storms, cyclones) that delays and cancels flights; airspace closures that force detours; route bans and travel advisories; real holidays and festivals that fill planes.
+- **Grow your airline** — Startup → Regional → National → Global, with goals along the way.
 - **Real logos (optional)** — *Settings → Download real logos* fetches airline logos from Wikimedia Commons onto your PC for personal use.
 - **Modern, minimal interface** — map-first, keyboard-friendly (press `?` in game), reduced-motion and colour-blind options.
 

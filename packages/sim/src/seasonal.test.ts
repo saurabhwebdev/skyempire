@@ -28,6 +28,13 @@ describe('seasonal fares', () => {
     expect(applyCommand(s, s.playerId, { type: 'updateRoute', routeId: r.id, seasonalFares: [{ startDay: 5, endDay: 30, pct: 10 }] }, catalog))
       .toEqual({ ok: false, reason: 'Seasonal fares must start today or later' });
   });
+  it('keeps a period that already started when adding another', () => {
+    const { s, r } = withRoute();
+    applyCommand(s, s.playerId, { type: 'updateRoute', routeId: r.id, seasonalFares: [{ startDay: 5, endDay: 30, pct: 10 }] }, catalog);
+    s.day = 20;
+    expect(applyCommand(s, s.playerId, { type: 'updateRoute', routeId: r.id, seasonalFares: [{ startDay: 5, endDay: 30, pct: 10 }, { startDay: 40, endDay: 45, pct: 20 }] }, catalog)).toEqual({ ok: true });
+    expect(s.routes[r.id]!.seasonalFares).toHaveLength(2);
+  });
   it('allows at most four periods, −50% to +100%, ending on or after they start', () => {
     const base = { type: 'updateRoute', routeId: 'r' } as const;
     const p = { startDay: 1, endDay: 2, pct: 10 };
@@ -35,6 +42,22 @@ describe('seasonal fares', () => {
     expect(CommandSchema.safeParse({ ...base, seasonalFares: [p, p, p, p, p] }).success).toBe(false);
     expect(CommandSchema.safeParse({ ...base, seasonalFares: [{ ...p, pct: 150 }] }).success).toBe(false);
     expect(CommandSchema.safeParse({ ...base, seasonalFares: [{ startDay: 5, endDay: 4, pct: 10 }] }).success).toBe(false);
+  });
+});
+
+describe('AI peak pricing', () => {
+  it('an AI airline raises fares for a big festival in its markets', async () => {
+    const { runAi } = await import('./ai/decide');
+    const { tick } = await import('./tick');
+    const { Rng } = await import('./rng');
+    let s = playerGame('PEK', 3);
+    for (let i = 0; i < 20; i++) s = tick(s, [], catalog).state;
+    s.day = dayOf(2027, 1, 25, 2026); // Lunar New Year window opens Jan 27
+    const cn = Object.values(s.routes).filter((x) => x.airlineId !== s.playerId && x.status === 'active' && [x.from, x.to].some((id) => catalog.airports[id]!.country === 'CN'));
+    expect(cn.length).toBeGreaterThan(0);
+    for (const id of new Set(cn.map((x) => x.airlineId))) runAi(s, id, catalog, new Rng(1));
+    const priced = cn.map((x) => s.routes[x.id]).filter((x) => x?.seasonalFares?.some((f) => f.pct > 0 && f.endDay >= dayOf(2027, 2, 6, 2026)));
+    expect(priced.length).toBeGreaterThan(0);
   });
 });
 

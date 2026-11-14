@@ -21,7 +21,7 @@ describe('holidays', () => {
   it('a holiday raises leisure demand and lowers business demand on a CN–CN pair', () => {
     const f = holidayDemandFactors(airport('PEK'), airport('PVG'), at(2027, 2, 6), 2026, catalog);
     expect(f.leisure).toBeGreaterThan(1.4);
-    expect(f.business).toBeLessThan(0.7);
+    expect(f.business).toBeCloseTo(0.8);
     const normal = holidayDemandFactors(airport('PEK'), airport('PVG'), at(2027, 6, 9), 2026, catalog);
     expect(normal).toEqual({ leisure: 1, business: 1 });
   });

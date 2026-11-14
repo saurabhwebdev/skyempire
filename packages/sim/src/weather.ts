@@ -14,7 +14,8 @@ function cycloneSeason(lat: number, month: number): boolean {
 /** Simulated daily weather from climatology (latitude band, hemisphere, month); a pure function of its inputs. */
 export function simulatedWeather(seed: number, a: Airport, day: number, startYear: number): WeatherCondition {
   // Tropical cyclones last 1–3 days from a start day.
-  for (let k = 0; k < 3; k++) {
+  const cycloneBelt = Math.abs(a.lat) >= 8 && Math.abs(a.lat) <= 30;
+  for (let k = 0; cycloneBelt && k < 3; k++) {
     const d0 = day - k;
     if (!cycloneSeason(a.lat, dateOf(d0, startYear).month)) continue;
     if (hash01(seed, d0, `${a.id}:cy`) >= WEATHER.pCycloneStart) continue;
@@ -40,12 +41,21 @@ export function simulatedWeather(seed: number, a: Airport, day: number, startYea
   return 'clear';
 }
 
-/** Today's weather: the live forecast when the main process supplied one, else simulated. */
+const simCache = new Map<string, WeatherCondition>();
+
+/** Today's weather: the live forecast when the main process supplied one, else simulated (memoised: it is pure). */
 export function weatherAt(state: GameState, catalog: Catalog, airportId: string, day: number): WeatherCondition {
   const live = state.world.liveWeather[day]?.[airportId];
   if (live) return live;
-  const a = catalog.airports[airportId];
-  return a ? simulatedWeather(state.seed, a, day, state.world.startYear) : 'clear';
+  const key = `${state.seed}:${state.world.startYear}:${day}:${airportId}`;
+  let w = simCache.get(key);
+  if (w === undefined) {
+    if (simCache.size > 50_000) simCache.clear();
+    const a = catalog.airports[airportId];
+    w = a ? simulatedWeather(state.seed, a, day, state.world.startYear) : 'clear';
+    simCache.set(key, w);
+  }
+  return w;
 }
 
 export interface WeatherEffect {
