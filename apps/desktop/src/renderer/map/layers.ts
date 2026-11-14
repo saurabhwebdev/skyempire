@@ -1,8 +1,11 @@
 import type { Airport, ClientView } from '@skyempire/shared';
 import type { Layer } from '@deck.gl/core';
-import { ArcLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers';
+import { loadAirspace } from '@skyempire/data';
+import { ArcLayer, GeoJsonLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers';
 import type { Selection } from '../store';
-import { ACCENT, AIRPORT, AIRPORT_ACTIVE, hexToRgba, RIVAL_PALETTE, WEATHER_COLORS, type RGBA } from './colors';
+import { ACCENT, AIRPORT, AIRPORT_ACTIVE, AIRSPACE, hexToRgba, RIVAL_PALETTE, WEATHER_COLORS, type RGBA } from './colors';
+
+const REGIONS = new Map(loadAirspace().map((r) => [r.id, r]));
 
 export interface MapInput {
   airports: Airport[];
@@ -42,6 +45,27 @@ export function buildLayers(m: MapInput): Layer[] {
     m.view.rivals.map((r, i) => [r.id, m.colorBlind ? RIVAL_PALETTE[i % RIVAL_PALETTE.length]! : hexToRgba(r.color)]),
   );
   const layers: Layer[] = [];
+
+  // Closed (and soon-closing) airspace: always shown — it changes where routes can fly.
+  const closures = m.view.tensions
+    .filter((t) => t.kind === 'airspaceClosure' && t.regionId && REGIONS.has(t.regionId))
+    .map((t) => {
+      const r = REGIONS.get(t.regionId!)!;
+      return {
+        type: 'Feature' as const, id: r.id, active: t.active,
+        properties: { name: r.name, active: t.active },
+        geometry: { type: 'MultiPolygon' as const, coordinates: r.rings.map((ring) => [[...ring, ring[0]!]]) },
+      };
+    });
+  if (closures.length)
+    layers.push(
+      new GeoJsonLayer({
+        id: 'airspace', data: closures, stroked: true, filled: true, lineWidthUnits: 'pixels',
+        getFillColor: (f) => [AIRSPACE[0], AIRSPACE[1], AIRSPACE[2], f.properties.active ? 46 : 20],
+        getLineColor: (f) => [AIRSPACE[0], AIRSPACE[1], AIRSPACE[2], f.properties.active ? 200 : 90],
+        getLineWidth: (f) => (f.properties.active ? 1.5 : 1),
+      }),
+    );
 
   if (m.showWeather) {
     const points: { id: string; cond: string; a: Airport }[] = [];

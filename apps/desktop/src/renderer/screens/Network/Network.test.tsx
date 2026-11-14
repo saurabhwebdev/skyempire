@@ -76,3 +76,34 @@ describe('NetworkTray', () => {
     expect(screen.getByText('LHR → CDG')).toBeInTheDocument();
   });
 });
+
+describe('route status chips', () => {
+  it('show a detour and a block in the route list', () => {
+    useGameStore.setState({ view: fakeView({}, { aircraft: [ac], routes: [route(), route({ id: 'r2', to: 'MAD' })], routeStatus: { r1: { detourKm: 480, blocked: null }, r2: { detourKm: 0, blocked: 'Flights banned between United Kingdom and Spain' } } }) });
+    wrap(<NetworkTray />);
+    expect(screen.getByText('Detour +480 km')).toBeInTheDocument();
+    expect(screen.getByText('Grounded')).toBeInTheDocument();
+  });
+  it('explain a block in the route inspector', async () => {
+    const { RouteInspector } = await import('./RouteInspector');
+    useGameStore.setState({ view: fakeView({}, { aircraft: [ac], routes: [route()], routeStatus: { r1: { detourKm: 0, blocked: 'Flights banned between United Kingdom and France' } } }) });
+    wrap(<RouteInspector id="r1" />);
+    expect(screen.getByText('Flights banned between United Kingdom and France. This route is grounded until it lifts; its slots are kept.')).toBeInTheDocument();
+  });
+});
+
+describe('RouteEditor detours', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    useGameStore.setState({ view: fakeView({}, { aircraft: [ac] }) });
+    useUi.setState({ ...useUi.getInitialState(), screen: 'game', routeEditor: { from: 'LHR', to: 'CDG' } });
+  });
+  afterEach(() => vi.useRealTimers());
+  it('warns about the extra distance before opening', async () => {
+    const preview = vi.fn().mockResolvedValue({ ok: true, expectedLoadFactor: 0.8, expectedProfitPerDay: 9200, paybackDays: 21, suggestedFares: { economy: 95, premium: 170, business: 330 }, distanceKm: 348, detourKm: 480 });
+    window.game = { preview, command: vi.fn() } as unknown as typeof window.game;
+    wrap(<RouteEditor />);
+    await act(() => vi.advanceTimersByTimeAsync(300));
+    expect(await screen.findByText('Detour +480 km around closed airspace')).toBeInTheDocument();
+  });
+});

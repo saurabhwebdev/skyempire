@@ -39,6 +39,14 @@ describe('buildLayers', () => {
     const layer = buildLayers(input({ view, showWeather: true })).find((l) => l.id === 'weather')!;
     expect((layer.props.data as { id: string }[]).map((d) => d.id).sort()).toEqual(['JFK', 'LHR']);
   });
+  it('shades closed and soon-closing airspace only', () => {
+    const t = (id: string, regionId: string, active: boolean, kind = 'airspaceClosure' as const) => ({ id, kind, regionId, startDay: 0, endDay: 9, active, label: '' });
+    const view = { ...input().view, tensions: [t('a', 'caucasus', true), t('b', 'sahel', false), { id: 'c', kind: 'routeBan' as const, countries: ['DE', 'ES'] as [string, string], startDay: 0, endDay: 9, active: true, label: '' }] };
+    const layer = buildLayers(input({ view })).find((l) => l.id === 'airspace')!;
+    const data = layer.props.data as { id: string; active: boolean }[];
+    expect(data.map((d) => [d.id, d.active])).toEqual([['caucasus', true], ['sahel', false]]);
+    expect(ids()).not.toContain('airspace');
+  });
   it('flags player bases', () => {
     const layer = buildLayers(input()).find((l) => l.id === 'airports')!;
     const data = layer.props.data as { id: string; isBase: boolean }[];

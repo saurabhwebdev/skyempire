@@ -4,10 +4,13 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const MAIN = join(import.meta.dirname, '..', 'out', 'main', 'index.js');
+/** Days since the first in-game date seen ("Mar 5, 2027" in the top bar). */
+let firstSeen: number | null = null;
 const dayOf = async (win: Page) => {
-  const text = (await win.getByText(/^[A-Z][a-z]{2} \d{1,2} Y\d+$/).first().textContent()) ?? '';
-  const [mon, d] = text.split(' ');
-  return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].indexOf(mon!) * 30 + Number(d) - 1;
+  const text = (await win.getByText(/^[A-Z][a-z]{2} \d{1,2}, \d{4}$/).first().textContent()) ?? '';
+  const t = Date.parse(`${text} UTC`) / 86_400_000;
+  firstSeen ??= t;
+  return Math.round(t - firstSeen);
 };
 
 test('a full first career: found, lease, fly, save, continue', async () => {
@@ -47,7 +50,12 @@ test('a full first career: found, lease, fly, save, continue', async () => {
 
   // Fly a week at 8×
   await win.getByRole('button', { name: '8× speed' }).click();
-  await expect.poll(() => dayOf(win), { timeout: 60_000 }).toBeGreaterThanOrEqual(7);
+  // Major events (a fuel spike, a strike at the hub) auto-pause the game: resume if that happens.
+  const fast = win.getByRole('button', { name: '8× speed' });
+  await expect.poll(async () => {
+    if ((await fast.getAttribute('aria-pressed')) !== 'true') await fast.click();
+    return dayOf(win);
+  }, { timeout: 60_000 }).toBeGreaterThanOrEqual(7);
   await win.getByRole('button', { name: 'Pause' }).click();
 
   // Finance shows revenue

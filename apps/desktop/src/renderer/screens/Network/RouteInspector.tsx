@@ -32,6 +32,12 @@ export function RouteInspector({ id }: { id: string }) {
         <h2 className="mt-1 font-mono text-[24px] font-semibold">{r.from} → {r.to}</h2>
         <p className="text-muted">{a.city} – {b.city} · {Math.round(distanceKm(a, b)).toLocaleString('en-US')} km</p>
         {r.status === 'suspended' && <p className="mt-2 rounded-md bg-warning/10 p-2 text-[13px] text-warning">Suspended — assign an aircraft to fly it again.</p>}
+        {view.routeStatus[r.id]?.blocked && (
+          <p className="mt-2 rounded-md bg-danger/10 p-2 text-[13px] text-danger">{view.routeStatus[r.id]!.blocked}. This route is grounded until it lifts; its slots are kept.</p>
+        )}
+        {!view.routeStatus[r.id]?.blocked && (view.routeStatus[r.id]?.detourKm ?? 0) > 0 && (
+          <p className="mt-2 rounded-md bg-warning/10 p-2 text-[13px] text-warning">Flying a {view.routeStatus[r.id]!.detourKm.toLocaleString('en-US')} km detour around closed airspace — more fuel and crew time.</p>
+        )}
       </header>
       <div className="grid grid-cols-2 gap-4">
         <KpiTile label="Load" value={r.last ? formatPct(r.last.loadFactor) : '—'} />

@@ -36,6 +36,10 @@ export function NetworkTray() {
           <span className="inline-flex items-center gap-2">
             <span className="font-mono">{r.from} → {r.to}</span>
             {r.status === 'suspended' && <span className="rounded-full bg-warning/15 px-2 py-0.5 text-[11px] font-semibold text-warning">Suspended</span>}
+            {view.routeStatus[r.id]?.blocked && <span title={view.routeStatus[r.id]!.blocked!} className="rounded-full bg-danger/15 px-2 py-0.5 text-[11px] font-semibold text-danger">Grounded</span>}
+            {!view.routeStatus[r.id]?.blocked && (view.routeStatus[r.id]?.detourKm ?? 0) > 0 && (
+              <span className="num rounded-full bg-warning/15 px-2 py-0.5 text-[11px] font-semibold text-warning">Detour +{view.routeStatus[r.id]!.detourKm.toLocaleString('en-US')} km</span>
+            )}
           </span>
         ), sortValue: (r) => `${r.from}${r.to}` },
         { key: 'aircraft', header: 'Aircraft', cell: aircraftOf },

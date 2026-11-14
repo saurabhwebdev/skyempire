@@ -145,6 +145,9 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
             {Math.round(dist).toLocaleString('en-US')} km · demand ~{(preview.demandPerDay ?? 0).toLocaleString('en-US')}/day · {preview.competitors ?? 0} competitor{preview.competitors === 1 ? '' : 's'}
           </p>
         )}
+        {to && preview?.ok && (preview.detourKm ?? 0) > 0 && (
+          <p className="num rounded-md bg-warning/10 p-2 text-[13px] text-warning">Detour +{preview.detourKm!.toLocaleString('en-US')} km around closed airspace</p>
+        )}
 
         <fieldset className="flex flex-col gap-3">
           <legend className="mb-1 text-[13px] font-semibold text-muted">Aircraft</legend>

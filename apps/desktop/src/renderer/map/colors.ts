@@ -23,3 +23,6 @@ export const WEATHER_COLORS: Record<string, RGBA> = {
   fog: [160, 165, 175, 100],
   cyclone: [235, 90, 80, 140],
 };
+
+/** Closed airspace (danger hue). */
+export const AIRSPACE: RGBA = [235, 90, 80, 255];
