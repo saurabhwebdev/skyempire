@@ -190,6 +190,6 @@ describe('save format', () => {
     const old = { ...structuredClone(s), schemaVersion: 3 };
     const m = migrate(old);
     expect(m.schemaVersion).toBe(CURRENT_SCHEMA);
-    expect(CURRENT_SCHEMA).toBe(4);
+    expect(CURRENT_SCHEMA).toBeGreaterThanOrEqual(4);
   });
 });

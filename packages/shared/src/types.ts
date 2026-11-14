@@ -15,7 +15,9 @@ export interface CabinProduct { economy: ClassProduct<EconomySeat>; premium: Cla
 export interface CabinConfig { seats: Cabin; product: CabinProduct; dense: boolean }
 export interface CabinTemplate { id: string; name: string; typeId: string; config: CabinConfig }
 export type AircraftClass = 'turboprop' | 'regional' | 'narrowbody' | 'longNarrowbody' | 'widebody';
-export type PersonalityId = 'budget' | 'legacy' | 'regional' | 'gulf' | 'expander';
+export type PersonalityId = 'budget' | 'legacy' | 'regional' | 'gulf' | 'expander' | 'integrator' | 'freightCarrier';
+/** Passenger, Passenger + Cargo, or Cargo only (v0.6). Chosen at the start and permanent. */
+export type AirlineKind = 'passenger' | 'combination' | 'cargo';
 export type Difficulty = 'easy' | 'normal' | 'hard';
 export type TierId = 'startup' | 'regional' | 'national' | 'global';
 export type SizeClass = 1 | 2 | 3 | 4 | 5 | 6;
@@ -61,6 +63,18 @@ export interface AircraftType {
   abreast?: number;
   /** A denser economy row some airlines really fly (e.g. 777 3-4-3). */
   denseAbreast?: number;
+  /** v0.6: a freighter (no seats; carries payloadT). */
+  kind?: 'freighter';
+  /** Freighters: maximum payload, tonnes. */
+  payloadT?: number;
+  /** Passenger types: hold capacity for cargo and bags, tonnes. */
+  bellyT?: number;
+  /** First year it can be delivered (e.g. the A350F in 2027); earlier orders wait. */
+  entryYear?: number;
+  /** A freighter made from passenger aircraft of these types, at this cost and downtime. */
+  conversion?: { from: string[]; costUsd: number; days: number };
+  /** A main-deck freighter that can take live animals and outsize cargo. */
+  special?: boolean;
   /** Out of production: only on the used market. */
   usedOnly?: boolean;
 }
@@ -77,6 +91,8 @@ export interface AirlineData {
   brandColor: string;
   fleetTypes: string[];
   sources: string[];
+  /** v0.6: airlines that fly freighters too ('combination') or only ('cargo'). Default passenger. */
+  kind?: AirlineKind;
 }
 
 /** Holiday tables (packages/data/src/holidays.json), built from date-holidays. */
@@ -120,8 +136,10 @@ export interface Aircraft {
   cabin: Cabin;
   product: CabinProduct;
   dense: boolean;
-  /** Days left in a cabin refit; the aircraft doesn't fly until 0. */
+  /** Days left in a cabin refit (or freighter conversion); the aircraft doesn't fly until 0. */
   refitDaysLeft: number;
+  /** Ordered before the type's first deliveries: arrives (and starts its lease) on this game day. */
+  deliveryDay?: number;
   status: 'active' | 'maintenance';
   maintenanceDaysLeft: number;
   bookValue: Money;
@@ -139,6 +157,12 @@ export interface RouteDayStats {
   marketPax?: Record<string, Cabin>;
   /** Multi-stop routes: load factor of each leg, in chain order. */
   legLoad?: number[];
+  /** Cargo carried today, tonnes (both directions; freighters or belly). */
+  cargoT?: number;
+  /** Revenue from cargo today (included in revenue). */
+  cargoRevenue?: Money;
+  /** Cargo routes: how full the freighters were, 0–1. */
+  cargoLoad?: number;
   revenue: Money;
   cost: Money;
   profit: Money;
@@ -161,7 +185,18 @@ export interface Route {
   stops?: string[];
   /** Fares for the markets other than from–to on a multi-stop route, keyed by pairKey (e.g. "DXB-LHR"). */
   legFares?: Record<string, Record<CabinClass, Money>>;
+  /** v0.6: a passenger route (default) or a freighter route. */
+  kind?: 'passenger' | 'cargo';
+  /** Cargo routes: general cargo rate, $/kg (other cargo types pay a multiple). */
+  cargoRate?: number;
+  /** Cargo routes: the cargo types it takes. */
+  cargoAccept?: CargoType[];
+  /** Passenger routes: belly cargo in the holds. */
+  belly?: BellySettings;
 }
+
+/** Belly cargo on a passenger route: the market default, or the player's own rate, cargo types and hold share (0.4–0.9). */
+export type BellySettings = { mode: 'default' } | { mode: 'custom'; rate: number; accept: CargoType[]; holdShare: number };
 
 export interface SeasonalFare {
   startDay: number;
@@ -193,6 +228,12 @@ export interface Airline {
   homeBaseId: string;
   reputation: number;
   cabinTemplates: CabinTemplate[];
+  /** v0.6: Passenger, Passenger + Cargo, or Cargo only. */
+  kind: AirlineKind;
+  /** Sell cargo in passenger aircraft holds (on by default). */
+  bellyCargo: boolean;
+  /** Licensed to carry dangerous goods. */
+  dgLicence: boolean;
   marketingPerMonth: Money;
   tier: TierId;
   completedObjectives: string[];
@@ -261,7 +302,7 @@ export interface World {
 }
 
 export interface GameState {
-  schemaVersion: 4;
+  schemaVersion: 5;
   seed: number;
   rngState: number;
   day: number;

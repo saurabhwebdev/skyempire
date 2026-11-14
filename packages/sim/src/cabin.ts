@@ -163,6 +163,8 @@ export function fuelFactor(config: CabinConfig, t: AircraftType): number {
 
 const PRODUCTS: Record<PersonalityId | 'player', (s: CabinProduct) => CabinProduct> = {
   player: (s) => s,
+  integrator: (s) => s,
+  freightCarrier: (s) => s,
   budget: (s) => ({ ...s, economy: { seat: 'slimline', ife: 'none', meal: 'buyOnBoard', amenityKit: false, lounge: false } }),
   expander: (s) => ({ ...s, economy: { seat: 'slimline', ife: 'wifi', meal: 'buyOnBoard', amenityKit: false, lounge: false } }),
   regional: (s) => ({ ...s, economy: { ...s.economy, seat: 'standard', ife: 'none', meal: 'snack' } }),

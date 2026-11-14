@@ -44,7 +44,8 @@ export interface MonthlyCosts { leases: Money; overhead: Money; bases: Money; ma
 export function monthlyFixedCosts(state: GameState, airlineId: string, catalog: Catalog): MonthlyCosts {
   const al = state.airlines[airlineId]!;
   const fleet = Object.values(state.aircraft).filter((a) => a.ownerId === airlineId);
-  const leases = fleet.filter((a) => a.ownership === 'leased').reduce((s, a) => s + catalog.aircraftTypes[a.typeId]!.leasePerMonth, 0);
+  // An aircraft on order isn't paid for until it arrives.
+  const leases = fleet.filter((a) => a.ownership === 'leased' && !(a.deliveryDay !== undefined && a.deliveryDay > state.day)).reduce((s, a) => s + catalog.aircraftTypes[a.typeId]!.leasePerMonth, 0);
   const overhead = BALANCE.overheadBase + BALANCE.overheadPerAircraft * fleet.length;
   const bases = al.baseIds.reduce((s, id) => s + BALANCE.baseUpkeepPerSize * (catalog.airports[id]?.sizeClass ?? 1), 0);
   return { leases, overhead, bases, marketing: al.marketingPerMonth };

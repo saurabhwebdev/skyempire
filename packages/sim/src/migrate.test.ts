@@ -41,3 +41,21 @@ describe('save migration', () => {
   });
   it('rejects saves from a newer version', () => expect(() => migrate({ ...v1, schemaVersion: 99 })).toThrow(/newer/));
 });
+
+describe('schema 5 (cargo)', () => {
+  it('gives airlines a kind, belly cargo on, and routes passenger with default belly cargo', async () => {
+    const { playerGame } = await import('./testing');
+    const s = playerGame('FRA', 3) as unknown as Record<string, unknown>;
+    type Loose = Record<string, unknown>;
+    const old = structuredClone(s) as Loose;
+    old.schemaVersion = 4;
+    for (const al of Object.values(old.airlines as Record<string, Loose>)) { delete al.kind; delete al.bellyCargo; delete al.dgLicence; }
+    old.routes = { r1: { id: 'r1', airlineId: old.playerId, from: 'FRA', to: 'CDG', fares: { economy: 1, premium: 1, business: 1 }, assignments: [], status: 'suspended', openedDay: 0, last: null, profit30: [] } };
+    const m = migrate(old);
+    expect(m.schemaVersion).toBe(CURRENT_SCHEMA);
+    expect(m.airlines[m.playerId]).toMatchObject({ kind: 'passenger', bellyCargo: true, dgLicence: false });
+    const lh = Object.values(m.airlines).find((a) => a.code === 'LH');
+    if (lh) expect(lh.kind).toBe('combination');
+    expect(m.routes.r1).toMatchObject({ kind: 'passenger', belly: { mode: 'default' } });
+  });
+});

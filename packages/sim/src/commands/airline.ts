@@ -1,3 +1,4 @@
+import { DG_LICENCE_COST } from './fleet';
 import type { Catalog, Command, CommandResult, GameState } from '@skyempire/shared';
 import { availableCredit, baseSetupCost } from '../finance';
 import { nextId } from '../ids';
@@ -46,6 +47,16 @@ export function applyAirline(state: GameState, airlineId: string, cmd: Command, 
       if (loan.principal === 0) al.loans = al.loans.filter((l) => l !== loan);
       return { ok: true };
     }
+    case 'buyDgLicence': {
+      if (al.dgLicence) return { ok: false, reason: ERR.dgAlready };
+      if (al.cash < DG_LICENCE_COST) return { ok: false, reason: ERR.notEnoughCash(DG_LICENCE_COST - al.cash) };
+      al.cash -= DG_LICENCE_COST;
+      al.dgLicence = true;
+      return { ok: true };
+    }
+    case 'setBellyCargo':
+      al.bellyCargo = cmd.on;
+      return { ok: true };
     case 'setMarketing':
       al.marketingPerMonth = cmd.perMonth;
       return { ok: true };

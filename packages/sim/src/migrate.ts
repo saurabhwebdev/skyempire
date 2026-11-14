@@ -1,7 +1,10 @@
 import type { CabinProduct, GameState, Ife, Meal } from '@skyempire/shared';
 import { standardProduct } from './cabin';
 
-export const CURRENT_SCHEMA = 4;
+export const CURRENT_SCHEMA = 5;
+
+/** Real airlines in the catalogue that fly freighters as well as passengers. */
+export const COMBINATION_CARRIERS = ['LH', 'EK', 'QR', 'CX', 'KE', 'CI', 'TK', 'SQ', 'ET', 'AF', 'KL', 'CA', 'CZ', 'MU', 'NH', 'JL', 'UA', 'AA', 'DL', 'BA'];
 
 type Raw = Record<string, unknown>;
 
@@ -22,6 +25,14 @@ export const migrations: Record<number, (s: Raw) => Raw> = {
   },
   // v0.4 → v0.5: multi-stop routes. Every new field is optional, so only the version changes.
   3: (s) => ({ ...s, schemaVersion: 4 }),
+  // v0.5 → v0.6: airline types and belly cargo. Real combination carriers keep flying freighters.
+  4: (s) => {
+    const airlines = Object.fromEntries(Object.entries(s.airlines as Record<string, Raw>).map(([id, al]) => [id, {
+      ...al, kind: !al.isPlayer && COMBINATION_CARRIERS.includes(String(al.code)) ? 'combination' : 'passenger', bellyCargo: true, dgLicence: false,
+    }]));
+    const routes = Object.fromEntries(Object.entries(s.routes as Record<string, Raw>).map(([id, r]) => [id, { ...r, kind: 'passenger', belly: { mode: 'default' } }]));
+    return { ...s, schemaVersion: 5, airlines, routes };
+  },
 };
 
 /** The v0.3 service levels 1–5 as products. Seats keep the standard fit, so every cabin still fits. */

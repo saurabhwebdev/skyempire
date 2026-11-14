@@ -20,6 +20,7 @@ export function applyCommand(state: GameState, airlineId: string, cmd: Command, 
     case 'setCabin':
     case 'saveCabinTemplate':
     case 'deleteCabinTemplate':
+    case 'convertAircraft':
       return applyFleet(state, airlineId, cmd, catalog);
     case 'openRoute':
     case 'updateRoute':

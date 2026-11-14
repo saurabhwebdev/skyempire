@@ -52,3 +52,25 @@ describe('parseCommand', () => {
     expect(() => parseCommand({ type: 'nope' })).toThrow();
   });
 });
+
+describe('cargo commands (v0.6)', () => {
+  it('accepts conversions, the dangerous-goods licence and the belly cargo switch', () => {
+    expect(parseCommand({ type: 'convertAircraft', aircraftId: 'ac1', toTypeId: 'B7SF' }).type).toBe('convertAircraft');
+    expect(parseCommand({ type: 'buyDgLicence' }).type).toBe('buyDgLicence');
+    expect(parseCommand({ type: 'setBellyCargo', on: false })).toEqual({ type: 'setBellyCargo', on: false });
+  });
+  it('leases a freighter without a cabin', () => {
+    expect(parseCommand({ type: 'leaseAircraft', typeId: 'B77F' })).toEqual({ type: 'leaseAircraft', typeId: 'B77F' });
+  });
+  it('opens a cargo route with a rate and the cargo it takes', () => {
+    const cmd = parseCommand({ type: 'openRoute', kind: 'cargo', from: 'HKG', to: 'LAX', fares, cargoRate: 3.2, cargoAccept: ['general', 'express'], assignments: [{ aircraftId: 'a1', roundTripsPerWeek: 5 }] });
+    expect(cmd).toMatchObject({ kind: 'cargo', cargoRate: 3.2, cargoAccept: ['general', 'express'] });
+    expect(() => parseCommand({ type: 'openRoute', kind: 'cargo', from: 'HKG', to: 'LAX', fares, cargoAccept: ['coal'], assignments: [{ aircraftId: 'a1', roundTripsPerWeek: 5 }] })).toThrow();
+  });
+  it('sets custom belly cargo on a passenger route, within the hold limits', () => {
+    const belly = { mode: 'custom', rate: 2.1, accept: ['general', 'perishable'], holdShare: 0.7 };
+    expect(parseCommand({ type: 'updateRoute', routeId: 'r1', belly })).toEqual({ type: 'updateRoute', routeId: 'r1', belly });
+    expect(() => parseCommand({ type: 'updateRoute', routeId: 'r1', belly: { ...belly, holdShare: 0.95 } })).toThrow();
+    expect(parseCommand({ type: 'updateRoute', routeId: 'r1', belly: { mode: 'default' } }).type).toBe('updateRoute');
+  });
+});

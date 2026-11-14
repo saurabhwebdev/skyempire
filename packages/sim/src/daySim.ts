@@ -92,7 +92,7 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
     blockH = flights.reduce((h, f) => h + blockHours(f.km, t.cruiseKmh), 0);
     const outOfRange = flights.some((f) => t.rangeKm < f.km);
     // Flights a cyclone would cancel still count as scheduled (stranded passengers cost money); strikes ground everything.
-    const flying = !struck && !blocked && !outOfRange && ac.status === 'active' && !(ac.refitDaysLeft > 0);
+    const flying = !struck && !blocked && !outOfRange && ac.status === 'active' && !(ac.refitDaysLeft > 0) && !(ac.deliveryDay !== undefined && ac.deliveryDay > state.day);
     if (outOfRange && !blocked && !rangeBlocked) rangeBlocked = `Detour exceeds ${t.name} range`;
     const scheduled = flying ? (average ? asg.roundTripsPerWeek / 7 : flightsToday(asg.roundTripsPerWeek, state.day)) : 0;
     const acSeats = CABIN_CLASSES.reduce((s, c) => s + ac.cabin[c], 0);
