@@ -33,6 +33,15 @@ describe('sim worker handler', () => {
     expect(h.handle({ kind: 'command', cmd }).view!.aircraft).toHaveLength(2);
     expect(h.handle({ kind: 'tick' }).view.aircraft).toHaveLength(2);
   });
+  it('suggests routes for an aircraft with free hours', () => {
+    const h = createSimHandler(catalog);
+    h.handle({ kind: 'newGame', opts });
+    const cmd = { type: 'leaseAircraft' as const, typeId: 'A20N', config: { seats: { economy: 194, premium: 0, business: 0 }, product: standardProduct(), dense: false } };
+    const ac = h.handle({ kind: 'command', cmd }).view!.aircraft[0]!.id;
+    const out = h.handle({ kind: 'suggestRoutes', aircraftId: ac });
+    expect(out.length).toBeGreaterThan(0);
+    expect(out[0]).toMatchObject({ from: expect.any(String), to: expect.any(String), roundTripsPerWeek: expect.any(Number) });
+  });
   it('a failed load keeps the current game', () => {
     const h = createSimHandler(catalog);
     h.handle({ kind: 'newGame', opts });

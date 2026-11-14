@@ -61,7 +61,7 @@ describe('side menu', () => {
     const { default: userEvent } = await import('@testing-library/user-event');
     const { NavRail } = await import('./NavRail');
     const user = userEvent.setup();
-    render(<TooltipProvider delayDuration={0}><NavRail /></TooltipProvider>);
+    render(<TooltipProvider><NavRail /></TooltipProvider>);
     await user.hover(screen.getByRole('button', { name: 'Fleet' }));
     const tip = await screen.findByRole('tooltip');
     expect(tip).toHaveTextContent(/^Fleet\s*3$/);

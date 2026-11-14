@@ -13,3 +13,4 @@ export { maxRoundTripsPerWeek, roundTripHours, seatUnits } from './ops';
 export { baseSetupCost } from './finance';
 export { aircraftMarketValue, tierAllows } from './fleet';
 export * from './cabin';
+export { suggestRoutes } from './suggest';

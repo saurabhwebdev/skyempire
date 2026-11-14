@@ -76,6 +76,8 @@ export interface GameApi {
   view(): Promise<ClientView | null>;
   history(airlineId: string, fromDay: number, toDay: number): Promise<AirlineDaily[]>;
   routeDemand(from: string, to: string): Promise<PreviewResult>;
+  /** Up to 3 profitable new routes that use an aircraft's free weekly hours. */
+  suggestRoutes(aircraftId: string): Promise<RouteSuggestion[]>;
   logos: {
     status(): Promise<{ have: number; total: number }>;
     download(): Promise<{ ok: number; failed: string[] }>;
@@ -112,6 +114,7 @@ export const IPC = {
   speed: 'game:speed',
   history: 'game:history',
   routeDemand: 'game:routeDemand',
+  suggestRoutes: 'game:suggestRoutes',
   getSettings: 'game:getSettings',
   setSettings: 'game:setSettings',
   view: 'game:view',
@@ -128,3 +131,14 @@ export const IPC = {
   updateOpenPage: 'update:openPage',
   updateState: 'update:state',
 } as const;
+
+/** A route suggestion for an aircraft's free hours (packages/sim/src/suggest.ts). */
+export interface RouteSuggestion {
+  from: string;
+  to: string;
+  roundTripsPerWeek: number;
+  fares: Record<'economy' | 'premium' | 'business', number>;
+  expectedLoadFactor: number;
+  expectedProfitPerDay: number;
+  distanceKm: number;
+}

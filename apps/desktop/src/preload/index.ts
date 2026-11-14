@@ -21,6 +21,7 @@ const api: GameApi = {
   view: () => ipcRenderer.invoke(IPC.view),
   history: (airlineId, from, to) => ipcRenderer.invoke(IPC.history, airlineId, from, to),
   routeDemand: (from, to) => ipcRenderer.invoke(IPC.routeDemand, from, to),
+  suggestRoutes: (aircraftId) => ipcRenderer.invoke(IPC.suggestRoutes, aircraftId),
   logos: {
     status: () => ipcRenderer.invoke(IPC.logoStatus),
     download: () => ipcRenderer.invoke(IPC.logoDownload),

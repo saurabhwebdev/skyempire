@@ -1,5 +1,5 @@
-import type { Catalog, ClientView, Command, CommandResult, GameState, NewGameOptions, PreviewResult, TickSummary, WeatherCondition } from '@skyempire/shared';
-import { applyCommand, buildClientView, distanceKm, newGame, preview, tick } from '@skyempire/sim';
+import type { Catalog, ClientView, Command, CommandResult, GameState, NewGameOptions, PreviewResult, RouteSuggestion, TickSummary, WeatherCondition } from '@skyempire/shared';
+import { applyCommand, buildClientView, distanceKm, newGame, preview, suggestRoutes, tick } from '@skyempire/sim';
 import { baseDemandBothWays } from './demandInfo';
 
 export type SimRequest =
@@ -9,6 +9,7 @@ export type SimRequest =
   | { kind: 'command'; cmd: Command }
   | { kind: 'preview'; cmd: Command }
   | { kind: 'routeDemand'; from: string; to: string }
+  | { kind: 'suggestRoutes'; aircraftId: string }
   | { kind: 'view' }
   | { kind: 'snapshot' }
   | { kind: 'weatherPoints' }
@@ -21,6 +22,7 @@ export interface SimResponses {
   command: { result: CommandResult; view: ClientView | null };
   preview: PreviewResult;
   routeDemand: PreviewResult;
+  suggestRoutes: RouteSuggestion[];
   view: ClientView;
   snapshot: GameState;
   weatherPoints: { day: number; token: string; points: { id: string; lat: number; lon: number }[] };
@@ -66,6 +68,7 @@ export function createSimHandler(catalog: Catalog): SimHandler {
       return { result, view: result.ok ? view() : null };
     },
     preview: (r) => preview(need(), need().playerId, r.cmd, catalog),
+    suggestRoutes: (r) => suggestRoutes(need(), need().playerId, r.aircraftId, catalog),
     routeDemand: (r) => {
       const s = need();
       const a = catalog.airports[r.from], b = catalog.airports[r.to];

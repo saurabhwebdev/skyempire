@@ -117,6 +117,7 @@ export function registerIpc(win: BrowserWindow, host: SimHost, store: SaveStore,
     return result;
   });
   ipcMain.handle(IPC.preview, async (_e, raw: unknown) => host.request({ kind: 'preview', cmd: parseCommand(raw) }));
+  ipcMain.handle(IPC.suggestRoutes, async (_e, aircraftId: string) => host.request({ kind: 'suggestRoutes', aircraftId: String(aircraftId) }));
   ipcMain.handle(IPC.routeDemand, async (_e, from: string, to: string) => host.request({ kind: 'routeDemand', from, to }));
   ipcMain.on(IPC.setSpeed, (_e, speed: Speed) => {
     if (saveId && [0, 1, 2, 4, 8].includes(speed)) loop.setSpeed(speed);

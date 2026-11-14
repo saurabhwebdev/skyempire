@@ -3,6 +3,8 @@ import { Button, DataTable, EmptyState, FilterSelect, ListToolbar, Meter, NoResu
 import { AlertTriangle, Plane, ShoppingCart } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { filterFleet, fleetStatus, type FleetStatus } from '../../lib/listFilters';
+import { FreeHoursDialog, underusedAircraft } from './FreeHours';
+import { Sparkles } from 'lucide-react';
 import { AircraftSilhouette } from '../../components/AircraftSilhouette';
 import { aircraftLabel, hoursUsed, WEEKLY_HOURS } from '../../lib/fleet';
 import { useGameStore, useUi } from '../../store';
@@ -23,6 +25,8 @@ export function FleetTray() {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState<FleetStatus | 'all'>('all');
   const [ownership, setOwnership] = useState<'all' | 'owned' | 'leased'>('all');
+  const [freeOpen, setFreeOpen] = useState(false);
+  const underused = underusedAircraft(view.aircraft, used).length;
   const clear = () => { setQuery(''); setStatus('all'); setOwnership('all'); };
   const rows = filterFleet(view.aircraft, { query, status, ownership }, used);
   const count = (k: FleetStatus) => view.aircraft.filter((a) => fleetStatus(a, used.get(a.id) ?? 0) === k).length;
@@ -63,7 +67,11 @@ export function FleetTray() {
           { id: 'maintenance', label: 'Maintenance', count: count('maintenance') }, { id: 'refit', label: 'Refit', count: count('refit') },
         ]} />
         <FilterSelect label="Owned or leased" value={ownership} onChange={setOwnership} options={[{ id: 'all', label: 'All' }, { id: 'owned', label: 'Owned' }, { id: 'leased', label: 'Leased' }]} />
+        <Button size="sm" variant={underused ? 'primary' : 'ghost'} onClick={() => setFreeOpen(true)}>
+          <Sparkles className="size-4" aria-hidden /> Use free hours{underused ? ` (${underused})` : ''}
+        </Button>
       </ListToolbar>
+      <FreeHoursDialog open={freeOpen} onOpenChange={setFreeOpen} />
       {rows.length ? table : <NoResults text="No aircraft match these filters." onClear={clear} />}
     </div>
   );
