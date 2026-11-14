@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.4.0 — "Cabin"
+
+- **Cabin designer.** Design every aircraft's cabin, with up to three classes: Economy, Premium Economy and Business. For each class you choose:
+  - **Seats:** how many, and the seat type. Economy can be slimline, standard or extra legroom. Business can be a recliner, angled lie-flat, full-flat bed or private suite. Bigger seats take more room, so you fit fewer.
+  - **A denser economy row** on aircraft where airlines really fly one (e.g. 3-4-3 on the 777-200).
+  - **Entertainment:** none, Wi-Fi streaming, seatback screens, or big screens with free Wi-Fi.
+  - **Meals:** from none or buy-on-board up to chef-designed dining, plus amenity kits and lounge access.
+- **Cabins matter.**
+  - Better products raise each class's quality, so you win more passengers and can charge more.
+  - They also cost money:
+    - seats and screens cost money to fit;
+    - meals, kits, lounges and Wi-Fi cost money on every flight;
+    - heavier cabins burn a little more fuel.
+  - Changing seats or screens on an aircraft you already have means a paid **refit**: 3 to 10 days out of service. Changing meals and extras is free and instant.
+- **Saved layouts.** Save a cabin as a layout (for example "787 long-haul") and start from it in one click.
+- **The live seat map** follows your seat choices, for example 1-2-1 lie-flat beds or 2-2 recliners.
+- **Rivals have products too.**
+  - Low-cost airlines fly slimline seats with buy-on-board.
+  - Full-service airlines fly lie-flat beds.
+  - Super-connectors fly suites on their widebodies.
+- **Search, filters and sorting** everywhere:
+  - **Aircraft market:**
+    - search by name or maker;
+    - filter by class, maker, "only what I can fly now", range and seats;
+    - sort by price, lease, seats, range or fuel per seat;
+    - used aircraft also sort by age and condition.
+  - **Fleet:** search, and filter by flying, idle, maintenance or refit, and by owned or leased.
+  - **Routes:** search by airport or city, and filter by profitable, losing, suspended or grounded.
+  - **News, rivals and saved careers:** search, filter and sort.
+- **Changes:**
+  - The airline-wide "service level" is replaced by per-class cabin products. Old saves convert automatically.
+  - Only one fuel price spike can happen at a time. Before, two could stack and push fuel to three times its normal price.
+
 ## 0.3.1
 
 - **Faster, more reliable start.**
