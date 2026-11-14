@@ -1,3 +1,5 @@
+import { catalog } from '../../lib/catalog';
+import { formatDate } from '@skyempire/sim';
 import { routeShort } from '../../lib/routes';
 import type { Aircraft } from '@skyempire/shared';
 import { Button, DataTable, EmptyState, FilterSelect, ListToolbar, Meter, NoResults, Segmented } from '@skyempire/ui';
@@ -10,8 +12,10 @@ import { AircraftSilhouette } from '../../components/AircraftSilhouette';
 import { aircraftLabel, hoursUsed, WEEKLY_HOURS } from '../../lib/fleet';
 import { useGameStore, useUi } from '../../store';
 
-export function aircraftStatus(ac: Aircraft, used: number): { text: string; idle: boolean } {
-  if (ac.refitDaysLeft > 0) return { text: `Refit · ${ac.refitDaysLeft}d`, idle: false };
+export function aircraftStatus(ac: Aircraft, used: number, day = 0, startYear = 2026): { text: string; idle: boolean } {
+  if (ac.deliveryDay !== undefined && ac.deliveryDay > day) return { text: `On order · ${formatDate(ac.deliveryDay, startYear)}`, idle: false };
+  const freighter = catalog.aircraftTypes[ac.typeId]?.kind === 'freighter';
+  if (ac.refitDaysLeft > 0) return { text: `${freighter ? 'Converting' : 'Refit'} · ${ac.refitDaysLeft}d`, idle: false };
   if (ac.status === 'maintenance') return { text: `Maintenance · ${ac.maintenanceDaysLeft}d`, idle: false };
   if (used <= 0) return { text: 'Idle', idle: true };
   return { text: 'Flying', idle: false };
@@ -53,7 +57,7 @@ export function FleetTray() {
         { key: 'routes', header: 'Routes', cell: (a) => routesOf(a.id).map(routeShort).join(', ') || <span className="text-faint">—</span> },
         { key: 'util', header: 'Use', numeric: true, cell: (a) => `${Math.round(((used.get(a.id) ?? 0) / WEEKLY_HOURS) * 100)}%`, sortValue: (a) => used.get(a.id) ?? 0 },
         { key: 'status', header: 'Status', cell: (a) => {
-          const s = aircraftStatus(a, used.get(a.id) ?? 0);
+          const s = aircraftStatus(a, used.get(a.id) ?? 0, view.day, view.startYear);
           return <span className={s.idle ? 'inline-flex items-center gap-1 text-warning' : 'text-muted'}>{s.idle && <AlertTriangle className="size-3.5" />}{s.text}</span>;
         } },
       ]}

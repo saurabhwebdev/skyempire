@@ -56,16 +56,19 @@ export function Finance() {
     for (const d of last30) for (const k of Object.keys(c) as (keyof CostBreakdown)[]) c[k] += d.costs[k];
     return (Object.entries(c) as [keyof CostBreakdown, number][]).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
   }, [last30]);
-  const { ask, seats, pax, revDay, costDay } = useMemo(() => {
-    let ask = 0, seats = 0, pax = 0, revDay = 0, costDay = 0;
+  const { ask, seats, pax, revDay, costDay, cargoRev, cargoT } = useMemo(() => {
+    let ask = 0, seats = 0, pax = 0, revDay = 0, costDay = 0, cargoRev = 0, cargoT = 0;
     for (const r of view.routes) {
-      if (!r.last || r.last.loadFactor <= 0) continue;
+      cargoRev += r.last?.cargoRevenue ?? 0;
+      cargoT += r.last?.cargoT ?? 0;
+      // Passenger figures (RASK, CASK, load factor) leave out freighter routes and belly cargo revenue.
+      if (!r.last || r.last.loadFactor <= 0 || r.kind === 'cargo') continue;
       const p = r.last.pax.economy + r.last.pax.premium + r.last.pax.business;
       const s = p / r.last.loadFactor;
       const d = routeLegs(r).reduce((x, [p, q]) => x + distanceKm(catalog.airports[p]!, catalog.airports[q]!), 0) / routeLegs(r).length;
-      ask += s * d; seats += s; pax += p; revDay += r.last.revenue; costDay += r.last.cost;
+      ask += s * d; seats += s; pax += p; revDay += r.last.revenue - (r.last.cargoRevenue ?? 0); costDay += r.last.cost;
     }
-    return { ask, seats, pax, revDay, costDay };
+    return { ask, seats, pax, revDay, costDay, cargoRev, cargoT };
   }, [view.routes]);
 
   if (!daily) return <div className="grid gap-4"><Skeleton className="h-28" /><Skeleton className="h-72" /></div>;
@@ -77,6 +80,7 @@ export function Finance() {
         <KpiTile label="RASK" value={ask ? `${((revDay / ask) * 100).toFixed(1)}¢` : '—'} />
         <KpiTile label="CASK" value={ask ? `${((costDay / ask) * 100).toFixed(1)}¢` : '—'} />
         <KpiTile label="Load factor" value={seats ? formatPct(pax / seats) : '—'} />
+        {cargoT > 0 && <KpiTile label="Cargo · yesterday" value={`${formatMoney(cargoRev)} · ${Math.round(cargoT).toLocaleString('en-US')} t`} />}
       </div>
 
       <Panel title="Revenue and costs by month" action={<Button size="sm" variant="ghost" onClick={() => setAsTable(!asTable)}>{asTable ? 'Show chart' : 'Show as table'}</Button>}>

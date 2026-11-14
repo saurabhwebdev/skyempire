@@ -27,6 +27,7 @@ export function Overview() {
   }, [view.player.id, Math.floor(view.day / 7)]);
   const alerts = useMemo(() => deriveAlerts(view), [view]);
   const profit30 = history.reduce((s, d) => s + d.revenue - Object.values(d.costs).reduce((a, b) => a + b, 0), 0);
+  const cargoT = view.routes.reduce((x, r) => x + (r.last?.cargoT ?? 0), 0);
   const top = [...view.routes].filter((r) => r.last).sort((a, b) => b.last!.profit - a.last!.profit).slice(0, 5);
   const rivals = [...view.rivals].sort((a, b) => b.overlapRoutes - a.overlapRoutes || b.routeCount - a.routeCount).slice(0, 4);
 
@@ -38,6 +39,7 @@ export function Overview() {
           <p className="mt-3 text-[13px] text-muted">
             Last 30 days: <Profit value={profit30} />
           </p>
+          {cargoT > 0 && <p className="num mt-1 text-[13px] text-muted">{Math.round(cargoT).toLocaleString('en-US')} t cargo yesterday</p>}
         </Panel>
       </motion.div>
 

@@ -28,6 +28,8 @@ export interface MapAirport extends Airport {
   active: boolean;
 }
 
+const CARGO_COLOR: RGBA = [245, 166, 35, 255];
+
 interface Arc {
   id: string;
   from: Airport;
@@ -112,7 +114,9 @@ export function buildLayers(m: MapInput): Layer[] {
     for (const [x, y] of routeLegs(r)) {
       const from = byId.get(x), to = byId.get(y);
       if (!from || !to) continue;
-      mine.push({ id: r.id, from, to, color: [player[0], player[1], player[2], Math.round(alpha * fresh)], width: (selected ? 4 : 2) * (0.5 + fresh / 2) });
+      // Cargo routes in amber so they stand apart from passenger routes.
+      const c = r.kind === 'cargo' ? CARGO_COLOR : player;
+      mine.push({ id: r.id, from, to, color: [c[0], c[1], c[2], Math.round(alpha * fresh)], width: (selected ? 4 : 2) * (0.5 + fresh / 2) });
     }
   }
   layers.push(

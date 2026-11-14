@@ -22,9 +22,18 @@ export function AircraftInspector({ id }: { id: string }) {
   const [confirm, setConfirm] = useState(false);
   const [cabinOpen, setCabinOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [convertOpen, setConvertOpen] = useState(false);
   const ac = view.aircraft.find((a) => a.id === id);
   if (!ac) return <p className="text-muted">This aircraft has left your fleet.</p>;
   const t = catalog.aircraftTypes[ac.typeId]!;
+  const freighter = t.kind === 'freighter';
+  // Freighter conversions this airline can order for this airliner (Passenger airlines don't fly freighters).
+  const targets = view.player.kind !== 'passenger' && !freighter
+    ? Object.values(catalog.aircraftTypes).filter((x) => x.conversion?.from.includes(ac.typeId)) : [];
+  const convert = async (toTypeId: string) => {
+    const r = await window.game.command({ type: 'convertAircraft', aircraftId: id, toTypeId });
+    if (r.ok) { setConvertOpen(false); toast({ title: 'Off to the conversion shop', tone: 'success' }); } else toast({ title: r.reason, tone: 'danger' });
+  };
   const routes = view.routes.filter((r) => r.assignments.some((a) => a.aircraftId === id));
   const used = hoursUsed(view).get(id) ?? 0;
   const leased = ac.ownership === 'leased';
@@ -61,12 +70,18 @@ export function AircraftInspector({ id }: { id: string }) {
       </div>
       <dl className="grid grid-cols-2 gap-y-2 text-[13px]">
         <dt className="text-muted">Age</dt><dd className="num text-right">{(ac.ageDays / 360).toFixed(1)} years</dd>
-        <dt className="text-muted">Seats</dt><dd className="num text-right">{ac.cabin.business}J · {ac.cabin.premium}W · {ac.cabin.economy}Y</dd>
-        <dt className="text-muted">Cabin</dt><dd className="text-right">{product}{ac.dense ? ' · dense' : ''}</dd>
+        {freighter ? (
+          <><dt className="text-muted">Payload</dt><dd className="num text-right">{t.payloadT} t payload</dd></>
+        ) : (
+          <>
+            <dt className="text-muted">Seats</dt><dd className="num text-right">{ac.cabin.business}J · {ac.cabin.premium}W · {ac.cabin.economy}Y</dd>
+            <dt className="text-muted">Cabin</dt><dd className="text-right">{product}{ac.dense ? ' · dense' : ''}</dd>
+          </>
+        )}
         <dt className="text-muted">Range</dt><dd className="num text-right">{t.rangeKm.toLocaleString('en-US')} km</dd>
         <dt className="text-muted">{leased ? 'Lease' : 'Market value'}</dt><dd className="num text-right">{leased ? `${formatMoney(t.leasePerMonth)}/mo` : formatMoney(value)}</dd>
         <dt className="text-muted">Flight hours</dt><dd className="num text-right">{Math.round(ac.flightHours).toLocaleString('en-US')}</dd>
-        <dt className="text-muted">Status</dt><dd className="text-right">{aircraftStatus(ac, routes.length ? used : 0).text}</dd>
+        <dt className="text-muted">Status</dt><dd className="text-right">{aircraftStatus(ac, routes.length ? used : 0, view.day, view.startYear).text}</dd>
       </dl>
       <div>
         <span className="label-caps">Routes</span>
@@ -77,12 +92,25 @@ export function AircraftInspector({ id }: { id: string }) {
         </ul>
       </div>
       <div className="flex flex-col gap-2">
-        <Button variant="primary" onClick={() => setCabinOpen(true)}>Design cabin</Button>
+        {!freighter && <Button variant="primary" onClick={() => setCabinOpen(true)}>Design cabin</Button>}
+        {targets.length > 0 && <Button onClick={() => setConvertOpen(true)}>Convert to freighter</Button>}
         <Button onClick={() => setAboutOpen(true)}>About the {t.name}</Button>
         <Button variant="ghost" onClick={() => setConfirm(true)}>{leased ? 'Return lease' : `Sell aircraft · ${formatMoney(value)}`}</Button>
       </div>
       <AircraftDetails typeId={ac.typeId} open={aboutOpen} onOpenChange={setAboutOpen} />
       <CabinDesigner open={cabinOpen} onOpenChange={setCabinOpen} typeId={ac.typeId} initial={current} mode={{ kind: 'refit', current }} onConfirm={setCabin} />
+      <Modal open={convertOpen} onOpenChange={setConvertOpen} title="Convert to a freighter?"
+        description={leased ? 'Only aircraft you own can be converted.' : routes.length ? 'Take it off its routes first: it’s out of service while it’s converted.' : 'It keeps its age and condition, loses its seats, and is out of service while the work is done.'}
+        footer={<Button variant="ghost" onClick={() => setConvertOpen(false)}>Cancel</Button>}>
+        <ul className="flex flex-col gap-2">
+          {targets.map((x) => (
+            <li key={x.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-surface-2 p-3 text-[13px]">
+              <span><span className="font-semibold">{x.name}</span><span className="num block text-muted">{x.payloadT} t payload · {x.conversion!.days} days in the shop</span></span>
+              <Button size="sm" variant="primary" disabled={leased || routes.length > 0} onClick={() => convert(x.id)}>Convert · {formatMoney(x.conversion!.costUsd)}</Button>
+            </li>
+          ))}
+        </ul>
+      </Modal>
       <Modal open={confirm} onOpenChange={setConfirm} title={leased ? 'Return this lease?' : 'Sell this aircraft?'}
         description={routes.length ? 'These routes will be suspended until you assign another aircraft:' : leased ? 'The aircraft goes back to the lessor. No refund.' : `You'll receive ${formatMoney(value)}.`}
         footer={<><Button variant="ghost" onClick={() => setConfirm(false)}>Keep aircraft</Button><Button variant="danger" onClick={remove}>{leased ? 'Return lease' : 'Sell aircraft'}</Button></>}>

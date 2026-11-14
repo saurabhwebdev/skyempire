@@ -44,6 +44,7 @@ export function NetworkTray() {
         { key: 'route', header: 'Route', cell: (r) => (
           <span className="inline-flex items-center gap-2">
             <span className="font-mono">{routeLabel(r)}</span>
+            {r.kind === 'cargo' && <span className="rounded-full bg-warning/15 px-2 py-0.5 text-[11px] font-semibold text-warning">Cargo</span>}
             {r.status === 'suspended' && <span className="rounded-full bg-warning/15 px-2 py-0.5 text-[11px] font-semibold text-warning">Suspended</span>}
             {view.routeStatus[r.id]?.blocked && <span title={view.routeStatus[r.id]!.blocked!} className="rounded-full bg-danger/15 px-2 py-0.5 text-[11px] font-semibold text-danger">Grounded</span>}
             {!view.routeStatus[r.id]?.blocked && (view.routeStatus[r.id]?.detourKm ?? 0) > 0 && (
@@ -54,7 +55,7 @@ export function NetworkTray() {
         { key: 'aircraft', header: 'Aircraft', cell: aircraftOf },
         { key: 'freq', header: 'Freq/wk', numeric: true, cell: (r) => r.assignments.reduce((s, a) => s + a.roundTripsPerWeek, 0), sortValue: (r) => r.assignments.reduce((s, a) => s + a.roundTripsPerWeek, 0) },
         { key: 'load', header: 'Load', width: '140px', cell: (r) => (r.last ? <Meter label="Load factor" value={r.last.loadFactor} tone={r.last.loadFactor < 0.6 ? 'warning' : 'accent'} /> : <span className="text-faint">—</span>), sortValue: (r) => r.last?.loadFactor ?? -1 },
-        { key: 'fare', header: 'Fare', numeric: true, cell: (r) => formatMoney(r.fares.economy), sortValue: (r) => r.fares.economy },
+        { key: 'fare', header: 'Fare', numeric: true, cell: (r) => (r.kind === 'cargo' ? `$${(r.cargoRate ?? 0).toFixed(2)}/kg` : formatMoney(r.fares.economy)), sortValue: (r) => (r.kind === 'cargo' ? r.cargoRate ?? 0 : r.fares.economy) },
         { key: 'profit', header: 'Profit/day', numeric: true, cell: (r) => (r.last ? <Profit value={r.last.profit} /> : <span className="text-faint">—</span>), sortValue: (r) => r.last?.profit ?? -Infinity },
       ]}
     />
