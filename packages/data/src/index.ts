@@ -26,7 +26,11 @@ export function loadCatalog(regionId: 'world' = 'world'): Catalog {
   cached = {
     regionId,
     airports: Object.fromEntries((airports as Airport[]).map((a) => [a.id, a])),
-    aircraftTypes: Object.fromEntries((aircraft as unknown as AircraftType[]).map((a) => [a.id, a])),
+    // Seats-across comes from the real-world details file.
+    aircraftTypes: Object.fromEntries((aircraft as unknown as AircraftType[]).map((a) => {
+      const d = (aircraftDetails as Record<string, { abreast: number; denseAbreast?: number }>)[a.id];
+      return [a.id, d ? { ...a, abreast: d.abreast, ...(d.denseAbreast ? { denseAbreast: d.denseAbreast } : {}) } : a];
+    })),
     airlines: airlines as AirlineData[],
     realRoutes: routes,
     holidays: holidays as HolidayData,

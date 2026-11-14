@@ -9,6 +9,14 @@ import { AircraftDetailsSchema, AircraftPhotoSchema } from './schema';
 const ids = aircraft.map((a) => a.id);
 
 describe('aircraft photos and specs', () => {
+  it('the catalog carries seats-across, and a denser row only where airlines really fly one', async () => {
+    const { loadCatalog } = await import('./index');
+    const types = loadCatalog().aircraftTypes;
+    for (const t of Object.values(types)) expect(t.abreast, t.id).toBeGreaterThanOrEqual(3);
+    const dense = Object.values(types).filter((t) => t.denseAbreast).map((t) => t.id).sort();
+    expect(dense).toEqual(['A332', 'A333', 'A339', 'A359', 'A35K', 'B763', 'B772'].sort());
+    for (const id of dense) expect(types[id]!.denseAbreast).toBe(types[id]!.abreast! + 1);
+  });
   it('every type has real specs', () => {
     for (const id of ids) AircraftDetailsSchema.parse((details as Record<string, unknown>)[id]);
     expect(Object.keys(details).sort()).toEqual([...ids].sort());

@@ -69,6 +69,7 @@ export const AircraftDetailsSchema = z.object({
   typicalSeats: z.string().min(1),
   /** Economy seats per row. */
   abreast: z.number().int().min(3).max(11),
+  denseAbreast: z.number().int().min(4).max(11).optional(),
   source: z.string().url(),
 });
 export type AircraftDetails = z.infer<typeof AircraftDetailsSchema>;

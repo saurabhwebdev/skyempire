@@ -2,6 +2,18 @@ export type Money = number; // integer USD
 export type CabinClass = 'economy' | 'premium' | 'business';
 export const CABIN_CLASSES: readonly CabinClass[] = ['economy', 'premium', 'business'] as const;
 export type Cabin = Record<CabinClass, number>;
+
+// Cabin products (v0.4). Seat type sets legroom and how much floor a seat takes.
+export type EconomySeat = 'slimline' | 'standard' | 'extraLegroom';
+export type PremiumSeat = 'recliner' | 'legRest';
+export type BusinessSeat = 'recliner' | 'angled' | 'flat' | 'suite';
+export type Ife = 'none' | 'wifi' | 'seatback' | 'premium';
+export type Meal = 'none' | 'buyOnBoard' | 'snack' | 'hot' | 'dining' | 'chef';
+export interface ClassProduct<S extends string = string> { seat: S; ife: Ife; meal: Meal; amenityKit: boolean; lounge: boolean }
+export interface CabinProduct { economy: ClassProduct<EconomySeat>; premium: ClassProduct<PremiumSeat>; business: ClassProduct<BusinessSeat> }
+/** Everything the cabin designer sets: seat counts, the product per class and the denser economy row. */
+export interface CabinConfig { seats: Cabin; product: CabinProduct; dense: boolean }
+export interface CabinTemplate { id: string; name: string; typeId: string; config: CabinConfig }
 export type AircraftClass = 'turboprop' | 'regional' | 'narrowbody' | 'longNarrowbody' | 'widebody';
 export type PersonalityId = 'budget' | 'legacy' | 'regional' | 'gulf' | 'expander';
 export type Difficulty = 'easy' | 'normal' | 'hard';
@@ -45,6 +57,10 @@ export interface AircraftType {
   mtowT: number;
   comfort: number;
   tier: TierId;
+  /** Economy seats per row (from aircraft-details). */
+  abreast?: number;
+  /** A denser economy row some airlines really fly (e.g. 777 3-4-3). */
+  denseAbreast?: number;
   /** Out of production: only on the used market. */
   usedOnly?: boolean;
 }
@@ -95,6 +111,10 @@ export interface Aircraft {
   hoursSinceA: number;
   hoursSinceC: number;
   cabin: Cabin;
+  product: CabinProduct;
+  dense: boolean;
+  /** Days left in a cabin refit; the aircraft doesn't fly until 0. */
+  refitDaysLeft: number;
   status: 'active' | 'maintenance';
   maintenanceDaysLeft: number;
   bookValue: Money;
@@ -157,7 +177,7 @@ export interface Airline {
   baseIds: string[];
   homeBaseId: string;
   reputation: number;
-  serviceLevel: 1 | 2 | 3 | 4 | 5;
+  cabinTemplates: CabinTemplate[];
   marketingPerMonth: Money;
   tier: TierId;
   completedObjectives: string[];
