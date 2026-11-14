@@ -13,10 +13,16 @@ test('design a cabin when leasing, refit it, and keep it after a reload', async 
   let app = await electron.launch({ args: [MAIN], env: { ...process.env, SKYEMPIRE_USER_DATA: userData } });
   let win = await app.firstWindow();
   await win.setViewportSize({ width: 1440, height: 900 });
-  await win.evaluate(() => window.game.newGame({ seed: 9, regionId: 'world', difficulty: 'normal', homeBaseId: 'LHR',
-    airline: { name: 'Cabin Test Air', code: 'C4B', colors: { primary: '#2f6fed', secondary: '#ffffff' }, logoShape: 'wing' } }));
-  await win.reload();
-  await expect(win.getByText('Cabin Test Air')).toBeVisible();
+  // Found the airline through the screens (a page reload can briefly show the title screen).
+  await win.getByRole('button', { name: 'New career' }).click();
+  await win.getByLabel('Airline name').fill('Cabin Test Air');
+  await win.getByRole('button', { name: 'Choose a hub' }).click();
+  await win.getByLabel('Search airports').fill('LHR');
+  await win.keyboard.press('Enter');
+  await win.getByRole('button', { name: 'Choose difficulty' }).click();
+  await win.getByRole('button', { name: 'Found airline' }).click();
+  await expect(win.getByText('Cabin Test Air', { exact: true })).toBeVisible();
+  await win.getByRole('button', { name: 'Skip tutorial' }).click();
 
   // Lease an A320neo with a two-class cabin, Wi-Fi and hot meals in economy, recliners up front.
   await win.keyboard.press('3');
@@ -54,7 +60,7 @@ test('design a cabin when leasing, refit it, and keep it after a reload', async 
   app = await electron.launch({ args: [MAIN], env: { ...process.env, SKYEMPIRE_USER_DATA: userData } });
   win = await app.firstWindow();
   await win.getByRole('button', { name: /Continue/ }).click();
-  await expect(win.getByText('Cabin Test Air')).toBeVisible();
+  await expect(win.getByText('Cabin Test Air', { exact: true })).toBeVisible();
   [ac] = await fleet(win);
   expect(ac!.product.business.seat).toBe('flat');
   expect(ac!.refitDaysLeft).toBe(5);
