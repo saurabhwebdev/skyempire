@@ -93,6 +93,10 @@ describe('costs', () => {
     expect(upgradeCost(cfg({ economy: 150, premium: 0, business: 0 }, { economy: { ife: 'wifi' } }))).toBe(400_000);
     expect(upgradeCost(cfg({ economy: 160, premium: 0, business: 0 }, { economy: { seat: 'slimline' } }))).toBe(0);
   });
+  it('a cheaper seat in one class does not pay for upgrades in another', () => {
+    const c = cfg({ economy: 180, premium: 0, business: 12 }, { economy: { seat: 'slimline' }, business: { ife: 'seatback' } });
+    expect(upgradeCost(c)).toBe(12 * 8_000);
+  });
   it('changing only meals and extras is free and instant', () => {
     const t = type('B789');
     const a = cfg({ economy: 200, premium: 20, business: 30 });

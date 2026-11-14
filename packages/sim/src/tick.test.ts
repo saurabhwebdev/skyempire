@@ -124,6 +124,18 @@ describe('cabins in the daily simulation', () => {
     expect(qb.business).toBeGreaterThan(qa.business + 5);
     expect(qb.economy).toBeCloseTo(qa.economy);
   });
+  it('an aircraft in a refit does not count towards the route quality', () => {
+    const a = widebody('recliner');
+    const before = routeOps(a.s.routes[a.routeId]!, a.s, catalog, hoursByAircraft(a.s, catalog), true).quality.business;
+    const p = standardProduct();
+    const c = config({ economy: 230, premium: 0, business: 30 }, { ...p, business: { ...p.business, seat: 'suite' } });
+    expect(applyCommand(a.s, a.s.playerId, { type: 'leaseAircraft', typeId: 'B789', config: c }, catalog)).toEqual({ ok: true });
+    const second = playerAircraft(a.s).find((x) => x.id !== a.ac)!;
+    second.refitDaysLeft = 4;
+    a.s.routes[a.routeId]!.assignments.push({ aircraftId: second.id, roundTripsPerWeek: 7 });
+    const after = routeOps(a.s.routes[a.routeId]!, a.s, catalog, hoursByAircraft(a.s, catalog), true).quality.business;
+    expect(after).toBeCloseTo(before);
+  });
   it('suites win more business passengers at the same fare', () => {
     const run = (seat: 'recliner' | 'suite') => {
       const { s, routeId } = widebody(seat);

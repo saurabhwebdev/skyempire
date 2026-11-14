@@ -183,7 +183,7 @@ export function AircraftMarket() {
       {pending && (
         <CabinDesigner open onOpenChange={(o) => !o && setPending(null)} typeId={pending.type.id}
           initial={defaultConfig(pending.type, null)}
-          mode={{ kind: 'new', confirmLabel: pending.kind === 'lease' ? `Lease for ${formatMoney(pending.type.leasePerMonth)}/mo` : `Buy for ${formatMoney(pending.kind === 'used' ? pending.listing.price : pending.type.priceUsd)}` }}
+          mode={{ kind: 'new', confirmLabel: (extra) => `${pending.kind === 'lease' ? `Lease for ${formatMoney(pending.type.leasePerMonth)}/mo` : `Buy for ${formatMoney(pending.kind === 'used' ? pending.listing.price : pending.type.priceUsd)}`}${extra ? ` + ${extra}` : ''}` }}
           onConfirm={confirm} />
       )}
     </motion.section>

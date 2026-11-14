@@ -114,9 +114,10 @@ export function installCost(config: CabinConfig): number {
   return CABIN_CLASSES.reduce((s, c) => s + classInstall(config, c), 0) + (hasWifi(config) ? WIFI_INSTALL : 0);
 }
 
-/** Extra paid on a new aircraft for a cabin above the standard fit. */
+/** Extra paid on a new aircraft for a cabin above the standard fit, per class (a cheaper seat in one class doesn't pay for another). */
 export function upgradeCost(config: CabinConfig): number {
-  return Math.max(0, installCost(config) - installCost({ seats: config.seats, product: standardProduct(), dense: false }));
+  const std: CabinConfig = { seats: config.seats, product: standardProduct(), dense: false };
+  return CABIN_CLASSES.reduce((s, c) => s + Math.max(0, classInstall(config, c) - classInstall(std, c)), 0) + (hasWifi(config) ? WIFI_INSTALL : 0);
 }
 
 function classChanged(a: CabinConfig, b: CabinConfig, cls: CabinClass): boolean {

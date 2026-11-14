@@ -98,3 +98,11 @@ seat × (0.6 − 0.15w) + IFE × (0.1 + 0.1w) + meal × (0.2 + 0.05w) + extras �
 ## Out of scope
 - Seat maps for specific real airlines.
 - First class as a fourth cabin (the maximum is three classes).
+
+## Notes after the final review (2026-11-14)
+- **Notifications:** News already filters by tone ("Warnings") and now has search. The toast/modal notifier isn't a list, so it has no filter.
+- **Airport pickers:** the route editor, the demand lookup and the new-airline screen already search airports by code or city.
+- **Upgrade cost:** taken per class (a cheaper seat in one class doesn't pay for upgrades in another).
+- **Deferred:**
+  - arrow-key (roving tabindex) navigation for the designer's choice groups and for the `Segmented` filter;
+  - a toast when a malformed command is rejected by the IPC schema (already the case on v0.3; the UI only sends valid commands).

@@ -128,6 +128,8 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
     const ac = state.aircraft[asg.aircraftId];
     if (!ac) continue;
     const t = catalog.aircraftTypes[ac.typeId]!;
+    // Only aircraft that can fly count: one in a refit or a check offers nothing today.
+    if (ac.status !== 'active' || ac.refitDaysLeft > 0) continue;
     for (const cls of CABIN_CLASSES) {
       const w = ac.cabin[cls] * asg.roundTripsPerWeek;
       if (w <= 0) continue;

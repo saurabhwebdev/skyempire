@@ -76,7 +76,7 @@ export function AircraftInspector({ id }: { id: string }) {
         </ul>
       </div>
       <div className="flex flex-col gap-2">
-        <Button variant="primary" onClick={() => setCabinOpen(true)} disabled={ac.refitDaysLeft > 0}>{ac.refitDaysLeft > 0 ? `Refit · ${ac.refitDaysLeft} days left` : 'Design cabin'}</Button>
+        <Button variant="primary" onClick={() => setCabinOpen(true)}>Design cabin</Button>
         <Button onClick={() => setAboutOpen(true)}>About the {t.name}</Button>
         <Button variant="ghost" onClick={() => setConfirm(true)}>{leased ? 'Return lease' : `Sell aircraft · ${formatMoney(value)}`}</Button>
       </div>

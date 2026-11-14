@@ -78,6 +78,12 @@ describe('routes', () => {
   it('sorts each route into a health group', () => {
     expect(routes.map((x) => routeHealth(x, status[x.id as 'r4']))).toEqual(['profitable', 'losing', 'suspended', 'grounded']);
   });
+  it('a route whose aircraft are all in refit or maintenance is grounded', () => {
+    const ac = { id: 'x', refitDaysLeft: 3, status: 'active' } as Aircraft;
+    const grounded = r('r5', 'LHR', 'MAD', { assignments: [{ aircraftId: 'x', roundTripsPerWeek: 7 }], last: last(0) });
+    expect(routeHealth(grounded, undefined, new Map([['x', ac]]))).toBe('grounded');
+    expect(routeHealth(grounded, undefined, new Map([['x', { ...ac, refitDaysLeft: 0 }]]))).toBe('profitable');
+  });
   it('filters by airport code or city and by health', () => {
     expect(ids(filterRoutes(routes, { query: 'paris', health: 'all' }, status))).toEqual(['r1']);
     expect(ids(filterRoutes(routes, { query: 'jfk', health: 'all' }, status))).toEqual(['r2']);

@@ -42,6 +42,11 @@ describe('Fleet', () => {
     expect(screen.getByRole('dialog')).toHaveTextContent('LHR → CDG');
   });
 
+  it('meals can still change while a refit runs', () => {
+    useGameStore.setState({ view: fakeView({}, { aircraft: [{ ...ac, refitDaysLeft: 4 }] }) });
+    wrap(<AircraftInspector id="ac1" />);
+    expect(screen.getByRole('button', { name: 'Design cabin' })).toBeEnabled();
+  });
   it('shows a running refit as the aircraft status', () => {
     expect(aircraftStatus({ ...ac, refitDaysLeft: 4 }, 0)).toEqual({ text: 'Refit · 4d', idle: false });
   });

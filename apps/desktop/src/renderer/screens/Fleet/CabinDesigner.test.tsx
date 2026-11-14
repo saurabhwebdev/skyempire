@@ -22,7 +22,7 @@ describe('cabin designer', () => {
   it('designs each class: seats, seat type, screens and meals', async () => {
     const user = userEvent.setup();
     const onConfirm = vi.fn();
-    wrap(<CabinDesigner open typeId="B789" initial={cfg({ economy: 250, premium: 0, business: 20 })} mode={{ kind: 'new', confirmLabel: 'Lease' }} onConfirm={onConfirm} onOpenChange={() => {}} />);
+    wrap(<CabinDesigner open typeId="B789" initial={cfg({ economy: 250, premium: 0, business: 20 })} mode={{ kind: 'new', confirmLabel: () => 'Lease' }} onConfirm={onConfirm} onOpenChange={() => {}} />);
     expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual([expect.stringMatching(/^Economy/), expect.stringMatching(/^Premium/), expect.stringMatching(/^Business/)]);
     await user.click(screen.getByRole('tab', { name: /Business/ }));
     await user.click(screen.getByRole('radio', { name: /Private suite/ }));
@@ -38,17 +38,17 @@ describe('cabin designer', () => {
 
   it('offers the denser economy row only where the aircraft has one', async () => {
     const user = userEvent.setup();
-    const { unmount } = wrap(<CabinDesigner open typeId="A333" initial={cfg({ economy: 250, premium: 0, business: 0 })} mode={{ kind: 'new', confirmLabel: 'Lease' }} onConfirm={vi.fn()} onOpenChange={() => {}} />);
+    const { unmount } = wrap(<CabinDesigner open typeId="A333" initial={cfg({ economy: 250, premium: 0, business: 0 })} mode={{ kind: 'new', confirmLabel: () => 'Lease' }} onConfirm={vi.fn()} onOpenChange={() => {}} />);
     await user.click(screen.getByRole('checkbox', { name: /Denser row/ }));
     expect(screen.getByRole('checkbox', { name: /Denser row/ })).toBeChecked();
     unmount();
-    wrap(<CabinDesigner open typeId="A20N" initial={cfg({ economy: 180, premium: 0, business: 0 })} mode={{ kind: 'new', confirmLabel: 'Lease' }} onConfirm={vi.fn()} onOpenChange={() => {}} />);
+    wrap(<CabinDesigner open typeId="A20N" initial={cfg({ economy: 180, premium: 0, business: 0 })} mode={{ kind: 'new', confirmLabel: () => 'Lease' }} onConfirm={vi.fn()} onOpenChange={() => {}} />);
     expect(screen.queryByRole('checkbox', { name: /Denser row/ })).not.toBeInTheDocument();
   });
 
   it('blocks a cabin that does not fit', async () => {
     const user = userEvent.setup();
-    wrap(<CabinDesigner open typeId="A20N" initial={cfg({ economy: 194, premium: 0, business: 0 })} mode={{ kind: 'new', confirmLabel: 'Lease for $862k/mo' }} onConfirm={vi.fn()} onOpenChange={() => {}} />);
+    wrap(<CabinDesigner open typeId="A20N" initial={cfg({ economy: 194, premium: 0, business: 0 })} mode={{ kind: 'new', confirmLabel: () => 'Lease for $862k/mo' }} onConfirm={vi.fn()} onOpenChange={() => {}} />);
     await user.click(screen.getByRole('radio', { name: /Extra legroom/ }));
     expect(screen.getByRole('alert')).toHaveTextContent('Too many seats — max 194 seat units');
     expect(screen.getByRole('button', { name: 'Lease for $862k/mo' })).toBeDisabled();
@@ -76,12 +76,22 @@ describe('cabin designer', () => {
     window.game = { command } as unknown as typeof window.game;
     const saved = { id: 'ct1', name: 'Long haul', typeId: 'B789', config: { ...cfg({ economy: 200, premium: 21, business: 28 }) } };
     useGameStore.setState({ view: fakeView({ cabinTemplates: [saved] }) });
-    wrap(<CabinDesigner open typeId="B789" initial={cfg({ economy: 290, premium: 0, business: 0 })} mode={{ kind: 'new', confirmLabel: 'Lease' }} onConfirm={vi.fn()} onOpenChange={() => {}} />);
+    wrap(<CabinDesigner open typeId="B789" initial={cfg({ economy: 290, premium: 0, business: 0 })} mode={{ kind: 'new', confirmLabel: () => 'Lease' }} onConfirm={vi.fn()} onOpenChange={() => {}} />);
     await user.type(screen.getByLabelText('Layout name'), 'My 787');
     await user.click(screen.getByRole('button', { name: 'Save as layout' }));
     expect(command).toHaveBeenCalledWith({ type: 'saveCabinTemplate', name: 'My 787', typeId: 'B789', config: expect.objectContaining({ seats: { economy: 290, premium: 0, business: 0 } }) });
     await user.click(screen.getByRole('button', { name: 'Long haul' }));
     expect(screen.getByRole('tab', { name: /Business/ })).toHaveTextContent('28');
+    await user.click(screen.getByRole('button', { name: 'Delete layout Long haul' }));
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    expect(command).toHaveBeenCalledWith({ type: 'deleteCabinTemplate', templateId: 'ct1' });
+  });
+  it('the confirm button shows the full price with cabin upgrades', async () => {
+    const user = userEvent.setup();
+    wrap(<CabinDesigner open typeId="A20N" initial={cfg({ economy: 180, premium: 0, business: 0 })} mode={{ kind: 'new', confirmLabel: (extra) => `Lease for $862k/mo${extra ? ` + ${extra}` : ''}` }} onConfirm={vi.fn()} onOpenChange={() => {}} />);
+    expect(screen.getByRole('button', { name: 'Lease for $862k/mo' })).toBeInTheDocument();
+    await user.click(screen.getByRole('radio', { name: /Seatback screens/ }));
+    expect(screen.getByRole('button', { name: 'Lease for $862k/mo + $1.4M cabin' })).toBeInTheDocument();
   });
 });
 

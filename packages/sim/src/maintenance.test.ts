@@ -9,6 +9,12 @@ const ac = (o: Partial<Aircraft> = {}): Aircraft => ({
 });
 
 describe('maintenance', () => {
+  it('a check and a refit count down on the same days', () => {
+    const a = ac({ status: 'maintenance', maintenanceDaysLeft: 2, refitDaysLeft: 5 });
+    advanceAircraft(a, 0);
+    advanceAircraft(a, 0);
+    expect(a).toMatchObject({ status: 'active', maintenanceDaysLeft: 0, refitDaysLeft: 3 });
+  });
   it('wears condition with use and ages a day', () => {
     const a = ac();
     advanceAircraft(a, 10);

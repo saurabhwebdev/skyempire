@@ -81,18 +81,23 @@ export function filterFleet(fleet: Aircraft[], f: FleetFilter, used: Map<string,
 
 // ── Routes ───────────────────────────────────────────────────────────────────
 export type RouteHealth = 'profitable' | 'losing' | 'suspended' | 'grounded' | 'new';
-export function routeHealth(r: Route, status?: { blocked: string | null }): RouteHealth {
+/** `aircraft`: the player's fleet by id; a route whose aircraft are all in a refit or check is grounded too. */
+export function routeHealth(r: Route, status?: { blocked: string | null }, aircraft?: Map<string, Aircraft>): RouteHealth {
   if (r.status === 'suspended') return 'suspended';
   if (status?.blocked) return 'grounded';
+  if (aircraft && r.assignments.length && r.assignments.every((x) => {
+    const ac = aircraft.get(x.aircraftId);
+    return ac && (ac.refitDaysLeft > 0 || ac.status === 'maintenance');
+  })) return 'grounded';
   if (!r.last) return 'new';
   return r.last.profit >= 0 ? 'profitable' : 'losing';
 }
 export interface RouteFilter { query: string; health: RouteHealth | 'all' }
-export function filterRoutes(routes: Route[], f: RouteFilter, status: Record<string, { blocked: string | null }>): Route[] {
+export function filterRoutes(routes: Route[], f: RouteFilter, status: Record<string, { blocked: string | null }>, aircraft?: Map<string, Aircraft>): Route[] {
   return routes.filter((r) => {
     const a = catalog.airports[r.from], b = catalog.airports[r.to];
     return textMatch(f.query, r.from, r.to, a?.city, b?.city, a?.name, b?.name)
-      && (f.health === 'all' || routeHealth(r, status[r.id]) === f.health);
+      && (f.health === 'all' || routeHealth(r, status[r.id], aircraft) === f.health);
   });
 }
 

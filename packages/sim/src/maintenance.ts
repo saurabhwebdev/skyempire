@@ -4,15 +4,15 @@ import { BALANCE } from './config/balance';
 /** Advance one aircraft by one day after it flew `hoursFlown` (simulation-spec §7). */
 export function advanceAircraft(ac: Aircraft, hoursFlown: number): { checkCost: number; check: 'A' | 'C' | null } {
   ac.ageDays += 1;
-  if (ac.refitDaysLeft > 0) {
-    ac.refitDaysLeft -= 1;
-    return { checkCost: 0, check: null };
-  }
+  // A refit and a maintenance check can run on the same days.
+  const inRefit = ac.refitDaysLeft > 0;
+  if (inRefit) ac.refitDaysLeft -= 1;
   if (ac.status === 'maintenance') {
     ac.maintenanceDaysLeft = Math.max(0, ac.maintenanceDaysLeft - 1);
     if (ac.maintenanceDaysLeft === 0) ac.status = 'active';
     return { checkCost: 0, check: null };
   }
+  if (inRefit) return { checkCost: 0, check: null };
   ac.flightHours += hoursFlown;
   ac.hoursSinceA += hoursFlown;
   ac.hoursSinceC += hoursFlown;

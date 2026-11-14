@@ -1,4 +1,5 @@
-import type { CabinClass, CabinConfig, ClassProduct, Ife, Meal } from '@skyempire/shared';
+import type { CabinClass, CabinConfig, CabinTemplate, ClassProduct, Ife, Meal } from '@skyempire/shared';
+import { X } from 'lucide-react';
 import { formatMoney } from '@skyempire/shared';
 import {
   ALLOWED_MEALS, checkConfig, configUnits, unitsPerSeat, ifeCostPerBlockHour, perPaxServiceCost, productScore, refitCost, refitDays, upgradeCost,
@@ -10,7 +11,8 @@ import { cabinPresets, economyAbreast, rowShape } from '../../lib/aircraftMedia'
 import { catalog } from '../../lib/catalog';
 import { useGameStore } from '../../store';
 
-export type DesignerMode = { kind: 'new'; confirmLabel: string } | { kind: 'refit'; current: CabinConfig };
+/** `confirmLabel` gets the cabin upgrade cost (formatted, or null when there is none) so the button shows the full price. */
+export type DesignerMode = { kind: 'new'; confirmLabel(extra: string | null): string } | { kind: 'refit'; current: CabinConfig };
 
 export interface CabinDesignerProps {
   open: boolean;
@@ -84,6 +86,13 @@ export function CabinDesigner({ open, typeId, initial, mode, onConfirm, onOpenCh
   const [tab, setTab] = useState<CabinClass>('economy');
   const [busy, setBusy] = useState(false);
   const [layoutName, setLayoutName] = useState('');
+  const [deleting, setDeleting] = useState<CabinTemplate | null>(null);
+  const deleteLayout = async () => {
+    if (!deleting) return;
+    const r = await window.game.command({ type: 'deleteCabinTemplate', templateId: deleting.id });
+    setDeleting(null);
+    if (r.ok) toast({ title: `Deleted layout “${deleting.name}”`, tone: 'info' }); else toast({ title: r.reason, tone: 'danger' });
+  };
   useEffect(() => {
     if (open) { setConfig(structuredClone(initial)); setTab('economy'); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -102,7 +111,7 @@ export function CabinDesigner({ open, typeId, initial, mode, onConfirm, onOpenCh
   const wifiPerH = ifeCostPerBlockHour(config);
   // Economy seats that exactly fill the floor left by the other classes.
   const fitEconomy = Math.max(0, Math.floor((t.maxSeats - (units - config.seats.economy * unitsPerSeat(config, 'economy', t))) / unitsPerSeat(config, 'economy', t) + 1e-9));
-  const confirmLabel = mode.kind === 'new' ? mode.confirmLabel : days > 0 ? `Start refit · ${formatMoney(cost)}` : 'Save cabin';
+  const confirmLabel = mode.kind === 'new' ? mode.confirmLabel(cost > 0 ? `${formatMoney(cost)} cabin` : null) : days > 0 ? `Start refit · ${formatMoney(cost)}` : 'Save cabin';
 
   const saveLayout = async () => {
     const name = layoutName.trim();
@@ -126,7 +135,14 @@ export function CabinDesigner({ open, typeId, initial, mode, onConfirm, onOpenCh
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-[13px] text-muted">Start from</span>
           {cabinPresets(t).map((pr) => <Button key={pr.id} size="sm" variant="ghost" onClick={() => setConfig(structuredClone(pr.config))}>{pr.label}</Button>)}
-          {templates.map((x) => <Button key={x.id} size="sm" onClick={() => setConfig(structuredClone(x.config))}>{x.name}</Button>)}
+          {templates.map((x) => (
+            <span key={x.id} className="inline-flex items-center rounded-md border border-border">
+              <Button size="sm" variant="ghost" onClick={() => setConfig(structuredClone(x.config))}>{x.name}</Button>
+              <button type="button" aria-label={`Delete layout ${x.name}`} onClick={() => setDeleting(x)} className="rounded p-1 text-faint hover:text-danger focus-visible:outline-2 focus-visible:outline-accent">
+                <X className="size-3.5" />
+              </button>
+            </span>
+          ))}
         </div>
 
         <div role="tablist" aria-label="Cabin class" className="flex rounded-md border border-border p-0.5 self-start">
@@ -194,6 +210,9 @@ export function CabinDesigner({ open, typeId, initial, mode, onConfirm, onOpenCh
           <Button disabled={!layoutName.trim() || !!problem} onClick={saveLayout}>Save as layout</Button>
         </div>
       </div>
+      <Modal open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)} title={`Delete “${deleting?.name ?? ''}”?`}
+        description="Aircraft already fitted with this layout keep their cabin."
+        footer={<><Button variant="ghost" onClick={() => setDeleting(null)}>Keep layout</Button><Button variant="danger" onClick={deleteLayout}>Delete</Button></>} />
     </Modal>
   );
 }

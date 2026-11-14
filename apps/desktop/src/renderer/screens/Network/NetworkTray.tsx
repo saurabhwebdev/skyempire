@@ -25,8 +25,9 @@ export function NetworkTray() {
   const [query, setQuery] = useState('');
   const [health, setHealth] = useState<RouteHealth | 'all'>('all');
   const clear = () => { setQuery(''); setHealth('all'); };
-  const rows = filterRoutes(view.routes, { query, health }, view.routeStatus);
-  const count = (k: RouteHealth) => view.routes.filter((r) => routeHealth(r, view.routeStatus[r.id]) === k).length;
+  const fleet = new Map(view.aircraft.map((a) => [a.id, a]));
+  const rows = filterRoutes(view.routes, { query, health }, view.routeStatus, fleet);
+  const count = (k: RouteHealth) => view.routes.filter((r) => routeHealth(r, view.routeStatus[r.id], fleet) === k).length;
   const table = (
     <DataTable<Route>
       rows={rows}
