@@ -1,6 +1,7 @@
-import type { Airport, Assignment, CabinClass, Command, PreviewResult } from '@skyempire/shared';
+import type { Airport, Assignment, BellySettings, CabinClass, CargoType, Command, PreviewResult } from '@skyempire/shared';
+import { CARGO_TYPES } from '@skyempire/shared';
 import { formatMoney, formatPct } from '@skyempire/shared';
-import { distanceKm, refFare, roundTripHours } from '@skyempire/sim';
+import { cargoRefRate, distanceKm, refFare, roundTripHours } from '@skyempire/sim';
 import { Button, cn, Combobox, NumberInput, Slider, useToast } from '@skyempire/ui';
 import { ChevronDown, ChevronRight, Plus, Trash2, X } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -10,6 +11,9 @@ import { aircraftLabel, hoursUsed, WEEKLY_HOURS } from '../../lib/fleet';
 import { useGameStore, useUi } from '../../store';
 import { airportFilter, airportRank } from '../NewAirline/NewAirline';
 import { routeLabel, routeLegs, routeMarkets, pairKey } from '../../lib/routes';
+
+type RouteKind = 'passenger' | 'cargo';
+const CARGO_LABEL: Record<CargoType, string> = { general: 'General', express: 'Express', mail: 'Mail', perishable: 'Perishables', dangerous: 'Dangerous goods', special: 'Live animals & outsize' };
 
 const AIRPORTS = Object.values(catalog.airports).sort((a, b) => b.population - a.population);
 type Fares = Record<CabinClass, number>;
@@ -36,11 +40,26 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
   const chain = { from, to: to ?? '', stops: chosenStops };
   const markets = to ? routeMarkets(chain) : [];
   const used = useMemo(() => hoursUsed(view, existing?.id), [view, existing?.id]);
+  // Route type: what the airline may fly (Cargo only → cargo; Passenger → passengers; Passenger + Cargo → either).
+  const airlineKind = view.player.kind ?? 'passenger';
+  const kinds: RouteKind[] = airlineKind === 'cargo' ? ['cargo'] : airlineKind === 'combination' ? ['passenger', 'cargo'] : ['passenger'];
+  const [kind, setKindState] = useState<RouteKind>(existing?.kind ?? kinds[0]!);
+  const fits = (k: RouteKind, acId: string) => (catalog.aircraftTypes[view.aircraft.find((a) => a.id === acId)?.typeId ?? '']?.kind === 'freighter') === (k === 'cargo');
+  const firstFree = (k: RouteKind) => [...view.aircraft].filter((a) => fits(k, a.id)).sort((a, b) => (used.get(a.id) ?? 0) - (used.get(b.id) ?? 0))[0];
   const [assignments, setAssignments] = useState<Assignment[]>(() => {
     if (existing?.assignments.length) return existing.assignments.map((a) => ({ ...a }));
-    const free = [...view.aircraft].sort((a, b) => (used.get(a.id) ?? 0) - (used.get(b.id) ?? 0))[0];
+    const free = firstFree(existing?.kind ?? kinds[0]!);
     return free ? [{ aircraftId: free.id, roundTripsPerWeek: 7 }] : [];
   });
+  const setKind = (k: RouteKind) => {
+    setKindState(k);
+    const free = firstFree(k);
+    setAssignments(free ? [{ aircraftId: free.id, roundTripsPerWeek: 7 }] : []);
+  };
+  const [cargoRate, setCargoRate] = useState<number | null>(existing?.cargoRate ?? null);
+  const [cargoAccept, setCargoAccept] = useState<CargoType[]>(() => existing?.cargoAccept ?? [...CARGO_TYPES]);
+  const [belly, setBelly] = useState<BellySettings>(() => existing?.belly ?? { mode: 'default' });
+  const [bellyOpen, setBellyOpen] = useState(false);
   const dist = to && catalog.airports[from] && catalog.airports[to] ? distanceKm(catalog.airports[from]!, catalog.airports[to]!) : 0;
   const legKm = to ? routeLegs(chain).map(([x, y]) => (catalog.airports[x] && catalog.airports[y] ? distanceKm(catalog.airports[x]!, catalog.airports[y]!) : 0)) : [];
   const flownKm = legKm.reduce((a, b) => a + b, 0);
@@ -90,14 +109,16 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [legFares, markets.map((m) => m.key).join(','), from, to]);
 
+  const effectiveRate = cargoRate ?? (dist ? Math.round(cargoRefRate(dist) * 100) / 100 : 1);
   const cmd: Command | null = useMemo(() => {
     if (!to || !stopsReady) return null;
     const leg = chosenStops.length ? { legFares: effectiveLegFares } : {};
-    if (existing) return { type: 'updateRoute', routeId: existing.id, fares: effectiveFares, assignments: sendAssignments, ...leg };
+    const extra = kind === 'cargo' ? { cargoRate: effectiveRate, cargoAccept } : { belly };
+    if (existing) return { type: 'updateRoute', routeId: existing.id, fares: effectiveFares, assignments: sendAssignments, ...leg, ...extra };
     if (!sendAssignments.length) return null;
-    return { type: 'openRoute', from, to, ...(chosenStops.length ? { stops: chosenStops } : {}), fares: effectiveFares, assignments: sendAssignments, ...leg };
+    return { type: 'openRoute', kind, from, to, ...(chosenStops.length ? { stops: chosenStops } : {}), fares: effectiveFares, assignments: sendAssignments, ...leg, ...extra };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [to, from, effectiveFares, effectiveLegFares, sendKey, existing, chosenStops.join(','), stopsReady]);
+  }, [to, from, effectiveFares, effectiveLegFares, sendKey, existing, chosenStops.join(','), stopsReady, kind, effectiveRate, cargoAccept.join(','), JSON.stringify(belly)]);
 
   useEffect(() => {
     if (!cmd) return;
@@ -106,6 +127,7 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
         setPreview(p);
         if (p.ok && p.suggestedFares && !faresTouched) setFares(p.suggestedFares);
         if (p.ok && p.suggestedLegFares && !faresTouched) setLegFares(p.suggestedLegFares);
+        if (p.ok && p.suggestedCargoRate && !faresTouched) setCargoRate(p.suggestedCargoRate);
       });
     }, 150);
     return () => clearTimeout(id);
@@ -116,7 +138,7 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
     : !stopsReady
       ? 'Choose the stop airport, or remove the stop.'
     : assignments.length === 0
-      ? view.aircraft.length === 0 ? 'Lease an aircraft first.' : 'Add an aircraft.'
+      ? kind === 'cargo' && !firstFree('cargo') ? 'Lease a freighter first.' : view.aircraft.length === 0 ? 'Lease an aircraft first.' : 'Add an aircraft.'
       : preview && !preview.ok
         ? preview.reason!
         : null;
@@ -136,7 +158,21 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
   };
 
   const longestLeg = Math.max(0, ...legKm);
-  const candidates = view.aircraft.filter((a) => !rangeOnly || (catalog.aircraftTypes[a.typeId]?.rangeKm ?? 0) >= longestLeg);
+  const candidates = view.aircraft.filter((a) => fits(kind, a.id) && (!rangeOnly || (catalog.aircraftTypes[a.typeId]?.rangeKm ?? 0) >= longestLeg));
+  const typeBoxes = (list: CargoType[], set: (v: CargoType[]) => void, allowSpecial: boolean) => (
+    <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+      {CARGO_TYPES.filter((c) => allowSpecial || c !== 'special').map((c) => {
+        const locked = c === 'dangerous' && !view.player.dgLicence;
+        return (
+          <label key={c} className={cn('inline-flex items-center gap-2 text-[13px]', locked && 'text-faint')}>
+            <input type="checkbox" className="size-4 accent-[var(--color-accent)]" disabled={locked} checked={list.includes(c) && !locked}
+              onChange={(e) => set(e.target.checked ? [...list, c] : list.filter((x) => x !== c))} />
+            {CARGO_LABEL[c]}{locked && <span className="text-[11px]">(licence)</span>}
+          </label>
+        );
+      })}
+    </div>
+  );
   const stopPicker = (i: number) => (
     <div key={i} className="flex items-end gap-2">
       <div className="flex-1">
@@ -183,6 +219,16 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
         <button type="button" aria-label="Close" onClick={close} className="rounded-md p-1 text-muted hover:bg-surface-3 hover:text-text"><X className="size-4" /></button>
       </header>
       <div className="flex flex-col gap-4 overflow-y-auto p-4">
+        {!existing && kinds.length > 1 && (
+          <div role="radiogroup" aria-label="Route type" className="flex self-start rounded-md border border-border p-0.5">
+            {kinds.map((k) => (
+              <button key={k} type="button" role="radio" aria-checked={kind === k} onClick={() => setKind(k)}
+                className={cn('h-8 rounded-[6px] px-3 text-[13px] font-semibold', kind === k ? 'bg-surface-3 text-text' : 'text-muted hover:text-text')}>
+                {k === 'cargo' ? 'Cargo' : 'Passengers'}
+              </button>
+            ))}
+          </div>
+        )}
         {!existing && (
           <>
             <div className="flex flex-col gap-1">
@@ -262,7 +308,16 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
           )}
         </fieldset>
 
-        {chosenStops.length > 0 && to ? (
+        {kind === 'cargo' ? (
+          <fieldset className="flex flex-col gap-3">
+            <legend className="mb-1 text-[13px] font-semibold text-muted">Cargo</legend>
+            <NumberInput label="Rate per kg (general cargo)" prefix="$" value={effectiveRate} min={0.1} max={50} step={0.05}
+              onChange={(v) => { setFaresTouched(true); setCargoRate(Math.round(v * 100) / 100); }}
+              hint={preview?.suggestedCargoRate ? `Suggested $${preview.suggestedCargoRate.toFixed(2)} · express, perishables and special cargo pay more` : undefined} />
+            <span className="text-[13px] text-muted">Cargo it takes</span>
+            {typeBoxes(cargoAccept, setCargoAccept, true)}
+          </fieldset>
+        ) : chosenStops.length > 0 && to ? (
           <table aria-label="Fares by market" className="w-full text-[13px]">
             <thead>
               <tr className="text-left text-muted"><th className="pb-1 font-semibold">Market</th><th className="pb-1 font-semibold">Economy</th><th className="pb-1 font-semibold">Premium</th><th className="pb-1 font-semibold">Business</th></tr>
@@ -307,6 +362,36 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
           )}
           </>
         )}
+        {kind === 'passenger' && view.player.bellyCargo !== false && (
+          <div className="flex flex-col gap-2">
+            <button type="button" aria-expanded={bellyOpen} onClick={() => setBellyOpen(!bellyOpen)} className="inline-flex items-center gap-1 self-start text-[13px] font-semibold text-muted hover:text-text">
+              {bellyOpen ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />} Belly cargo · {belly.mode === 'default' ? 'Default' : 'Custom'}
+            </button>
+            {bellyOpen && (
+              <div className="flex flex-col gap-3 rounded-lg border border-border p-3">
+                <div role="radiogroup" aria-label="Belly cargo" className="flex self-start rounded-md border border-border p-0.5">
+                  {(['default', 'custom'] as const).map((m) => (
+                    <button key={m} type="button" role="radio" aria-checked={belly.mode === m}
+                      onClick={() => setBelly(m === 'default' ? { mode: 'default' } : { mode: 'custom', rate: Math.round(0.95 * cargoRefRate(dist || 1000) * 100) / 100, accept: CARGO_TYPES.filter((c) => c !== 'special' && (c !== 'dangerous' || !!view.player.dgLicence)), holdShare: 0.5 })}
+                      className={cn('h-7 rounded-[6px] px-3 text-[12px] font-semibold', belly.mode === m ? 'bg-surface-3 text-text' : 'text-muted hover:text-text')}>
+                      {m === 'default' ? 'Default' : 'Custom'}
+                    </button>
+                  ))}
+                </div>
+                {belly.mode === 'default' ? (
+                  <p className="text-[13px] text-muted">Sold at the market rate, every cargo type you can carry, in the space bags don't need.</p>
+                ) : (
+                  <>
+                    <NumberInput label="Rate per kg (general cargo)" prefix="$" value={belly.rate} min={0.1} max={50} step={0.05} onChange={(v) => setBelly({ ...belly, rate: Math.round(v * 100) / 100 })} />
+                    {typeBoxes(belly.accept, (accept) => setBelly({ ...belly, accept }), false)}
+                    <Slider label="Hold space for cargo" value={Math.round(belly.holdShare * 100)} min={20} max={90} step={5} onChange={(v) => setBelly({ ...belly, holdShare: v / 100 })} format={(v) => `${v}%`} />
+                    {belly.holdShare > 0.75 && <p className="text-[13px] text-warning">Not enough room for every bag: some get left behind, and passengers notice.</p>}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <footer className="flex flex-col gap-3 border-t border-border p-4">
@@ -317,6 +402,7 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
               {(preview.expectedProfitPerDay ?? 0) >= 0 ? '+' : ''}{formatMoney(preview.expectedProfitPerDay ?? 0)}/day
             </span>
             {preview.paybackDays ? ` · payback ${preview.paybackDays}d` : ''}
+            {(preview.expectedCargoT ?? 0) > 0 ? ` · ${(preview.expectedCargoT ?? 0).toLocaleString('en-US', { maximumFractionDigits: 1 })} t cargo a day` : ''}
           </p>
         )}
         {blocking && (
