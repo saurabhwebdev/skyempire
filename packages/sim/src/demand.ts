@@ -2,9 +2,10 @@ import type { Airport, Cabin, CabinClass, Money } from '@skyempire/shared';
 import { BALANCE } from './config/balance';
 import { distanceKm } from './geo';
 
-/** Leisure seasonality: peaks mid-July; stronger for touristy pairs. Range 0.7–1.3. */
-export function seasonality(dayOfYear: number, tourism: number): number {
-  return 1 + (0.05 + 0.25 * tourism) * Math.cos((2 * Math.PI * (dayOfYear - 197)) / 365);
+/** Leisure seasonality: peaks mid-July in the north, mid-January in the south; stronger for touristy pairs. Range 0.7–1.3. */
+export function seasonality(dayOfYear: number, tourism: number, lat = 0): number {
+  const peak = lat < 0 ? 197 - 182.5 : 197;
+  return 1 + (0.05 + 0.25 * tourism) * Math.cos((2 * Math.PI * (dayOfYear - peak)) / 365);
 }
 
 /** One-direction daily passenger demand A→B before price effects (gravity model, simulation-spec §3). */
@@ -14,7 +15,8 @@ export function baseDemand(a: Airport, b: Airport, dayOfYear: number, economyInd
   const wealth = (a.wealth * b.wealth) ** BALANCE.wealthExponent;
   const domestic = a.country === b.country ? BALANCE.domesticFactor : 1;
   const pull = 1 + 0.5 * (b.tourism + b.business);
-  const season = seasonality(dayOfYear, (a.tourism + b.tourism) / 2);
+  const t = (a.tourism + b.tourism) / 2;
+  const season = (seasonality(dayOfYear, t, a.lat) + seasonality(dayOfYear, t, b.lat)) / 2;
   let f = dist ** BALANCE.distanceExponent;
   if (dist < BALANCE.shortHaulKm) f /= BALANCE.shortHaulFactor;
   return (BALANCE.demandK * gravity * wealth * domestic * pull * season * economyIndex) / f;

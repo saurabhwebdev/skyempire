@@ -63,12 +63,22 @@ export interface AirlineData {
   sources: string[];
 }
 
+/** Holiday tables (packages/data/src/holidays.json), built from date-holidays. */
+export interface HolidayData {
+  years: number[];
+  /** country → year → day-of-year (0 = Jan 1) of public holidays. */
+  public: Record<string, Record<string, number[]>>;
+  /** festival anchor id → year → ISO date. */
+  anchors: Record<string, Record<string, string>>;
+}
+
 export interface Catalog {
   regionId: string;
   airports: Record<string, Airport>;
   aircraftTypes: Record<string, AircraftType>;
   airlines: AirlineData[];
   realRoutes: { airlineIata: string; from: string; to: string }[];
+  holidays: HolidayData;
 }
 
 export interface Aircraft {

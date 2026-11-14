@@ -1,8 +1,9 @@
-import type { AircraftType, AirlineData, Airport, Catalog } from '@skyempire/shared';
+import type { AircraftType, AirlineData, Airport, Catalog, HolidayData } from '@skyempire/shared';
 import aircraft from './aircraft.json';
 import airlines from './airlines.world.json';
 import airports from './airports.world.json';
 import basemap from './basemap/countries-50m.json';
+import holidays from './holidays.json';
 import reserved from './reserved.json';
 import routes from './routes.world.json';
 
@@ -19,6 +20,7 @@ export function loadCatalog(regionId: 'world' = 'world'): Catalog {
     aircraftTypes: Object.fromEntries((aircraft as unknown as AircraftType[]).map((a) => [a.id, a])),
     airlines: airlines as AirlineData[],
     realRoutes: routes,
+    holidays: holidays as HolidayData,
   };
   return cached;
 }

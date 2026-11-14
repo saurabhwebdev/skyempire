@@ -5,6 +5,7 @@ import { dateOf } from './calendar';
 import { BALANCE } from './config/balance';
 import { baseDemand, classSplit, elasticDemand, refFare } from './demand';
 import { flightsToday } from './economics';
+import { holidayDemandFactors } from './holidays';
 import { isAirportClosed, isStormAffected } from './events';
 import { distanceKm } from './geo';
 import { onTimeFor } from './maintenance';
@@ -106,8 +107,10 @@ export function simulatePair(ops: RouteOps[], state: GameState, catalog: Catalog
     const base = baseDemand(o, d, doy, state.market.economyIndex);
     demandTotal += base;
     const split = classSplit(o, d);
+    const hol = holidayDemandFactors(o, d, state.day, state.world.startYear, catalog);
     for (const cls of CABIN_CLASSES) {
       const ref = refFare(dist, cls);
+      const classBase = base * split[cls] * (cls === 'business' ? hol.business : hol.leisure);
       const offers: Offer[] = ops
         .filter((x) => x.weeklyFrequency > 0)
         .map((x) => ({
@@ -118,7 +121,7 @@ export function simulatePair(ops: RouteOps[], state: GameState, catalog: Catalog
       if (withSeats.length === 0) continue;
       // "Other airlines": real carriers not in this world. They soak up demand the game's airlines don't serve,
       // so no player is ever a true monopolist on a big market.
-      const classDemand = base * split[cls];
+      const classDemand = classBase;
       const gameSeats = withSeats.reduce((s, x) => s + x.seats, 0);
       const bgSeats = Math.max(BALANCE.backgroundMinShare * classDemand, BALANCE.backgroundShare * classDemand - gameSeats);
       offers.push({
@@ -127,8 +130,8 @@ export function simulatePair(ops: RouteOps[], state: GameState, catalog: Catalog
         quality: BALANCE.backgroundQuality, reputation: BALANCE.backgroundReputation, stops: 0, seats: bgSeats,
       });
       const seatSum = withSeats.reduce((s, x) => s + x.seats, 0);
-      const avgFare = (withSeats.reduce((s, x) => s + x.fare * x.seats, 0) + ref * BALANCE.backgroundFareFactor * Math.max(0, BALANCE.backgroundShare * base * split[cls] - seatSum)) / Math.max(seatSum, BALANCE.backgroundShare * base * split[cls]);
-      const demand = elasticDemand(base * split[cls], avgFare, ref, cls);
+      const avgFare = (withSeats.reduce((s, x) => s + x.fare * x.seats, 0) + ref * BALANCE.backgroundFareFactor * Math.max(0, BALANCE.backgroundShare * classBase - seatSum)) / Math.max(seatSum, BALANCE.backgroundShare * classBase);
+      const demand = elasticDemand(classBase, avgFare, ref, cls);
       for (const [routeId, n] of allocate(demand, offers, ref, cls)) if (routeId !== '__others') pax.get(routeId)![cls] += n;
     }
   }
