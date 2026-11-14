@@ -2,6 +2,7 @@ import type { AircraftType, Airport, Cabin, Catalog, GameState, Route } from '@s
 import { CABIN_CLASSES } from '@skyempire/shared';
 import { BALANCE } from './config/balance';
 import { distanceKm } from './geo';
+import { effectiveFare } from './fares';
 import { blockHours } from './ops';
 import { PERSONALITIES } from './ai/personalities';
 
@@ -61,7 +62,7 @@ export function routeDayCosts(
   }
   const totalPax = CABIN_CLASSES.reduce((s, c) => s + pax[c], 0);
   out.fees += Math.round(((a.paxFee + b.paxFee) / 2) * totalPax * BALANCE.paxFeeShare);
-  const ticketRevenue = CABIN_CLASSES.reduce((s, c) => s + pax[c] * route.fares[c], 0);
+  const ticketRevenue = CABIN_CLASSES.reduce((s, c) => s + pax[c] * effectiveFare(route, c, state.day), 0);
   out.fees += Math.round(BALANCE.distributionShare * ticketRevenue);
   const perPax = BALANCE.serviceCostPerPax[al.serviceLevel]!;
   out.service = Math.round(CABIN_CLASSES.reduce((s, c) => s + pax[c] * perPax * BALANCE.serviceClassMultiplier[c], 0));

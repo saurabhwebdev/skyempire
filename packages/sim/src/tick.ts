@@ -90,7 +90,7 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
         hoursFlown.set(acId, (hoursFlown.get(acId) ?? 0) + 2 * rt * ops.blockH);
       }
       const c = routeDayCosts(r, s, catalog, legs, p, ops.closed);
-      const revenue = ops.closed ? 0 : revenueOf(r, p);
+      const revenue = ops.closed ? 0 : revenueOf(r, p, s.day);
       const cost = c.fuel + c.crew + c.maintenance + c.fees + c.service;
       const seats = totalSeats(ops);
       const paxTotal = CABIN_CLASSES.reduce((sum, k) => sum + p[k], 0);

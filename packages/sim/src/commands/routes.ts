@@ -68,6 +68,10 @@ export function applyRoutes(state: GameState, airlineId: string, cmd: Command, c
         const bad = validateAssignments(state, airlineId, r.from, r.to, cmd.assignments, catalog, r.id);
         if (bad) return bad;
       }
+      if (cmd.seasonalFares) {
+        if (cmd.seasonalFares.some((f) => f.startDay < state.day)) return fail(ERR.seasonalPast);
+        r.seasonalFares = cmd.seasonalFares.map((f) => ({ ...f }));
+      }
       if (cmd.fares) r.fares = { ...cmd.fares };
       if (cmd.assignments) {
         r.assignments = cmd.assignments.map((a) => ({ ...a }));

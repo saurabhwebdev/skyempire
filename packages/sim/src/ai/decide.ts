@@ -46,7 +46,7 @@ export function estimateRoute(
   const t = catalog.aircraftTypes[ac.typeId]!;
   const share = (rtpw * roundTripHours(distanceKm(catalog.airports[from]!, catalog.airports[to]!), t)) / BALANCE.weeklyHours;
   const fixed = (((ac.ownership === 'leased' ? t.leasePerMonth : 0) + BALANCE.overheadPerAircraft) / 30) * share;
-  const profit = revenueOf(cand, pax) - (c.fuel + c.crew + c.maintenance + c.fees + c.service) - fixed;
+  const profit = revenueOf(cand, pax, state.day) - (c.fuel + c.crew + c.maintenance + c.fees + c.service) - fixed;
   return { profit, competitors: rivals.length };
 }
 

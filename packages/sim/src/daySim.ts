@@ -5,6 +5,7 @@ import { dateOf } from './calendar';
 import { BALANCE } from './config/balance';
 import { baseDemand, classSplit, elasticDemand, refFare } from './demand';
 import { flightsToday } from './economics';
+import { effectiveFare } from './fares';
 import { holidayDemandFactors } from './holidays';
 import { isAirportClosed, isStormAffected } from './events';
 import { distanceKm } from './geo';
@@ -114,7 +115,7 @@ export function simulatePair(ops: RouteOps[], state: GameState, catalog: Catalog
       const offers: Offer[] = ops
         .filter((x) => x.weeklyFrequency > 0)
         .map((x) => ({
-          airlineId: x.route.airlineId, routeId: x.route.id, fare: x.route.fares[cls], weeklyFrequency: x.weeklyFrequency,
+          airlineId: x.route.airlineId, routeId: x.route.id, fare: effectiveFare(x.route, cls, state.day), weeklyFrequency: x.weeklyFrequency,
           quality: x.quality, reputation: state.airlines[x.route.airlineId]!.reputation, stops: 0, seats: x.seats[cls],
         }));
       const withSeats = offers.filter((x) => x.seats > 0);
@@ -138,8 +139,8 @@ export function simulatePair(ops: RouteOps[], state: GameState, catalog: Catalog
   return { pax, demand: demandTotal };
 }
 
-export function revenueOf(route: Route, pax: Cabin): number {
-  return Math.round(CABIN_CLASSES.reduce((s, c: CabinClass) => s + pax[c] * route.fares[c], 0));
+export function revenueOf(route: Route, pax: Cabin, day: number): number {
+  return Math.round(CABIN_CLASSES.reduce((s, c: CabinClass) => s + pax[c] * effectiveFare(route, c, day), 0));
 }
 
 export function totalSeats(ops: RouteOps): number {

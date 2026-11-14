@@ -30,7 +30,7 @@ function evaluate(s: GameState, routeId: string, catalog: Catalog) {
     fixed += ((ac.ownership === 'leased' ? t.leasePerMonth : 0) + BALANCE.overheadPerAircraft) / 30 * share;
     upfront += (ac.ownership === 'leased' ? t.leasePerMonth : ac.bookValue) * share;
   }
-  const revenue = revenueOf(route, pax);
+  const revenue = revenueOf(route, pax, s.day);
   const profit = Math.round(revenue - (c.fuel + c.crew + c.maintenance + c.fees + c.service) - fixed);
   const seats = totalSeats(ops);
   const paxTotal = CABIN_CLASSES.reduce((x, k) => x + pax[k], 0);

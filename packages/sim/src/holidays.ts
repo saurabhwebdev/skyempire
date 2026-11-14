@@ -72,3 +72,37 @@ export function holidayDemandFactors(a: Airport, b: Airport, day: number, startY
   const tourism = (a.tourism + b.tourism) / 2;
   return { leisure: 1 + lift * (0.6 + 0.4 * tourism), business: 1 - 0.5 * Math.max(0, lift) };
 }
+
+export interface UpcomingPeak {
+  name: string;
+  countries: string[];
+  startDay: number;
+  endDay: number;
+  peak: number;
+}
+
+/** Festivals (positive peaks only) touching `countries` whose window overlaps [fromDay, toDay], soonest first. */
+export function upcomingPeaks(countries: string[], fromDay: number, toDay: number, startYear: number, catalog: Catalog): UpcomingPeak[] {
+  const from = dateOf(fromDay, startYear);
+  const wy = wrapYear(from.year);
+  const fromAbs = absDay(wy, from.month, from.dayOfMonth);
+  const out: UpcomingPeak[] = [];
+  for (const f of FESTIVALS) {
+    if (f.peak <= 0) continue;
+    const hit = countries.filter((c) => f.countries.includes(c));
+    if (hit.length === 0) continue;
+    for (const y of [wy - 1, wy, wy + 1]) {
+      let anchor: number;
+      if (typeof f.anchor === 'string') {
+        const iso = catalog.holidays.anchors[f.anchor]?.[y];
+        if (!iso) continue;
+        anchor = isoDay(iso);
+      } else anchor = absDay(y, f.anchor.month, f.anchor.day);
+      const anchorDay = fromDay + (anchor - fromAbs);
+      const startDay = anchorDay - f.before, endDay = anchorDay + f.after;
+      if (endDay < fromDay || startDay > toDay) continue;
+      out.push({ name: f.name, countries: hit, startDay, endDay, peak: f.peak });
+    }
+  }
+  return out.sort((a, b) => a.startDay - b.startDay);
+}

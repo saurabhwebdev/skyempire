@@ -5,7 +5,7 @@ export { buildClientView } from './view';
 export { applyCommand } from './commands/apply';
 export { BALANCE } from './config/balance';
 export { PERSONALITIES } from './ai/personalities';
-export { formatDate, formatMonth, dateOf, dayOf } from './calendar';
+export { formatDate, formatDayMonth, formatMonth, dateOf, dayOf } from './calendar';
 export { migrate, migrations, CURRENT_SCHEMA } from './migrate';
 export { distanceKm } from './geo';
 export { baseDemand, refFare } from './demand';

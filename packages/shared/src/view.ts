@@ -63,6 +63,14 @@ export interface RivalSummary {
   overlapRoutes: number;
 }
 
+export interface UpcomingPeakView {
+  name: string;
+  countries: string[];
+  startDay: number;
+  endDay: number;
+  peak: number;
+}
+
 export interface ClientView {
   day: number;
   startYear: number;
@@ -77,4 +85,6 @@ export interface ClientView {
   objectives: { id: string; title: string; done: boolean }[];
   gameOver: GameState['gameOver'];
   finance: { companyValue: Money; availableCredit: Money; monthlyFixed: Money };
+  /** Festivals in the player's markets over the next 60 days. */
+  upcomingPeaks: UpcomingPeakView[];
 }

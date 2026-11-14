@@ -6,6 +6,7 @@ import { catalog } from '../../lib/catalog';
 import { aircraftLabel } from '../../lib/fleet';
 import { useGameStore, useUi } from '../../store';
 import { Profit } from './NetworkTray';
+import { SeasonalFares } from './SeasonalFares';
 
 export function RouteInspector({ id }: { id: string }) {
   const view = useGameStore((s) => s.view)!;
@@ -45,6 +46,7 @@ export function RouteInspector({ id }: { id: string }) {
         <dt className="text-muted">Aircraft</dt>
         <dd className="text-right">{r.assignments.map((x) => { const ac = view.aircraft.find((y) => y.id === x.aircraftId); return ac ? <div key={x.aircraftId}>{aircraftLabel(ac)}</div> : null; })}</dd>
       </dl>
+      <SeasonalFares route={r} />
       <div className="flex flex-col gap-2">
         <Button variant="primary" onClick={() => useUi.getState().openRouteEditor({ routeId: r.id })}>Edit route</Button>
         <Button variant="ghost" onClick={() => setConfirm(true)}>Close route</Button>

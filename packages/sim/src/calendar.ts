@@ -40,3 +40,9 @@ export function formatMonth(day: number, startYear: number): string {
   const d = dateOf(day, startYear);
   return `${MONTHS[d.month - 1]} ${d.year}`;
 }
+
+/** "Dec 20" — date without the year. */
+export function formatDayMonth(day: number, startYear: number): string {
+  const d = dateOf(day, startYear);
+  return `${MONTHS[d.month - 1]} ${d.dayOfMonth}`;
+}

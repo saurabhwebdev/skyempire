@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Assignment, Cabin, CabinClass, Money } from './types';
+import type { Assignment, Cabin, CabinClass, Money, SeasonalFare } from './types';
 
 const money = z.number().int().nonnegative();
 const positiveMoney = z.number().int().positive();
@@ -12,6 +12,9 @@ export const CabinSchema = z.object({
   business: z.number().int().nonnegative(),
 });
 export const FaresSchema = z.object({ economy: positiveMoney, premium: positiveMoney, business: positiveMoney });
+export const SeasonalFareSchema = z
+  .object({ startDay: z.number().int().nonnegative(), endDay: z.number().int().nonnegative(), pct: z.number().int().min(-50).max(100) })
+  .refine((f) => f.endDay >= f.startDay, { message: 'A seasonal fare must end on or after its start' });
 export const AssignmentSchema = z.object({ aircraftId: id, roundTripsPerWeek: z.number().int().min(1).max(200) });
 
 export const CommandSchema = z.discriminatedUnion('type', [
@@ -34,6 +37,7 @@ export const CommandSchema = z.discriminatedUnion('type', [
     routeId: id,
     fares: FaresSchema.optional(),
     assignments: z.array(AssignmentSchema).optional(),
+    seasonalFares: z.array(SeasonalFareSchema).max(4).optional(),
   }),
   z.object({ type: z.literal('closeRoute'), routeId: id }),
   z.object({ type: z.literal('openBase'), airportId: code }),
@@ -52,7 +56,7 @@ export type Command =
   | { type: 'sellAircraft'; aircraftId: string }
   | { type: 'setCabin'; aircraftId: string; cabin: Cabin }
   | { type: 'openRoute'; from: string; to: string; fares: Fares; assignments: Assignment[] }
-  | { type: 'updateRoute'; routeId: string; fares?: Fares; assignments?: Assignment[] }
+  | { type: 'updateRoute'; routeId: string; fares?: Fares; assignments?: Assignment[]; seasonalFares?: SeasonalFare[] }
   | { type: 'closeRoute'; routeId: string }
   | { type: 'openBase'; airportId: string }
   | { type: 'closeBase'; airportId: string }

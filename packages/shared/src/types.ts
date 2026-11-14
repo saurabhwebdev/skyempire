@@ -121,6 +121,15 @@ export interface Route {
   openedDay: number;
   last: RouteDayStats | null;
   profit30: Money[];
+  /** Fare changes for date ranges (game days, inclusive), e.g. +20% over a festival. */
+  seasonalFares?: SeasonalFare[];
+}
+
+export interface SeasonalFare {
+  startDay: number;
+  endDay: number;
+  /** −50…+100 percent applied to every cabin's fare. */
+  pct: number;
 }
 
 export interface Loan {

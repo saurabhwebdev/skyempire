@@ -2,6 +2,7 @@ import type { Catalog, ClientView, GameState } from '@skyempire/shared';
 import { pairKey } from './daySim';
 import { slotsFree } from './ops';
 import { availableCredit, companyValue, monthlyFixedCosts } from './finance';
+import { upcomingPeaks } from './holidays';
 import { objectivesView } from './progression';
 
 /** Player-scoped snapshot for the UI. Rival finances stay hidden. */
@@ -21,6 +22,9 @@ export function buildClientView(state: GameState, playerId: string, catalog: Cat
         overlapRoutes: theirs.filter((r) => myPairs.has(pairKey(r.from, r.to))).length,
       };
     });
+  const markets = new Set<string>();
+  for (const id of player.baseIds) markets.add(catalog.airports[id]!.country);
+  for (const r of mine) for (const id of [r.from, r.to]) markets.add(catalog.airports[id]!.country);
   const free: Record<string, number> = {};
   for (const id of Object.keys(catalog.airports)) free[id] = slotsFree(state, catalog, id);
   return {
@@ -35,6 +39,7 @@ export function buildClientView(state: GameState, playerId: string, catalog: Cat
     events: state.events,
     slotsFree: free,
     objectives: objectivesView(state, playerId, catalog),
+    upcomingPeaks: upcomingPeaks([...markets], state.day, state.day + 60, state.world.startYear, catalog),
     gameOver: state.gameOver,
     finance: (() => {
       const m = monthlyFixedCosts(state, playerId, catalog);

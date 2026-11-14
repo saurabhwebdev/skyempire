@@ -8,6 +8,7 @@ import { useGameStore, useUi } from '../../store';
 import { Profit } from '../Network/NetworkTray';
 import { AirlineLogo } from '../../components/AirlineLogo';
 import { deriveAlerts } from './alerts';
+import { PeaksCard } from './PeaksCard';
 
 const card = (i: number) => ({
   initial: { opacity: 0, y: 8 },
@@ -100,6 +101,10 @@ export function Overview() {
       </motion.div>
 
       <motion.div {...card(5)}>
+        <PeaksCard />
+      </motion.div>
+
+      <motion.div {...card(6)}>
         <Panel title="Rival watch">
           <ul className="flex flex-col gap-2">
             {rivals.map((r) => (
