@@ -66,7 +66,7 @@ export function UpdateBanner() {
         {show && s && (
           <motion.div role="status" aria-label="Update available"
             initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.22, ease: [0.16, 1, 0.3, 1] } }} exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }}
-            className="fixed left-1/2 top-3 z-[60] w-[min(560px,calc(100vw-32px))] -translate-x-1/2 overflow-hidden rounded-lg border border-accent/40 bg-surface-2 shadow-lg">
+            className="fixed left-1/2 top-[52px] z-[60] w-[min(600px,calc(100vw-32px))] -translate-x-1/2 overflow-hidden rounded-lg border border-accent/40 bg-surface-2 shadow-lg">
             <div className="flex items-center gap-3 px-4 py-3">
               <Sparkles className="size-5 shrink-0 text-accent" aria-hidden />
               <div className="min-w-0 flex-1">
@@ -77,10 +77,10 @@ export function UpdateBanner() {
                     : `SkyEmpire ${s.version} is available`}
                 </p>
                 <p className="truncate text-[12px] text-muted">
-                  {s.status === 'ready' ? 'Your game is saved first. SkyEmpire restarts in a few seconds.'
+                  {s.status === 'ready' ? 'Your game is saved first, then SkyEmpire restarts.'
                     : s.status === 'downloading' ? 'Keep playing — we’ll tell you when it’s ready.'
                     : s.status === 'error' ? s.error
-                    : s.canInstall ? `You have ${s.current}. Updating takes about a minute.` : `You have ${s.current}. Download the new installer from GitHub.`}
+                    : s.canInstall ? `You have ${s.current}. Takes about a minute.` : `You have ${s.current}. Get the new installer from GitHub.`}
                 </p>
               </div>
               {s.status !== 'downloading' && <Button size="sm" variant="ghost" onClick={() => setNotesOpen(true)}>What’s new</Button>}

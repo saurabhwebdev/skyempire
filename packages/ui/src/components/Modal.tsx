@@ -9,9 +9,11 @@ export interface ModalProps {
   description?: ReactNode;
   children?: ReactNode;
   footer?: ReactNode;
+  /** 'lg' for wide content such as the aircraft page. */
+  size?: 'md' | 'lg';
 }
 
-export function Modal({ open, onOpenChange, title, description, children, footer }: ModalProps) {
+export function Modal({ open, onOpenChange, title, description, children, footer, size = 'md' }: ModalProps) {
   // Radix only restores focus to its own Trigger; our modals open from ordinary buttons, so remember the opener.
   const opener = useRef<HTMLElement | null>(null);
   useLayoutEffect(() => {
@@ -26,7 +28,7 @@ export function Modal({ open, onOpenChange, title, description, children, footer
             e.preventDefault();
             opener.current?.focus();
           }}
-          className="se-content fixed top-1/2 left-1/2 z-50 w-[min(480px,calc(100vw-32px))] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border bg-surface-2 p-6 shadow-overlay">
+          className={`se-content fixed top-1/2 left-1/2 z-50 ${size === 'lg' ? 'max-h-[calc(100vh-48px)] w-[min(880px,calc(100vw-32px))] overflow-y-auto' : 'w-[min(480px,calc(100vw-32px))]'} -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border bg-surface-2 p-6 shadow-overlay`}>
           <div className="flex items-start justify-between gap-4">
             <Dialog.Title className="text-[20px] font-semibold tracking-[-0.02em]">{title}</Dialog.Title>
             <Dialog.Close aria-label="Close" className="rounded-md p-1 text-muted hover:bg-surface-3 hover:text-text">

@@ -2,10 +2,11 @@ import { formatMoney, type Cabin } from '@skyempire/shared';
 import { aircraftMarketValue } from '@skyempire/sim';
 import { Button, Meter, Modal, useToast } from '@skyempire/ui';
 import { useState } from 'react';
-import { AircraftSilhouette } from '../../components/AircraftSilhouette';
+import { AircraftPhoto } from '../../components/AircraftPhoto';
 import { catalog } from '../../lib/catalog';
 import { aircraftLabel, hoursUsed, WEEKLY_HOURS } from '../../lib/fleet';
 import { useGameStore, useUi } from '../../store';
+import { AircraftDetails } from './AircraftDetails';
 import { CabinEditor } from './CabinEditor';
 
 export function AircraftInspector({ id }: { id: string }) {
@@ -13,6 +14,7 @@ export function AircraftInspector({ id }: { id: string }) {
   const toast = useToast();
   const [confirm, setConfirm] = useState(false);
   const [cabinOpen, setCabinOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const ac = view.aircraft.find((a) => a.id === id);
   if (!ac) return <p className="text-muted">This aircraft has left your fleet.</p>;
   const t = catalog.aircraftTypes[ac.typeId]!;
@@ -37,7 +39,9 @@ export function AircraftInspector({ id }: { id: string }) {
       <header>
         <span className="label-caps">{leased ? 'Leased aircraft' : 'Owned aircraft'}</span>
         <h2 className="mt-1 text-[24px] font-semibold tracking-[-0.02em]">{aircraftLabel(ac)}</h2>
-        <AircraftSilhouette typeId={ac.typeId} className="mt-3 h-14 w-full text-muted" />
+        <button type="button" aria-label={`About the ${t.name}`} onClick={() => setAboutOpen(true)} className="mt-3 block w-full overflow-hidden rounded-md focus-visible:outline-2 focus-visible:outline-accent">
+          <AircraftPhoto typeId={ac.typeId} className="aspect-[16/9]" />
+        </button>
       </header>
       <div className="flex flex-col gap-2">
         <span className="text-[13px] text-muted">Condition</span>
@@ -63,8 +67,10 @@ export function AircraftInspector({ id }: { id: string }) {
       </div>
       <div className="flex flex-col gap-2">
         <Button variant="primary" onClick={() => setCabinOpen(true)}>Edit cabin</Button>
+        <Button onClick={() => setAboutOpen(true)}>About the {t.name}</Button>
         <Button variant="ghost" onClick={() => setConfirm(true)}>{leased ? 'Return lease' : `Sell aircraft · ${formatMoney(value)}`}</Button>
       </div>
+      <AircraftDetails typeId={ac.typeId} open={aboutOpen} onOpenChange={setAboutOpen} />
       <CabinEditor open={cabinOpen} onOpenChange={setCabinOpen} typeId={ac.typeId} initial={ac.cabin} confirmLabel="Save cabin" onConfirm={setCabin} />
       <Modal open={confirm} onOpenChange={setConfirm} title={leased ? 'Return this lease?' : 'Sell this aircraft?'}
         description={routes.length ? 'These routes will be suspended until you assign another aircraft:' : leased ? 'The aircraft goes back to the lessor. No refund.' : `You'll receive ${formatMoney(value)}.`}

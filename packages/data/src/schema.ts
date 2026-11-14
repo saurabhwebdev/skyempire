@@ -58,3 +58,28 @@ export const AirlineDataSchema = z.object({
   fleetTypes: z.array(z.string()).min(1),
   sources: z.array(z.string()).min(1),
 });
+
+/** Real-world facts shown on the aircraft page (v0.3), from Wikipedia. */
+export const AircraftDetailsSchema = z.object({
+  lengthM: z.number().positive(),
+  spanM: z.number().positive(),
+  heightM: z.number().positive(),
+  engines: z.string().min(3),
+  firstFlight: z.string().regex(/^\d{4}-\d{2}$/),
+  typicalSeats: z.string().min(1),
+  /** Economy seats per row. */
+  abreast: z.number().int().min(3).max(11),
+  source: z.string().url(),
+});
+export type AircraftDetails = z.infer<typeof AircraftDetailsSchema>;
+
+/** A freely licensed Wikimedia Commons photo (credit required for CC BY / CC BY-SA). */
+export const AircraftPhotoSchema = z.object({
+  file: z.string().regex(/^[A-Z0-9]{3,4}\.webp$/),
+  title: z.string(),
+  author: z.string().min(1),
+  license: z.string().regex(/^(CC BY(-SA)? [\d.]+|CC0|Public domain)/i),
+  licenseUrl: z.string(),
+  source: z.string().url(),
+});
+export type AircraftPhoto = z.infer<typeof AircraftPhotoSchema>;

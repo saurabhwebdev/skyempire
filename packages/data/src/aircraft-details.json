@@ -1,0 +1,382 @@
+{
+ "AT46": {
+  "lengthM": 22.67,
+  "spanM": 24.57,
+  "heightM": 7.59,
+  "engines": "2 × Pratt & Whitney Canada PW127M",
+  "firstFlight": "2010-03",
+  "typicalSeats": "48 (1 class)",
+  "abreast": 4,
+  "source": "https://en.wikipedia.org/wiki/ATR_42"
+ },
+ "AT76": {
+  "lengthM": 27.17,
+  "spanM": 27.05,
+  "heightM": 7.65,
+  "engines": "2 × Pratt & Whitney Canada PW127M",
+  "firstFlight": "2009-07",
+  "typicalSeats": "70 (1 class)",
+  "abreast": 4,
+  "source": "https://en.wikipedia.org/wiki/ATR_72"
+ },
+ "DH8D": {
+  "lengthM": 32.81,
+  "spanM": 28.42,
+  "heightM": 8.34,
+  "engines": "2 × Pratt & Whitney Canada PW150A",
+  "firstFlight": "1998-01",
+  "typicalSeats": "78 (1 class)",
+  "abreast": 4,
+  "source": "https://en.wikipedia.org/wiki/De_Havilland_Canada_Dash_8"
+ },
+ "E175": {
+  "lengthM": 31.68,
+  "spanM": 26,
+  "heightM": 9.86,
+  "engines": "2 × GE CF34-8E",
+  "firstFlight": "2003-06",
+  "typicalSeats": "76 (2 class)",
+  "abreast": 4,
+  "source": "https://en.wikipedia.org/wiki/Embraer_E-Jet_family"
+ },
+ "E290": {
+  "lengthM": 36.25,
+  "spanM": 33.72,
+  "heightM": 10.96,
+  "engines": "2 × Pratt & Whitney PW1900G",
+  "firstFlight": "2016-05",
+  "typicalSeats": "97 (2 class)",
+  "abreast": 4,
+  "source": "https://en.wikipedia.org/wiki/Embraer_E-Jet_E2_family"
+ },
+ "E295": {
+  "lengthM": 41.5,
+  "spanM": 35.12,
+  "heightM": 10.9,
+  "engines": "2 × Pratt & Whitney PW1900G",
+  "firstFlight": "2017-03",
+  "typicalSeats": "120 (2 class)",
+  "abreast": 4,
+  "source": "https://en.wikipedia.org/wiki/Embraer_E-Jet_E2_family"
+ },
+ "CRJ9": {
+  "lengthM": 36.2,
+  "spanM": 24.85,
+  "heightM": 7.51,
+  "engines": "2 × GE CF34-8C5",
+  "firstFlight": "2001-02",
+  "typicalSeats": "76 (2 class)",
+  "abreast": 4,
+  "source": "https://en.wikipedia.org/wiki/Bombardier_CRJ700_series"
+ },
+ "AJ27": {
+  "lengthM": 33.46,
+  "spanM": 27.29,
+  "heightM": 8.44,
+  "engines": "2 × GE CF34-10A",
+  "firstFlight": "2008-11",
+  "typicalSeats": "78 (2 class)",
+  "abreast": 5,
+  "source": "https://en.wikipedia.org/wiki/Comac_ARJ21"
+ },
+ "BCS1": {
+  "lengthM": 35,
+  "spanM": 35.1,
+  "heightM": 11.5,
+  "engines": "2 × Pratt & Whitney PW1500G",
+  "firstFlight": "2013-09",
+  "typicalSeats": "100–120 (2 class)",
+  "abreast": 5,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A220"
+ },
+ "BCS3": {
+  "lengthM": 38.7,
+  "spanM": 35.1,
+  "heightM": 11.5,
+  "engines": "2 × Pratt & Whitney PW1500G",
+  "firstFlight": "2015-02",
+  "typicalSeats": "120–150 (2 class)",
+  "abreast": 5,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A220"
+ },
+ "A319": {
+  "lengthM": 33.84,
+  "spanM": 35.8,
+  "heightM": 11.76,
+  "engines": "2 × CFM56-5B or IAE V2500",
+  "firstFlight": "1995-08",
+  "typicalSeats": "124 (2 class)",
+  "abreast": 6,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A320_family"
+ },
+ "A320": {
+  "lengthM": 37.57,
+  "spanM": 35.8,
+  "heightM": 11.76,
+  "engines": "2 × CFM56-5B or IAE V2500",
+  "firstFlight": "1987-02",
+  "typicalSeats": "150 (2 class)",
+  "abreast": 6,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A320_family"
+ },
+ "A321": {
+  "lengthM": 44.51,
+  "spanM": 35.8,
+  "heightM": 11.76,
+  "engines": "2 × CFM56-5B or IAE V2500",
+  "firstFlight": "1993-03",
+  "typicalSeats": "185 (2 class)",
+  "abreast": 6,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A320_family"
+ },
+ "A19N": {
+  "lengthM": 33.84,
+  "spanM": 35.8,
+  "heightM": 11.76,
+  "engines": "2 × CFM LEAP-1A or Pratt & Whitney PW1100G",
+  "firstFlight": "2017-03",
+  "typicalSeats": "120–150 (2 class)",
+  "abreast": 6,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A320neo_family"
+ },
+ "A20N": {
+  "lengthM": 37.57,
+  "spanM": 35.8,
+  "heightM": 11.76,
+  "engines": "2 × CFM LEAP-1A or Pratt & Whitney PW1100G",
+  "firstFlight": "2014-09",
+  "typicalSeats": "150–180 (2 class)",
+  "abreast": 6,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A320neo_family"
+ },
+ "A21N": {
+  "lengthM": 44.51,
+  "spanM": 35.8,
+  "heightM": 11.76,
+  "engines": "2 × CFM LEAP-1A or Pratt & Whitney PW1100G",
+  "firstFlight": "2016-02",
+  "typicalSeats": "180–220 (2 class)",
+  "abreast": 6,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A320neo_family"
+ },
+ "A21X": {
+  "lengthM": 44.51,
+  "spanM": 35.8,
+  "heightM": 11.76,
+  "engines": "2 × CFM LEAP-1A or Pratt & Whitney PW1100G",
+  "firstFlight": "2022-06",
+  "typicalSeats": "180–220 (2 class)",
+  "abreast": 6,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A321XLR"
+ },
+ "B737": {
+  "lengthM": 33.63,
+  "spanM": 35.79,
+  "heightM": 12.5,
+  "engines": "2 × CFM56-7B",
+  "firstFlight": "1997-02",
+  "typicalSeats": "126 (2 class)",
+  "abreast": 6,
+  "source": "https://en.wikipedia.org/wiki/Boeing_737_Next_Generation"
+ },
+ "B738": {
+  "lengthM": 39.47,
+  "spanM": 35.79,
+  "heightM": 12.5,
+  "engines": "2 × CFM56-7B",
+  "firstFlight": "1997-07",
+  "typicalSeats": "162 (2 class)",
+  "abreast": 6,
+  "source": "https://en.wikipedia.org/wiki/Boeing_737_Next_Generation"
+ },
+ "B38M": {
+  "lengthM": 39.52,
+  "spanM": 35.92,
+  "heightM": 12.29,
+  "engines": "2 × CFM LEAP-1B",
+  "firstFlight": "2016-01",
+  "typicalSeats": "162–178 (2 class)",
+  "abreast": 6,
+  "source": "https://en.wikipedia.org/wiki/Boeing_737_MAX"
+ },
+ "B39M": {
+  "lengthM": 42.16,
+  "spanM": 35.92,
+  "heightM": 12.29,
+  "engines": "2 × CFM LEAP-1B",
+  "firstFlight": "2017-04",
+  "typicalSeats": "178–193 (2 class)",
+  "abreast": 6,
+  "source": "https://en.wikipedia.org/wiki/Boeing_737_MAX"
+ },
+ "B3XM": {
+  "lengthM": 43.8,
+  "spanM": 35.92,
+  "heightM": 12.29,
+  "engines": "2 × CFM LEAP-1B",
+  "firstFlight": "2021-06",
+  "typicalSeats": "188–204 (2 class)",
+  "abreast": 6,
+  "source": "https://en.wikipedia.org/wiki/Boeing_737_MAX"
+ },
+ "C919": {
+  "lengthM": 38.9,
+  "spanM": 35.8,
+  "heightM": 11.95,
+  "engines": "2 × CFM LEAP-1C",
+  "firstFlight": "2017-05",
+  "typicalSeats": "158 (2 class)",
+  "abreast": 6,
+  "source": "https://en.wikipedia.org/wiki/Comac_C919"
+ },
+ "B752": {
+  "lengthM": 47.32,
+  "spanM": 38.05,
+  "heightM": 13.56,
+  "engines": "2 × Rolls-Royce RB211-535 or Pratt & Whitney PW2000",
+  "firstFlight": "1982-02",
+  "typicalSeats": "200 (2 class)",
+  "abreast": 6,
+  "source": "https://en.wikipedia.org/wiki/Boeing_757"
+ },
+ "B763": {
+  "lengthM": 54.94,
+  "spanM": 47.57,
+  "heightM": 15.85,
+  "engines": "2 × GE CF6-80C2, Pratt & Whitney PW4000 or Rolls-Royce RB211-524",
+  "firstFlight": "1986-12",
+  "typicalSeats": "218 (3 class) or 261 (2 class)",
+  "abreast": 7,
+  "source": "https://en.wikipedia.org/wiki/Boeing_767"
+ },
+ "A332": {
+  "lengthM": 58.82,
+  "spanM": 60.3,
+  "heightM": 17.39,
+  "engines": "2 × GE CF6-80E1, Pratt & Whitney PW4000 or Rolls-Royce Trent 700",
+  "firstFlight": "1997-08",
+  "typicalSeats": "220–260 (2 class)",
+  "abreast": 8,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A330"
+ },
+ "A333": {
+  "lengthM": 63.67,
+  "spanM": 60.3,
+  "heightM": 16.79,
+  "engines": "2 × GE CF6-80E1, Pratt & Whitney PW4000 or Rolls-Royce Trent 700",
+  "firstFlight": "1992-11",
+  "typicalSeats": "250–290 (2 class)",
+  "abreast": 8,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A330"
+ },
+ "A339": {
+  "lengthM": 63.66,
+  "spanM": 64,
+  "heightM": 16.79,
+  "engines": "2 × Rolls-Royce Trent 7000",
+  "firstFlight": "2017-10",
+  "typicalSeats": "260–300 (2 class)",
+  "abreast": 8,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A330neo"
+ },
+ "B788": {
+  "lengthM": 56.72,
+  "spanM": 60.12,
+  "heightM": 16.92,
+  "engines": "2 × GE GEnx-1B or Rolls-Royce Trent 1000",
+  "firstFlight": "2009-12",
+  "typicalSeats": "248 (2 class)",
+  "abreast": 9,
+  "source": "https://en.wikipedia.org/wiki/Boeing_787_Dreamliner"
+ },
+ "B789": {
+  "lengthM": 62.81,
+  "spanM": 60.12,
+  "heightM": 17.02,
+  "engines": "2 × GE GEnx-1B or Rolls-Royce Trent 1000",
+  "firstFlight": "2013-09",
+  "typicalSeats": "296 (2 class)",
+  "abreast": 9,
+  "source": "https://en.wikipedia.org/wiki/Boeing_787_Dreamliner"
+ },
+ "B78X": {
+  "lengthM": 68.28,
+  "spanM": 60.12,
+  "heightM": 17.02,
+  "engines": "2 × GE GEnx-1B or Rolls-Royce Trent 1000",
+  "firstFlight": "2017-03",
+  "typicalSeats": "336 (2 class)",
+  "abreast": 9,
+  "source": "https://en.wikipedia.org/wiki/Boeing_787_Dreamliner"
+ },
+ "A359": {
+  "lengthM": 66.8,
+  "spanM": 64.75,
+  "heightM": 17.05,
+  "engines": "2 × Rolls-Royce Trent XWB-84",
+  "firstFlight": "2013-06",
+  "typicalSeats": "300–350 (3 class)",
+  "abreast": 9,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A350"
+ },
+ "A35K": {
+  "lengthM": 73.79,
+  "spanM": 64.75,
+  "heightM": 17.08,
+  "engines": "2 × Rolls-Royce Trent XWB-97",
+  "firstFlight": "2016-11",
+  "typicalSeats": "350–410 (3 class)",
+  "abreast": 9,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A350"
+ },
+ "B772": {
+  "lengthM": 63.73,
+  "spanM": 60.93,
+  "heightM": 18.52,
+  "engines": "2 × GE GE90, Pratt & Whitney PW4000 or Rolls-Royce Trent 800",
+  "firstFlight": "1996-10",
+  "typicalSeats": "301 (3 class) or 313 (2 class)",
+  "abreast": 9,
+  "source": "https://en.wikipedia.org/wiki/Boeing_777"
+ },
+ "B77W": {
+  "lengthM": 73.86,
+  "spanM": 64.8,
+  "heightM": 18.52,
+  "engines": "2 × GE GE90-115B",
+  "firstFlight": "2003-02",
+  "typicalSeats": "396 (2 class)",
+  "abreast": 10,
+  "source": "https://en.wikipedia.org/wiki/Boeing_777"
+ },
+ "B779": {
+  "lengthM": 76.72,
+  "spanM": 71.75,
+  "heightM": 19.68,
+  "engines": "2 × GE GE9X",
+  "firstFlight": "2020-01",
+  "typicalSeats": "426 (2 class)",
+  "abreast": 10,
+  "source": "https://en.wikipedia.org/wiki/Boeing_777X"
+ },
+ "A388": {
+  "lengthM": 72.72,
+  "spanM": 79.75,
+  "heightM": 24.09,
+  "engines": "4 × Rolls-Royce Trent 900 or Engine Alliance GP7200",
+  "firstFlight": "2005-04",
+  "typicalSeats": "575 (4 class, two decks)",
+  "abreast": 10,
+  "source": "https://en.wikipedia.org/wiki/Airbus_A380"
+ },
+ "B748": {
+  "lengthM": 76.25,
+  "spanM": 68.4,
+  "heightM": 19.35,
+  "engines": "4 × GE GEnx-2B67",
+  "firstFlight": "2011-03",
+  "typicalSeats": "410 (3 class)",
+  "abreast": 10,
+  "source": "https://en.wikipedia.org/wiki/Boeing_747-8"
+ }
+}

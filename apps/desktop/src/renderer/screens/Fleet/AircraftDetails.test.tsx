@@ -1,0 +1,72 @@
+// @vitest-environment jsdom
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { seatUnits } from '@skyempire/sim';
+import { TooltipProvider } from '@skyempire/ui';
+import { describe, expect, it } from 'vitest';
+import { SeatMap } from '../../components/SeatMap';
+import { cabinPresets, detailsOf, photoOf, rowShape } from '../../lib/aircraftMedia';
+import { catalog } from '../../lib/catalog';
+import { AircraftDetails } from './AircraftDetails';
+
+describe('cabin presets', () => {
+  it('always fit the aircraft and use full business rows', () => {
+    for (const t of Object.values(catalog.aircraftTypes)) {
+      const d = detailsOf(t.id)!;
+      const jRow = rowShape(d.abreast).business.reduce((a, b) => a + b, 0);
+      for (const p of cabinPresets(t, d.abreast)) {
+        expect(seatUnits(p.cabin), `${t.id} ${p.id}`).toBeLessThanOrEqual(t.maxSeats);
+        expect(p.cabin.economy, `${t.id} ${p.id}`).toBeGreaterThan(0);
+        expect(p.cabin.business % jRow, `${t.id} ${p.id}`).toBe(0);
+      }
+    }
+  });
+  it('keeps turboprops all-economy and gives widebodies three classes', () => {
+    const atr = catalog.aircraftTypes.AT76!;
+    expect(cabinPresets(atr, 4).map((p) => p.id)).toEqual(['economy']);
+    const b789 = catalog.aircraftTypes.B789!;
+    const three = cabinPresets(b789, 9).find((p) => p.id === 'three')!.cabin;
+    expect(three.business).toBeGreaterThan(0);
+    expect(three.premium).toBeGreaterThan(0);
+  });
+  it('uses real seats-per-row', () => {
+    expect(rowShape(6).economy).toEqual([3, 3]);
+    expect(rowShape(9).economy).toEqual([3, 3, 3]);
+    expect(rowShape(10).business).toEqual([1, 2, 1]);
+  });
+});
+
+describe('seat map', () => {
+  it('draws one seat per passenger and labels the cabins', () => {
+    const { container } = render(<SeatMap cabin={{ business: 12, premium: 0, economy: 150 }} abreast={6} />);
+    expect(container.querySelectorAll('rect')).toHaveLength(162);
+    expect(screen.getByRole('img', { name: 'Cabin layout: 12 business, 0 premium, 150 economy seats' })).toBeInTheDocument();
+    expect(screen.getByText('28 rows')).toBeInTheDocument(); // 3 rows of 2-2 business + 25 of 3-3 economy
+  });
+  it('shows an empty cabin without crashing', () => {
+    render(<SeatMap cabin={{ business: 0, premium: 0, economy: 0 }} abreast={6} />);
+    expect(screen.getByText('No seats')).toBeInTheDocument();
+  });
+});
+
+describe('aircraft page', () => {
+  it('every type has a photo with a credit', () => {
+    for (const id of Object.keys(catalog.aircraftTypes)) {
+      const p = photoOf(id);
+      expect(p, id).not.toBeNull();
+      expect(p!.author.length, id).toBeGreaterThan(0);
+    }
+  });
+  it('shows the photo credit, real specs and switches cabin layouts', async () => {
+    const user = userEvent.setup();
+    render(<TooltipProvider><AircraftDetails typeId="B789" open onOpenChange={() => {}} /></TooltipProvider>);
+    expect(screen.getByRole('heading', { name: 'Boeing 787-9' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /Boeing 787-9 in flight/ })).toBeInTheDocument();
+    expect(screen.getByText(/Photo: /)).toBeInTheDocument();
+    expect(screen.getByText('62.8 m')).toBeInTheDocument();
+    expect(screen.getByText('Sep 2013')).toBeInTheDocument();
+    await user.click(screen.getByRole('tab', { name: 'Three class' }));
+    expect(screen.getByRole('tab', { name: 'Three class' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('img', { name: /Cabin layout: \d+ business, [1-9]\d* premium/ })).toBeInTheDocument();
+  });
+});

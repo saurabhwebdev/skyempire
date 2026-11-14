@@ -2,6 +2,8 @@ import type { Cabin } from '@skyempire/shared';
 import { seatUnits } from '@skyempire/sim';
 import { Button, Modal, NumberInput } from '@skyempire/ui';
 import { useEffect, useState } from 'react';
+import { SeatMap } from '../../components/SeatMap';
+import { cabinPresets, detailsOf } from '../../lib/aircraftMedia';
 import { catalog } from '../../lib/catalog';
 
 export interface CabinEditorProps {
@@ -25,6 +27,8 @@ export function CabinEditor({ open, typeId, initial, confirmLabel, onConfirm, on
   const units = seatUnits(cabin);
   const over = units > t.maxSeats;
   const seats = cabin.economy + cabin.premium + cabin.business;
+  const abreast = detailsOf(typeId)?.abreast;
+  const presets = abreast ? cabinPresets(t, abreast) : [];
   return (
     <Modal open={open} onOpenChange={onOpenChange} title={`${t.name} cabin`}
       description={`${t.maxSeats} seat units. Business seats use 2.5 units, premium 1.5.`}
@@ -54,7 +58,13 @@ export function CabinEditor({ open, typeId, initial, confirmLabel, onConfirm, on
           </div>
           {over && <p role="alert" className="mt-2 text-[13px] text-danger">Too many seats — max {t.maxSeats} seat units</p>}
         </div>
-        <Button size="sm" variant="ghost" className="self-start" onClick={() => setCabin({ economy: t.maxSeats, premium: 0, business: 0 })}>Reset to all economy</Button>
+        {abreast && <SeatMap cabin={cabin} abreast={abreast} />}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[13px] text-muted">Start from</span>
+          {presets.length ? presets.map((p) => (
+            <Button key={p.id} size="sm" variant="ghost" onClick={() => setCabin(p.cabin)}>{p.label}</Button>
+          )) : <Button size="sm" variant="ghost" onClick={() => setCabin({ economy: t.maxSeats, premium: 0, business: 0 })}>All economy</Button>}
+        </div>
       </div>
     </Modal>
   );

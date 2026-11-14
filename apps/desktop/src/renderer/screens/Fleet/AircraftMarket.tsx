@@ -5,9 +5,10 @@ import { Button, cn, NumberInput, useToast } from '@skyempire/ui';
 import { Lock, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useMemo, useState } from 'react';
-import { AircraftSilhouette } from '../../components/AircraftSilhouette';
+import { AircraftPhoto } from '../../components/AircraftPhoto';
 import { catalog } from '../../lib/catalog';
 import { useGameStore, useUi } from '../../store';
+import { AircraftDetails } from './AircraftDetails';
 import { CabinEditor } from './CabinEditor';
 
 const TYPES = Object.values(catalog.aircraftTypes).sort((a, b) => a.priceUsd - b.priceUsd);
@@ -27,6 +28,7 @@ export function AircraftMarket() {
   const [minSeats, setMinSeats] = useState(0);
   const [compare, setCompare] = useState<string[]>([]);
   const [pending, setPending] = useState<Pending | null>(null);
+  const [details, setDetails] = useState<string | null>(null);
   const close = () => useUi.getState().setMarketOpen(false);
   const types = useMemo(() => TYPES.filter((t) => t.rangeKm >= minRange && t.maxSeats >= minSeats), [minRange, minSeats]);
   const listings = view.market.usedListings.filter((l) => {
@@ -49,8 +51,11 @@ export function AircraftMarket() {
     const locked = !tierAllows(view.player.tier, t.tier);
     const fuelPerSeatHour = t.fuelKgPerH / t.maxSeats;
     return (
-      <article key={extra?.listing.id ?? t.id} className={cn('flex flex-col gap-3 rounded-lg border bg-surface-1 p-4', compare.includes(t.id) ? 'border-accent' : 'border-border')}>
-        <AircraftSilhouette typeId={t.id} className="h-12 w-full text-muted" />
+      <article key={extra?.listing.id ?? t.id} className={cn('flex flex-col gap-3 overflow-hidden rounded-lg border bg-surface-1 p-4', compare.includes(t.id) ? 'border-accent' : 'border-border')}>
+        <button type="button" aria-label={`About the ${t.name}`} onClick={() => setDetails(t.id)}
+          className="group -mx-4 -mt-4 overflow-hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent">
+          <AircraftPhoto typeId={t.id} className="aspect-[16/9] transition-transform duration-300 ease-out group-hover:scale-[1.03]" />
+        </button>
         <header className="flex items-baseline justify-between gap-2">
           <h3 className="font-semibold">{t.name}{t.usedOnly && !extra && <span className="ml-2 rounded-full border border-border px-2 py-0.5 text-[11px] font-normal text-muted">Used only</span>}</h3>
           <span className="text-[12px] text-faint">{t.class === 'longNarrowbody' ? 'long-range narrowbody' : t.class}</span>
@@ -74,7 +79,10 @@ export function AircraftMarket() {
           )}
         </dl>
         {locked ? (
-          <p className="inline-flex items-center gap-2 text-[13px] text-faint"><Lock className="size-4" /> Unlocks at {TIER[t.tier]} tier</p>
+          <div className="mt-auto flex flex-wrap items-center justify-between gap-2">
+            <p className="inline-flex items-center gap-2 text-[13px] text-faint"><Lock className="size-4" /> Unlocks at {TIER[t.tier]} tier</p>
+            <Button size="sm" variant="ghost" onClick={() => setDetails(t.id)}>Details</Button>
+          </div>
         ) : (
           <div className="mt-auto flex flex-wrap gap-2">
             {extra ? (
@@ -87,6 +95,7 @@ export function AircraftMarket() {
                 <Button size="sm" onClick={() => setPending({ kind: 'buy', type: t })}>Buy for {formatMoney(t.priceUsd)}</Button>
               </>
             )}
+            <Button size="sm" variant="ghost" onClick={() => setDetails(t.id)}>Details</Button>
             {!extra && (
               <Button size="sm" variant="ghost" aria-pressed={compare.includes(t.id)} onClick={() => setCompare((c) => (c.includes(t.id) ? c.filter((x) => x !== t.id) : [...c, t.id].slice(-3)))}>
                 {compare.includes(t.id) ? 'Remove from compare' : 'Compare'}
@@ -134,6 +143,7 @@ export function AircraftMarket() {
           </table>
         </footer>
       )}
+      {details && <AircraftDetails typeId={details} open onOpenChange={(o) => !o && setDetails(null)} />}
       {pending && (
         <CabinEditor open onOpenChange={(o) => !o && setPending(null)} typeId={pending.type.id}
           initial={{ economy: pending.type.maxSeats, premium: 0, business: 0 }}

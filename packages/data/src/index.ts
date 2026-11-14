@@ -1,5 +1,7 @@
 import type { AircraftType, AirlineData, AirspaceRegion, Airport, Catalog, HolidayData } from '@skyempire/shared';
 import aircraft from './aircraft.json';
+import aircraftDetails from './aircraft-details.json';
+import aircraftPhotos from './aircraft-photos.json';
 import airlines from './airlines.world.json';
 import airports from './airports.world.json';
 import basemap from './basemap/countries-50m.json';
@@ -10,6 +12,12 @@ import routes from './routes.world.json';
 
 export * from './heuristics';
 export * from './schema';
+import type { AircraftDetails, AircraftPhoto } from './schema';
+
+/** Real-world specs per aircraft type id (Wikipedia). */
+export const AIRCRAFT_DETAILS = aircraftDetails as Record<string, AircraftDetails>;
+/** Photo credit per aircraft type id; the image itself is src/photos/<file>. */
+export const AIRCRAFT_PHOTOS = aircraftPhotos as Record<string, AircraftPhoto>;
 
 let cached: Catalog | null = null;
 

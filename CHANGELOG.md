@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.0 — "Hangar"
+
+- **Real aircraft photos.** Every one of the 38 aircraft now has a real photo, from Wikimedia Commons. Each photo credits its photographer and licence.
+- **A new aircraft page.** Click any aircraft in the market or your fleet to open it:
+  - real-world specs: length, wingspan, height, engines, first flight and typical seating
+  - the in-game numbers side by side
+  - a cabin map showing one-, two- and three-class layouts
+- **Cabin editor with a seat map.** It draws your seats row by row as you change them, and has one-click typical layouts to start from.
+- **Updates inside the game.** When a new version comes out, a banner tells you.
+  - Click **Update now**: it downloads while you play, then **Restart now** saves your game and installs it.
+  - A "What's new" note appears after the update.
+  - Settings has a **Check for updates** button.
+  - This works with the Setup .exe install. The .zip version gets a download link instead.
+
 ## 0.2.0 — "Living World"
 
 - **Weather.** Every airport gets a daily condition: clear, wind, rain, thunderstorms, snow, fog or a tropical cyclone. Realistic weather is simulated from climate, by latitude, hemisphere and month. When you're online, real forecasts from Open-Meteo are used instead (Settings → Live weather).
