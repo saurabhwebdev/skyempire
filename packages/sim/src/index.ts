@@ -11,4 +11,5 @@ export { distanceKm } from './geo';
 export { baseDemand, refFare } from './demand';
 export { maxRoundTripsPerWeek, roundTripHours, seatUnits } from './ops';
 export { baseSetupCost } from './finance';
-export { aircraftMarketValue, defaultCabin, tierAllows } from './fleet';
+export { aircraftMarketValue, tierAllows } from './fleet';
+export * from './cabin';
