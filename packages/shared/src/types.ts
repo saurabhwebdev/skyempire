@@ -240,7 +240,7 @@ export interface Airline {
   daysInsolvent: number;
   bankrupt: boolean;
   creditRating: 'A' | 'B' | 'C' | 'D';
-  totals: { pax: number; revenue360: Money[] };
+  totals: { pax: number; revenue360: Money[]; /** Cargo tonnes moved (v0.6). */ cargoT?: number };
   nextAiDecisionDay: number;
 }
 
@@ -330,4 +330,6 @@ export interface NewGameOptions {
   aiCount?: number;
   /** Real year the career starts in (default 2026). */
   startYear?: number;
+  /** v0.6: Passenger (default), Passenger + Cargo, or Cargo only. */
+  airlineKind?: AirlineKind;
 }

@@ -27,7 +27,7 @@ function blankAirline(id: string, cash: number): Omit<Airline, 'name' | 'code' |
     daysInsolvent: 0,
     bankrupt: false,
     creditRating: 'B',
-    totals: { pax: 0, revenue360: Array(12).fill(0) },
+    totals: { pax: 0, revenue360: Array(12).fill(0), cargoT: 0 },
     nextAiDecisionDay: 0,
   };
 }
@@ -93,6 +93,7 @@ export function newGame(opts: NewGameOptions, catalog: Catalog): GameState {
     personality: null,
     homeBaseId,
     baseIds: [homeBaseId],
+    kind: opts.airlineKind ?? 'passenger',
   };
 
   const aiCount = opts.aiCount ?? 19;

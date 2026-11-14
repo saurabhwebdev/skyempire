@@ -94,6 +94,7 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
   const { results: sold } = simulateRoutes(allOps, s, catalog);
   // Cargo: freighter routes, and belly holds on passenger routes.
   const cargo = simulateCargo(allOps, s, catalog);
+  const cargoByAirline = new Map<string, number>();
   for (const opsList of byPair.values()) {
     for (const ops of opsList) {
       const r = ops.route;
@@ -112,6 +113,7 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
       const paxTotal = CABIN_CLASSES.reduce((sum, k) => sum + p[k], 0);
       const loadFactor = r.kind === 'cargo' ? (cg?.load ?? 0) : res.loadFactor;
       r.last = { pax: p, loadFactor, revenue, cost, profit: revenue - cost };
+      cargoByAirline.set(r.airlineId, (cargoByAirline.get(r.airlineId) ?? 0) + (cg?.tonnes ?? 0));
       if (cg || r.kind === 'cargo') {
         r.last.cargoT = cg?.tonnes ?? 0;
         r.last.cargoRevenue = cg?.revenue ?? 0;
@@ -197,6 +199,7 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
     const variable = d.costs.fuel + d.costs.crew + d.costs.maintenance + d.costs.fees + d.costs.service + d.costs.interest;
     al.cash += d.revenue - variable;
     al.totals.pax += d.pax;
+    al.totals.cargoT = (al.totals.cargoT ?? 0) + (cargoByAirline.get(al.id) ?? 0);
     al.totals.revenue360[month] = (al.totals.revenue360[month] ?? 0) + d.revenue;
 
     // 8. Solvency
