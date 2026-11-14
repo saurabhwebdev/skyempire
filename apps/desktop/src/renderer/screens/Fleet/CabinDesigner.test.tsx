@@ -52,6 +52,10 @@ describe('cabin designer', () => {
     await user.click(screen.getByRole('radio', { name: /Extra legroom/ }));
     expect(screen.getByRole('alert')).toHaveTextContent('Too many seats — max 194 seat units');
     expect(screen.getByRole('button', { name: 'Lease for $862k/mo' })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Fit economy seats' }));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Economy/ })).toHaveTextContent('168');
+    expect(screen.getByRole('button', { name: 'Lease for $862k/mo' })).toBeEnabled();
   });
 
   it('a refit shows its cost and downtime; meal changes apply at once', async () => {

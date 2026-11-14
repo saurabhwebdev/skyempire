@@ -1,7 +1,7 @@
 import type { CabinClass, CabinConfig, ClassProduct, Ife, Meal } from '@skyempire/shared';
 import { formatMoney } from '@skyempire/shared';
 import {
-  ALLOWED_MEALS, checkConfig, configUnits, ifeCostPerBlockHour, perPaxServiceCost, productScore, refitCost, refitDays, upgradeCost,
+  ALLOWED_MEALS, checkConfig, configUnits, unitsPerSeat, ifeCostPerBlockHour, perPaxServiceCost, productScore, refitCost, refitDays, upgradeCost,
 } from '@skyempire/sim';
 import { Button, cn, Modal, NumberInput, useToast } from '@skyempire/ui';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -100,6 +100,8 @@ export function CabinDesigner({ open, typeId, initial, mode, onConfirm, onOpenCh
   const days = mode.kind === 'refit' ? refitDays(mode.current, config, t) : 0;
   const cost = mode.kind === 'refit' ? refitCost(mode.current, config) : upgradeCost(config);
   const wifiPerH = ifeCostPerBlockHour(config);
+  // Economy seats that exactly fill the floor left by the other classes.
+  const fitEconomy = Math.max(0, Math.floor((t.maxSeats - (units - config.seats.economy * unitsPerSeat(config, 'economy', t))) / unitsPerSeat(config, 'economy', t) + 1e-9));
   const confirmLabel = mode.kind === 'new' ? mode.confirmLabel : days > 0 ? `Start refit · ${formatMoney(cost)}` : 'Save cabin';
 
   const saveLayout = async () => {
@@ -177,6 +179,9 @@ export function CabinDesigner({ open, typeId, initial, mode, onConfirm, onOpenCh
                 : <p className="text-muted">No refit needed — meal and extra changes apply from the next flight.</p>}
             <p className="text-[12px] text-faint">Comfort is for a typical {blockH}-hour flight: screens and meals count for more on long flights.</p>
             {problem && <p role="alert" className="text-danger">{problem}</p>}
+            {fitEconomy !== config.seats.economy && (
+              <Button size="sm" className="self-start" onClick={() => setConfig((c) => ({ ...c, seats: { ...c.seats, economy: fitEconomy } }))}>Fit economy seats</Button>
+            )}
           </div>
         </div>
 

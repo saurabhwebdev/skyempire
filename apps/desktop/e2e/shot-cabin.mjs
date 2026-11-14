@@ -1,0 +1,31 @@
+// Dev helper (v0.4): the cabin designer when leasing a widebody.
+import { _electron as electron } from '@playwright/test';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+const [dir] = process.argv.slice(2);
+const app = await electron.launch({ args: [join(import.meta.dirname, '..', 'out', 'main', 'index.js')], env: { ...process.env, SKYEMPIRE_USER_DATA: mkdtempSync(join(tmpdir(), 'se-shot-')) } });
+const win = await app.firstWindow();
+win.on('pageerror', (e) => console.log('[pageerror]', e.message));
+await win.setViewportSize({ width: 1440, height: 900 });
+await win.evaluate(async () => {
+  await window.game.newGame({ seed: 4, regionId: 'world', difficulty: 'normal', homeBaseId: 'DXB', airline: { name: 'Saffron Air', code: 'S4F', colors: { primary: '#e08a1e', secondary: '#ffffff' }, logoShape: 'circle' } });
+});
+await win.reload();
+await win.waitForTimeout(1500);
+await win.keyboard.press('3');
+await win.getByRole('button', { name: 'Get aircraft' }).click();
+await win.waitForTimeout(800);
+await win.locator('article').filter({ hasText: 'Airbus A220-300' }).getByRole('button', { name: /^Lease/ }).click();
+await win.waitForTimeout(600);
+await win.getByRole('button', { name: 'Two class' }).click();
+await win.screenshot({ path: join(dir, 'designer-economy.png') });
+await win.getByRole('tab', { name: /Business/ }).click();
+await win.getByRole('radio', { name: /Full-flat bed/ }).click();
+await win.getByRole('radio', { name: /Seatback screens/ }).click();
+await win.waitForTimeout(300);
+await win.screenshot({ path: join(dir, 'designer-business.png') });
+await win.getByRole('dialog').evaluate((d) => d.scrollTo(0, d.scrollHeight));
+await win.waitForTimeout(300);
+await win.screenshot({ path: join(dir, 'designer-bottom.png') });
+await app.close();
