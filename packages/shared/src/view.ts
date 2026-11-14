@@ -65,6 +65,7 @@ export interface RivalSummary {
 
 export interface ClientView {
   day: number;
+  startYear: number;
   player: Airline;
   aircraft: Aircraft[];
   routes: Route[];

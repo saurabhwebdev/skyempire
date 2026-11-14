@@ -48,8 +48,8 @@ describe('tick', () => {
   });
   it('a strike cancels flights: no revenue, no variable cost, overhead still charged', () => {
     const { s, routeId } = withRoute();
-    s.day = 29; // next tick is day 30 = month start
-    s.events.push({ id: 'x', kind: 'strike', startDay: 30, endDay: 31, airportId: 'CDG', magnitude: 1 });
+    s.day = 30; // next tick is day 31 = Feb 1, a month start
+    s.events.push({ id: 'x', kind: 'strike', startDay: 31, endDay: 32, airportId: 'CDG', magnitude: 1 });
     const { state, summary } = tick(s, [], catalog);
     expect(state.routes[routeId]!.last).toMatchObject({ revenue: 0, cost: 0 });
     expect(summary.daily.find((d) => d.airlineId === s.playerId)!.costs.overhead).toBeGreaterThan(0);

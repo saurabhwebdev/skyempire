@@ -1,5 +1,5 @@
 import type { AirlineDaily, CostBreakdown } from '@skyempire/shared';
-import { formatDate } from '@skyempire/sim';
+import { dateOf, formatMonth } from '@skyempire/sim';
 
 export interface MonthRow {
   month: string;
@@ -11,15 +11,15 @@ export interface MonthRow {
 
 export const totalCost = (c: CostBreakdown) => Object.values(c).reduce((a, b) => a + b, 0);
 
-/** Group daily rows into 30-day game months, oldest first. */
-export function aggregateMonthly(daily: AirlineDaily[]): MonthRow[] {
+/** Group daily rows into calendar months, oldest first. */
+export function aggregateMonthly(daily: AirlineDaily[], startYear: number): MonthRow[] {
   const byMonth = new Map<number, MonthRow>();
   for (const d of daily) {
-    const key = Math.floor(d.day / 30);
+    const date = dateOf(d.day, startYear);
+    const key = date.year * 12 + date.month;
     let row = byMonth.get(key);
     if (!row) {
-      const label = formatDate(key * 30).split(' ');
-      row = { month: `${label[0]} ${label[2]}`, revenue: 0, cost: 0, profit: 0, costs: { fuel: 0, crew: 0, maintenance: 0, fees: 0, service: 0, leases: 0, interest: 0, overhead: 0, bases: 0, marketing: 0 } };
+      row = { month: formatMonth(d.day, startYear), revenue: 0, cost: 0, profit: 0, costs: { fuel: 0, crew: 0, maintenance: 0, fees: 0, service: 0, leases: 0, interest: 0, overhead: 0, bases: 0, marketing: 0 } };
       byMonth.set(key, row);
     }
     row.revenue += d.revenue;

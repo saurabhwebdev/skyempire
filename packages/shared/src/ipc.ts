@@ -9,6 +9,8 @@ export interface SaveInfo {
   name: string;
   airlineName: string;
   day: number;
+  /** Real year of game day 0 (saves from v0.1: 2026). */
+  startYear: number;
   updatedAt: number;
 }
 

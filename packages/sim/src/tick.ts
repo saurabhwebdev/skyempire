@@ -131,7 +131,7 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
     }
   }
 
-  const month = dateOf(s.day).month - 1;
+  const month = dateOf(s.day, s.world.startYear).month - 1;
   for (const al of Object.values(s.airlines)) {
     const d = daily.get(al.id)!;
     if (al.bankrupt) {
@@ -153,7 +153,7 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
     });
     al.reputation = Math.max(0, stepReputation(al.reputation, target) - (incidents.get(al.id) ?? 0));
 
-    if (isMonthStart(s.day)) {
+    if (isMonthStart(s.day, s.world.startYear)) {
       const m = applyMonthly(s, al.id, catalog);
       Object.assign(d.costs, m);
       al.totals.revenue360[month] = 0;

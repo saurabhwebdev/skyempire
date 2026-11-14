@@ -46,7 +46,7 @@ export function Finance() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view.player.id, Math.floor(view.day / 7)]);
 
-  const months = useMemo(() => aggregateMonthly(daily ?? []).slice(-12), [daily]);
+  const months = useMemo(() => aggregateMonthly(daily ?? [], view.startYear).slice(-12), [daily, view.startYear]);
   const last30 = useMemo(() => (daily ?? []).slice(-30), [daily]);
   const rev30 = last30.reduce((s, d) => s + d.revenue, 0);
   const cost30 = last30.reduce((s, d) => s + totalCost(d.costs), 0);
@@ -107,7 +107,7 @@ export function Finance() {
         <Panel title="Cash">
           <div className="h-56">
             <ResponsiveContainer>
-              <LineChart data={daily.map((d) => ({ day: formatDate(d.day), cash: d.cash }))}>
+              <LineChart data={daily.map((d) => ({ day: formatDate(d.day, view.startYear), cash: d.cash }))}>
                 <CartesianGrid vertical={false} stroke={GRID} />
                 <XAxis dataKey="day" {...AXIS} minTickGap={48} />
                 <YAxis tickFormatter={short} width={64} {...AXIS} />

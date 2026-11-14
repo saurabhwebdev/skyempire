@@ -59,7 +59,7 @@ export function newGame(opts: NewGameOptions, catalog: Catalog): GameState {
   const rng = new Rng(opts.seed);
   const cash = BALANCE.startingCash[difficulty];
   const state: GameState = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     seed: opts.seed,
     rngState: 0,
     day: 0,
@@ -75,6 +75,7 @@ export function newGame(opts: NewGameOptions, catalog: Catalog): GameState {
     events: [],
     nextId: 0,
     gameOver: null,
+    world: { startYear: opts.startYear ?? 2026, liveWeather: {}, tensions: [], preCancelled: {} },
   };
 
   state.airlines.al_player = {

@@ -165,8 +165,35 @@ export interface UsedListing {
   price: Money;
 }
 
+export type WeatherCondition = 'clear' | 'wind' | 'rain' | 'thunderstorm' | 'snow' | 'fog' | 'cyclone';
+
+export type TensionKind = 'airspaceClosure' | 'routeBan' | 'advisory' | 'thawBonus';
+
+/** A generic geopolitical event: never names parties or causes. */
+export interface ActiveTension {
+  id: string;
+  kind: TensionKind;
+  regionId?: string;
+  countries?: [string, string];
+  country?: string;
+  magnitude: number;
+  warnDay: number;
+  startDay: number;
+  endDay: number;
+}
+
+export interface World {
+  /** Real year of game day 0 (Jan 1). */
+  startYear: number;
+  /** Live forecast fed in by the main process: game day → airport → condition. */
+  liveWeather: Record<number, Record<string, WeatherCondition>>;
+  tensions: ActiveTension[];
+  /** Route id → game days the player cancelled ahead of time. */
+  preCancelled: Record<string, number[]>;
+}
+
 export interface GameState {
-  schemaVersion: 1;
+  schemaVersion: 2;
   seed: number;
   rngState: number;
   day: number;
@@ -182,6 +209,7 @@ export interface GameState {
   events: ActiveEvent[];
   nextId: number;
   gameOver: null | { reason: 'bankrupt'; day: number };
+  world: World;
 }
 
 export interface NewGameOptions {
@@ -191,4 +219,6 @@ export interface NewGameOptions {
   airline: { name: string; code: string; colors: { primary: string; secondary: string }; logoShape: LogoShape };
   homeBaseId: string;
   aiCount?: number;
+  /** Real year the career starts in (default 2026). */
+  startYear?: number;
 }

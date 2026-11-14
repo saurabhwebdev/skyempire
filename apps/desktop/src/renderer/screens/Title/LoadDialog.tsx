@@ -50,7 +50,7 @@ export function LoadDialog({ open, onOpenChange }: { open: boolean; onOpenChange
                   <span className="text-[13px] text-muted">{s.name}</span>
                 </span>
                 <span className="num text-right text-[13px] text-muted">
-                  {s.updatedAt ? formatDate(s.day) : ''}
+                  {s.updatedAt ? formatDate(s.day, s.startYear) : ''}
                   <span className="block text-faint">{s.updatedAt ? new Date(s.updatedAt).toLocaleString() : ''}</span>
                 </span>
               </button>

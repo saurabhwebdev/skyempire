@@ -4,7 +4,9 @@ import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { gunzipSync, gzipSync } from 'node:zlib';
 
-export const CURRENT_SCHEMA = 1;
+import { CURRENT_SCHEMA, migrations } from '@skyempire/sim';
+
+export { CURRENT_SCHEMA };
 const KEEP_AUTOSAVES = 3;
 
 export class SaveLoadError extends Error {
@@ -14,8 +16,6 @@ export class SaveLoadError extends Error {
   }
 }
 
-/** Upgrades from older schema versions: migrations[n] turns version n into n+1. */
-const migrations: Record<number, (s: Record<string, unknown>) => Record<string, unknown>> = {};
 
 const SCHEMA = `
   CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -73,6 +73,7 @@ export class SaveStore {
         const put = db.prepare('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)');
         put.run('airlineName', airline);
         put.run('day', String(state.day));
+        put.run('startYear', String(state.world?.startYear ?? 2026));
         put.run('updatedAt', String(now));
         put.run('schemaVersion', String((state as { schemaVersion: number }).schemaVersion));
         db.exec('COMMIT');
@@ -182,7 +183,7 @@ export class SaveStore {
     try {
       const rows = db.prepare('SELECT key, value FROM meta').all() as { key: string; value: string }[];
       const m = Object.fromEntries(rows.map((r) => [r.key, r.value]));
-      return { id, name: m.name ?? id, airlineName: m.airlineName ?? '', day: Number(m.day ?? 0), updatedAt: Number(m.updatedAt ?? 0) };
+      return { id, name: m.name ?? id, airlineName: m.airlineName ?? '', day: Number(m.day ?? 0), startYear: Number(m.startYear ?? 2026), updatedAt: Number(m.updatedAt ?? 0) };
     } finally {
       db.close();
     }
@@ -197,7 +198,7 @@ export class SaveStore {
         try {
           return this.info(id);
         } catch {
-          return { id, name: id, airlineName: '(damaged)', day: 0, updatedAt: 0 };
+          return { id, name: id, airlineName: '(damaged)', day: 0, startYear: 2026, updatedAt: 0 };
         }
       })
       .sort((a, b) => b.updatedAt - a.updatedAt);

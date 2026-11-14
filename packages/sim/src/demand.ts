@@ -4,7 +4,7 @@ import { distanceKm } from './geo';
 
 /** Leisure seasonality: peaks mid-July; stronger for touristy pairs. Range 0.7–1.3. */
 export function seasonality(dayOfYear: number, tourism: number): number {
-  return 1 + (0.05 + 0.25 * tourism) * Math.cos((2 * Math.PI * (dayOfYear - 195)) / 360);
+  return 1 + (0.05 + 0.25 * tourism) * Math.cos((2 * Math.PI * (dayOfYear - 197)) / 365);
 }
 
 /** One-direction daily passenger demand A→B before price effects (gravity model, simulation-spec §3). */

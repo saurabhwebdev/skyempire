@@ -15,12 +15,12 @@ const day = (d: number, revenue: number, fuel: number): AirlineDaily => ({
 });
 
 describe('aggregateMonthly', () => {
-  it('rolls 60 days into two months', () => {
-    const rows = Array.from({ length: 60 }, (_, i) => day(i, 100, 40));
-    const m = aggregateMonthly(rows);
+  it('rolls 59 days into January and February (real month lengths)', () => {
+    const rows = Array.from({ length: 59 }, (_, i) => day(i, 100, 40));
+    const m = aggregateMonthly(rows, 2026);
     expect(m).toHaveLength(2);
-    expect(m[0]).toMatchObject({ month: 'Jan Y1', revenue: 3000, cost: 1200, profit: 1800 });
-    expect(m[1]!.month).toBe('Feb Y1');
+    expect(m[0]).toMatchObject({ month: 'Jan 2026', revenue: 3100, cost: 1240, profit: 1860 });
+    expect(m[1]).toMatchObject({ month: 'Feb 2026', revenue: 2800 });
   });
 });
 

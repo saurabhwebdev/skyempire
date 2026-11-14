@@ -80,6 +80,7 @@ export function NewAirline() {
         difficulty,
         homeBaseId: hub.id,
         airline: { name: name.trim(), code: effectiveCode, colors: { primary, secondary }, logoShape: shape },
+        startYear: new Date().getFullYear(),
       });
       useGameStore.getState().setView(view);
       useUi.setState({ section: 'overview', selection: null, speed: 0 });

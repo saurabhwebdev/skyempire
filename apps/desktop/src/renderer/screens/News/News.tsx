@@ -14,6 +14,7 @@ const ICON = { event: CloudLightning, rival: Users, airline: Info, goal: BadgeCh
 export function News() {
   const notes = useGameStore((s) => s.notifications);
   const markRead = useGameStore((s) => s.markRead);
+  const startYear = useGameStore((s) => s.view?.startYear ?? 2026);
   const [filter, setFilter] = useState<Filter>('all');
   useEffect(() => markRead(), [markRead, notes.length]);
   const shown = notes.filter((n) => match(filter, n));
@@ -38,7 +39,7 @@ export function News() {
                   <div className="font-semibold">{n.title}</div>
                   <p className="text-[13px] text-muted">{n.body}</p>
                 </div>
-                <time className="num shrink-0 text-[12px] text-faint">{formatDate(n.day)}</time>
+                <time className="num shrink-0 text-[12px] text-faint">{formatDate(n.day, startYear)}</time>
               </li>
             );
           })}

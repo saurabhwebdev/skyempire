@@ -9,7 +9,7 @@ export function fakeView(p: Partial<Airline> = {}, v: Partial<ClientView> = {}):
     creditRating: 'B', totals: { pax: 0, revenue360: Array(12).fill(0) }, nextAiDecisionDay: 0, ...p,
   };
   return {
-    day: 10, player, aircraft: [], routes: [], rivals: [], rivalRoutes: [],
+    day: 10, startYear: 2026, player, aircraft: [], routes: [], rivals: [], rivalRoutes: [],
     market: { fuelPricePerKg: 0.95, economyIndex: 1, usedListings: [] }, events: [], slotsFree: {}, objectives: [], gameOver: null,
     finance: { companyValue: player.cash, availableCredit: 20_000_000, monthlyFixed: 1_000_000 }, ...v,
   };

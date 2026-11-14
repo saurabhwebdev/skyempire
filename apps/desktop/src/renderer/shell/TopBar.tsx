@@ -38,7 +38,7 @@ export function TopBar() {
         )}
       </div>
 
-      <span className="num w-24 text-right text-muted">{formatDate(view.day)}</span>
+      <span className="num w-28 text-right text-muted">{formatDate(view.day, view.startYear)}</span>
 
       <div role="group" aria-label="Game speed" className="flex items-center rounded-md border border-border bg-bg p-0.5">
         <button

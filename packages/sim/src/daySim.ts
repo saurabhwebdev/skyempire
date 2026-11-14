@@ -100,7 +100,7 @@ export function simulatePair(ops: RouteOps[], state: GameState, catalog: Catalog
   const first = ops[0]!.route;
   const A = catalog.airports[first.from]!, B = catalog.airports[first.to]!;
   const dist = distanceKm(A, B);
-  const doy = dateOf(state.day).dayOfYear;
+  const doy = dateOf(state.day, state.world.startYear).dayOfYear;
   let demandTotal = 0;
   for (const [o, d] of [[A, B], [B, A]] as const) {
     const base = baseDemand(o, d, doy, state.market.economyIndex);

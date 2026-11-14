@@ -25,6 +25,7 @@ export function buildClientView(state: GameState, playerId: string, catalog: Cat
   for (const id of Object.keys(catalog.airports)) free[id] = slotsFree(state, catalog, id);
   return {
     day: state.day,
+    startYear: state.world.startYear,
     player,
     aircraft: Object.values(state.aircraft).filter((a) => a.ownerId === playerId),
     routes: mine,

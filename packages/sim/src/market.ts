@@ -20,5 +20,5 @@ export function stepMarket(state: GameState, catalog: Catalog, rng: Rng): void {
   const target = 1 + state.events.reduce((s, e) => s + (e.kind === 'boom' ? 0.2 : e.kind === 'recession' ? -0.2 : 0), 0);
   state.market.economyIndex += (target - state.market.economyIndex) / 60;
 
-  if (isMonthStart(state.day) && state.day > 0) refreshUsedListings(state, catalog, rng);
+  if (isMonthStart(state.day, state.world.startYear) && state.day > 0) refreshUsedListings(state, catalog, rng);
 }

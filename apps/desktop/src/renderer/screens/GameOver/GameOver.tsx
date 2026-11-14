@@ -26,7 +26,7 @@ export function GameOver() {
         <header className="text-center">
           <p className="label-caps">Game over</p>
           <h1 className="mt-2 text-[48px] font-semibold tracking-[-0.03em]">{view.player.name} has gone bankrupt</h1>
-          <p className="mt-2 text-muted">Out of cash and credit on {formatDate(view.gameOver?.day ?? view.day)}.</p>
+          <p className="mt-2 text-muted">Out of cash and credit on {formatDate(view.gameOver?.day ?? view.day, view.startYear)}.</p>
         </header>
         <div className="grid grid-cols-3 gap-4 rounded-lg border border-border bg-surface-1 p-4">
           <KpiTile label="Days flown" value={String(view.day)} />
@@ -37,7 +37,7 @@ export function GameOver() {
           <Panel title="Cash over time">
             <div className="h-48">
               <ResponsiveContainer>
-                <LineChart data={history.map((d) => ({ day: formatDate(d.day), cash: d.cash }))}>
+                <LineChart data={history.map((d) => ({ day: formatDate(d.day, view.startYear), cash: d.cash }))}>
                   <XAxis dataKey="day" stroke="var(--text-faint)" fontSize={12} tickLine={false} axisLine={false} minTickGap={48} />
                   <YAxis tickFormatter={(v: number) => formatMoney(v)} stroke="var(--text-faint)" fontSize={12} tickLine={false} axisLine={false} width={64} />
                   <Tooltip formatter={(v) => formatMoney(Number(v))} contentStyle={{ background: 'var(--surface-3)', border: '1px solid var(--border)', borderRadius: 8 }} />

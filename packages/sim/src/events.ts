@@ -36,7 +36,7 @@ export function rollEvents(state: GameState, catalog: Catalog, rng: Rng): Notifi
   }
 
   const airports = Object.values(catalog.airports);
-  const month = dateOf(state.day).month;
+  const month = dateOf(state.day, state.world.startYear).month;
   const winter = month === 11 || month === 12 || month === 1 || month === 2;
   const start = (kind: EventKind, days: number, magnitude: number, airportId?: string): ActiveEvent => {
     const e: ActiveEvent = { id: nextId(state, 'ev'), kind, startDay: state.day, endDay: state.day + days - 1, magnitude, ...(airportId ? { airportId } : {}) };
