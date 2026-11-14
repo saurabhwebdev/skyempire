@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.1
+
+- **Faster, more reliable start.**
+  - The window opens straight away with a "Loading…" screen, instead of staying hidden until the game has loaded.
+  - The game files are about a third of the size, and the map and charts load after the title screen appears.
+  - Only one copy of the game runs at a time. Double-clicking again just brings the open game to the front. Two copies used to fight over the same files and could hang.
+  - If the game screen crashes, it reloads by itself. If it can't load, you get a message with a **Try again** button instead of nothing.
+- **A log file** for start-up problems, at `%APPDATA%\SkyEmpire\logs\main.log`.
+
 ## 0.3.0 — "Hangar"
 
 - **Real aircraft photos.** Every one of the 38 aircraft now has a real photo, from Wikimedia Commons. Each photo credits its photographer and licence.

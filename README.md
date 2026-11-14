@@ -12,7 +12,7 @@
 
 A free, open-source airline-management game for Windows. Found an airline with $50M and a dream, lease your first A320neo, build a network across ~1,000 real airports, and take on 19 real rival airlines — Emirates, IndiGo, Lufthansa, Ryanair, Delta and more — in a world with real demand, real aircraft and real costs.
 
-**Status:** v0.3 "Hangar" — single-player; works offline.
+**Status:** v0.3.1 "Hangar" — single-player; works offline.
 
 ## Features
 

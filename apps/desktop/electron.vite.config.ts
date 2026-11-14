@@ -19,6 +19,7 @@ export default defineConfig({
   renderer: {
     plugins: [react(), tailwind()],
     root: resolve(import.meta.dirname, 'src/renderer'),
-    build: { rollupOptions: { input: resolve(import.meta.dirname, 'src/renderer/index.html') } },
+    // Minified: the unminified bundle was ~9 MB and slowed every start.
+    build: { minify: true, rollupOptions: { input: resolve(import.meta.dirname, 'src/renderer/index.html') } },
   },
 });

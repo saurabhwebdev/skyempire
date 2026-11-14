@@ -18,6 +18,7 @@ export class SimHost {
       else p.reject(new Error(msg.error));
     });
     this.proc.on('exit', (code) => {
+      console.warn(`Simulation process exited (code ${code})`);
       this.dead = true;
       for (const p of this.pending.values()) p.reject(new Error(`Simulation stopped (code ${code})`));
       this.pending.clear();
