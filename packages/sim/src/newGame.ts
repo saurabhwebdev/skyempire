@@ -131,7 +131,8 @@ export function newGame(opts: NewGameOptions, catalog: Catalog): GameState {
     state.airlines[id] = al;
 
     // Cargo airlines start with freighters; everyone else with airliners (a combination carrier adds one freighter).
-    const ok = (t: string) => { const x = catalog.aircraftTypes[t]; return !!x && !x.usedOnly && !x.entryYear && tierAllows(al.tier, x.tier); };
+    // Freighters an airline already flies may be types only sold used today (747-400F, conversions…).
+    const ok = (t: string) => { const x = catalog.aircraftTypes[t]; return !!x && (!x.usedOnly || x.kind === 'freighter') && !x.entryYear && tierAllows(al.tier, x.tier); };
     const freighters = data.fleetTypes.filter((t) => ok(t) && catalog.aircraftTypes[t]!.kind === 'freighter');
     const airliners = data.fleetTypes.filter((t) => ok(t) && catalog.aircraftTypes[t]!.kind !== 'freighter');
     const base = al.kind === 'cargo' ? freighters : airliners;

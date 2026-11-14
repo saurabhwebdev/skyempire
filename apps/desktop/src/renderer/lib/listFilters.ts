@@ -25,15 +25,18 @@ export interface AircraftFilter {
   tier: TierId;
   minRange: number;
   minSeats: number;
+  /** Airliners, freighters or both. */
+  kind?: 'all' | 'passenger' | 'freighter';
 }
 
 export function filterAircraftTypes(types: AircraftType[], f: AircraftFilter): AircraftType[] {
   return types.filter((t) =>
-    textMatch(f.query, t.name, t.manufacturer, t.id)
+    (!f.kind || f.kind === 'all' || (t.kind === 'freighter') === (f.kind === 'freighter'))
+    && textMatch(f.query, t.name, t.manufacturer, t.id)
     && (f.aircraftClass === 'all' || t.class === f.aircraftClass)
     && (f.manufacturer === 'all' || t.manufacturer === f.manufacturer)
     && (!f.availableOnly || (tierAllows(f.tier, t.tier) && !t.usedOnly))
-    && t.rangeKm >= f.minRange && t.maxSeats >= f.minSeats);
+    && t.rangeKm >= f.minRange && (t.kind === 'freighter' || t.maxSeats >= f.minSeats));
 }
 
 export type AircraftSort = 'price' | 'lease' | 'seats' | 'range' | 'fuel' | 'name';
@@ -42,8 +45,9 @@ export const AIRCRAFT_SORTS: { id: AircraftSort; label: string }[] = [
   { id: 'range', label: 'Range: longest first' }, { id: 'fuel', label: 'Fuel per seat: lowest first' }, { id: 'name', label: 'Name: A–Z' },
 ];
 const aircraftKey: Record<AircraftSort, (t: AircraftType) => number | string> = {
-  price: (t) => t.priceUsd, lease: (t) => t.leasePerMonth, seats: (t) => -t.maxSeats, range: (t) => -t.rangeKm,
-  fuel: (t) => t.fuelKgPerH / t.maxSeats, name: (t) => t.name,
+  // Freighters sort by payload where airliners sort by seats (≈ 0.1 t per seat).
+  price: (t) => t.priceUsd, lease: (t) => t.leasePerMonth, seats: (t) => -(t.kind === 'freighter' ? (t.payloadT ?? 0) * 10 : t.maxSeats), range: (t) => -t.rangeKm,
+  fuel: (t) => (t.kind === 'freighter' ? t.fuelKgPerH / ((t.payloadT ?? 1) * 10) : t.fuelKgPerH / t.maxSeats), name: (t) => t.name,
 };
 const by = <T,>(key: (x: T) => number | string) => (a: T, b: T) => {
   const x = key(a), y = key(b);

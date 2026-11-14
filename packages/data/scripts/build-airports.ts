@@ -168,6 +168,24 @@ async function main() {
   const byId = new Map<string, Cand>();
   for (const c of cands) if (!byId.has(c.id) || byId.get(c.id)!.score < c.score) byId.set(c.id, c);
   const all = [...byId.values()].sort((a, b) => b.score - a.score);
+
+  // --add MEM,SDF: append just these airports (same formulas) and leave every existing one untouched.
+  const addAt = process.argv.indexOf('--add');
+  if (addAt >= 0) {
+    const ids = (process.argv[addAt + 1] ?? '').split(',').filter(Boolean);
+    const path = join(ROOT, 'src', 'airports.world.json');
+    const current = JSON.parse(readFileSync(path, 'utf8')) as Airport[];
+    for (const id of ids) {
+      if (current.some((a) => a.id === id)) continue;
+      const c = byId.get(id);
+      if (!c) { console.warn(`Airport ${id} not found`); continue; }
+      const { score: _score, ...ap } = c;
+      current.push({ ...ap, ...(overrides[id] ?? {}) });
+      console.log(`Added ${id} ${ap.name}`);
+    }
+    writeFileSync(path, JSON.stringify(current.sort((a, b) => a.id.localeCompare(b.id))));
+    return;
+  }
   const chosen = new Map<string, Cand>();
   for (const id of [...airlineHubs, ...Object.keys(overrides)]) {
     const c = byId.get(id);

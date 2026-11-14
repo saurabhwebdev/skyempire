@@ -385,5 +385,345 @@
     "typicalSeats": "410 (3 class)",
     "abreast": 10,
     "source": "https://en.wikipedia.org/wiki/Boeing_747-8"
+  },
+  "B48F": {
+    "lengthM": 76.25,
+    "spanM": 68.4,
+    "heightM": 19.35,
+    "engines": "4 \u00d7 GE GEnx-2B67",
+    "firstFlight": "2010-02",
+    "typicalSeats": "132.6 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Boeing_747-8"
+  },
+  "B77F": {
+    "lengthM": 63.73,
+    "spanM": 64.8,
+    "heightM": 18.6,
+    "engines": "2 \u00d7 GE GE90-110B1",
+    "firstFlight": "2008-07",
+    "typicalSeats": "103.7 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Boeing_777"
+  },
+  "B76F": {
+    "lengthM": 54.94,
+    "spanM": 47.57,
+    "heightM": 15.85,
+    "engines": "2 \u00d7 GE CF6-80C2B6F",
+    "firstFlight": "1995-06",
+    "typicalSeats": "52.7 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Boeing_767"
+  },
+  "A32F": {
+    "lengthM": 58.82,
+    "spanM": 60.3,
+    "heightM": 16.9,
+    "engines": "2 \u00d7 Pratt & Whitney PW4000 or Rolls-Royce Trent 700",
+    "firstFlight": "2009-11",
+    "typicalSeats": "70 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Airbus_A330"
+  },
+  "AT7F": {
+    "lengthM": 27.17,
+    "spanM": 27.05,
+    "heightM": 7.65,
+    "engines": "2 \u00d7 Pratt & Whitney Canada PW127M",
+    "firstFlight": "2020-09",
+    "typicalSeats": "9 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/ATR_72"
+  },
+  "C408": {
+    "lengthM": 16.8,
+    "spanM": 22.02,
+    "heightM": 6.3,
+    "engines": "2 \u00d7 Pratt & Whitney Canada PT6A-65SC",
+    "firstFlight": "2020-05",
+    "typicalSeats": "2.72 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Cessna_408_SkyCourier"
+  },
+  "C08F": {
+    "lengthM": 12.67,
+    "spanM": 15.88,
+    "heightM": 4.71,
+    "engines": "1 \u00d7 Pratt & Whitney Canada PT6A-114A",
+    "firstFlight": "1986-03",
+    "typicalSeats": "1.36 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Cessna_208_Caravan"
+  },
+  "A35F": {
+    "lengthM": 70.8,
+    "spanM": 64.75,
+    "heightM": 17.08,
+    "engines": "2 \u00d7 Rolls-Royce Trent XWB-97",
+    "firstFlight": "2026-09",
+    "typicalSeats": "111 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Airbus_A350"
+  },
+  "B78F": {
+    "lengthM": 70.87,
+    "spanM": 71.75,
+    "heightM": 19.5,
+    "engines": "2 \u00d7 GE GE9X",
+    "firstFlight": "2022-01",
+    "typicalSeats": "118 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Boeing_777X"
+  },
+  "B7SF": {
+    "lengthM": 73.86,
+    "spanM": 64.8,
+    "heightM": 18.52,
+    "engines": "2 \u00d7 GE GE90-115B",
+    "firstFlight": "2023-03",
+    "typicalSeats": "101.6 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Boeing_777"
+  },
+  "B76C": {
+    "lengthM": 54.94,
+    "spanM": 47.57,
+    "heightM": 15.85,
+    "engines": "2 \u00d7 GE CF6-80C2 or Pratt & Whitney PW4000",
+    "firstFlight": "1986-12",
+    "typicalSeats": "52 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Boeing_767"
+  },
+  "A2PF": {
+    "lengthM": 58.82,
+    "spanM": 60.3,
+    "heightM": 17.39,
+    "engines": "2 \u00d7 GE CF6-80E1, Pratt & Whitney PW4000 or Rolls-Royce Trent 700",
+    "firstFlight": "2018-06",
+    "typicalSeats": "61 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Airbus_A330"
+  },
+  "A3PF": {
+    "lengthM": 63.67,
+    "spanM": 60.3,
+    "heightM": 16.79,
+    "engines": "2 \u00d7 GE CF6-80E1, Pratt & Whitney PW4000 or Rolls-Royce Trent 700",
+    "firstFlight": "2017-10",
+    "typicalSeats": "62 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Airbus_A330"
+  },
+  "B75F": {
+    "lengthM": 47.32,
+    "spanM": 38.05,
+    "heightM": 13.56,
+    "engines": "2 \u00d7 Rolls-Royce RB211-535 or Pratt & Whitney PW2000",
+    "firstFlight": "1982-02",
+    "typicalSeats": "32.8 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Boeing_757"
+  },
+  "B38C": {
+    "lengthM": 39.47,
+    "spanM": 35.79,
+    "heightM": 12.5,
+    "engines": "2 \u00d7 CFM56-7B",
+    "firstFlight": "1997-07",
+    "typicalSeats": "23.9 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Boeing_737_Next_Generation"
+  },
+  "A21F": {
+    "lengthM": 44.51,
+    "spanM": 35.8,
+    "heightM": 11.76,
+    "engines": "2 \u00d7 CFM56-5B or IAE V2500",
+    "firstFlight": "2020-01",
+    "typicalSeats": "28 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Airbus_A321"
+  },
+  "A20F": {
+    "lengthM": 37.57,
+    "spanM": 35.8,
+    "heightM": 11.76,
+    "engines": "2 \u00d7 CFM56-5B or IAE V2500",
+    "firstFlight": "2021-12",
+    "typicalSeats": "21.4 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Airbus_A320_family"
+  },
+  "AT7C": {
+    "lengthM": 27.17,
+    "spanM": 27.05,
+    "heightM": 7.65,
+    "engines": "2 \u00d7 Pratt & Whitney Canada PW127M",
+    "firstFlight": "2009-07",
+    "typicalSeats": "8 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/ATR_72"
+  },
+  "DH4F": {
+    "lengthM": 32.81,
+    "spanM": 28.42,
+    "heightM": 8.34,
+    "engines": "2 \u00d7 Pratt & Whitney Canada PW150A",
+    "firstFlight": "1998-01",
+    "typicalSeats": "9 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/De_Havilland_Canada_Dash_8"
+  },
+  "B74F": {
+    "lengthM": 70.66,
+    "spanM": 64.44,
+    "heightM": 19.41,
+    "engines": "4 \u00d7 GE CF6-80C2B5F, Pratt & Whitney PW4062 or Rolls-Royce RB211-524H",
+    "firstFlight": "1993-05",
+    "typicalSeats": "124.3 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Boeing_747-400"
+  },
+  "B74C": {
+    "lengthM": 70.66,
+    "spanM": 64.44,
+    "heightM": 19.41,
+    "engines": "4 \u00d7 GE CF6-80C2, Pratt & Whitney PW4056 or Rolls-Royce RB211-524G/H",
+    "firstFlight": "1988-04",
+    "typicalSeats": "113 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Boeing_747-400"
+  },
+  "MD1F": {
+    "lengthM": 61.6,
+    "spanM": 51.97,
+    "heightM": 17.65,
+    "engines": "3 \u00d7 GE CF6-80C2D1F or Pratt & Whitney PW4460/4462",
+    "firstFlight": "1990-01",
+    "typicalSeats": "91.2 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/McDonnell_Douglas_MD-11"
+  },
+  "A124": {
+    "lengthM": 69.1,
+    "spanM": 73.3,
+    "heightM": 21.08,
+    "engines": "4 \u00d7 Progress D-18T",
+    "firstFlight": "1982-12",
+    "typicalSeats": "120 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Antonov_An-124_Ruslan"
+  },
+  "A30F": {
+    "lengthM": 54.08,
+    "spanM": 44.84,
+    "heightM": 16.66,
+    "engines": "2 \u00d7 GE CF6-80C2 or Pratt & Whitney PW4158",
+    "firstFlight": "1983-07",
+    "typicalSeats": "48.3 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Airbus_A300"
+  },
+  "IL76": {
+    "lengthM": 46.6,
+    "spanM": 50.5,
+    "heightM": 14.42,
+    "engines": "4 \u00d7 Soloviev D-30KP-2",
+    "firstFlight": "1971-03",
+    "typicalSeats": "50 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Ilyushin_Il-76"
+  },
+  "B3QF": {
+    "lengthM": 33.4,
+    "spanM": 28.88,
+    "heightM": 11.13,
+    "engines": "2 \u00d7 CFM56-3",
+    "firstFlight": "1984-02",
+    "typicalSeats": "19 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Boeing_737_Classic"
+  },
+  "B4QF": {
+    "lengthM": 36.4,
+    "spanM": 28.88,
+    "heightM": 11.13,
+    "engines": "2 \u00d7 CFM56-3",
+    "firstFlight": "1988-02",
+    "typicalSeats": "20.5 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Boeing_737_Classic"
+  },
+  "T20C": {
+    "lengthM": 46.14,
+    "spanM": 41.8,
+    "heightM": 13.9,
+    "engines": "2 \u00d7 Aviadvigatel PS-90A or Rolls-Royce RB211-535E4",
+    "firstFlight": "1989-01",
+    "typicalSeats": "27 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Tupolev_Tu-204"
+  },
+  "AT4F": {
+    "lengthM": 22.67,
+    "spanM": 24.57,
+    "heightM": 7.59,
+    "engines": "2 \u00d7 Pratt & Whitney Canada PW120",
+    "firstFlight": "1984-08",
+    "typicalSeats": "5 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/ATR_42"
+  },
+  "E90F": {
+    "lengthM": 36.24,
+    "spanM": 28.72,
+    "heightM": 10.57,
+    "engines": "2 \u00d7 GE CF34-10E",
+    "firstFlight": "2024-04",
+    "typicalSeats": "10.7 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Embraer_E-Jet_family"
+  },
+  "E95F": {
+    "lengthM": 38.65,
+    "spanM": 28.72,
+    "heightM": 10.55,
+    "engines": "2 \u00d7 GE CF34-10E",
+    "firstFlight": "2004-12",
+    "typicalSeats": "12.3 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Embraer_E-Jet_family"
+  },
+  "CR2F": {
+    "lengthM": 26.77,
+    "spanM": 21.21,
+    "heightM": 6.22,
+    "engines": "2 \u00d7 GE CF34-3B1",
+    "firstFlight": "1991-05",
+    "typicalSeats": "6.1 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Bombardier_CRJ100/200"
+  },
+  "SB3F": {
+    "lengthM": 19.73,
+    "spanM": 21.44,
+    "heightM": 6.97,
+    "engines": "2 \u00d7 GE CT7-9B",
+    "firstFlight": "1983-01",
+    "typicalSeats": "3.4 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/Saab_340"
+  },
+  "B46F": {
+    "lengthM": 31.0,
+    "spanM": 26.21,
+    "heightM": 8.59,
+    "engines": "4 \u00d7 Lycoming ALF 502R-5",
+    "firstFlight": "1981-09",
+    "typicalSeats": "12.5 t payload",
+    "abreast": 0,
+    "source": "https://en.wikipedia.org/wiki/British_Aerospace_146"
   }
 }

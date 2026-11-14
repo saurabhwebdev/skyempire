@@ -9,6 +9,7 @@ import airspace from './airspace.json';
 import holidays from './holidays.json';
 import reserved from './reserved.json';
 import routes from './routes.world.json';
+import cargo from './cargo.json';
 
 export * from './heuristics';
 export * from './schema';
@@ -35,6 +36,7 @@ export function loadCatalog(regionId: 'world' = 'world'): Catalog {
     realRoutes: routes,
     holidays: holidays as HolidayData,
     airspace: airspace as AirspaceRegion[],
+    cargo: { airportT: cargo.airportT as Record<string, number>, exportIndex: cargo.exportIndex as Record<string, number> },
     countryNames: Object.fromEntries((basemap as { features: { properties: { iso: string; name: string } }[] }).features.filter((f) => f.properties.iso !== '-99').map((f) => [f.properties.iso, f.properties.name])),
   };
   return cached;

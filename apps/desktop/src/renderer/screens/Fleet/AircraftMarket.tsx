@@ -1,7 +1,7 @@
 import type { AircraftType, CabinConfig, UsedListing } from '@skyempire/shared';
 import { formatMoney } from '@skyempire/shared';
-import { defaultConfig, tierAllows } from '@skyempire/sim';
-import { Button, cn, FilterSelect, ListToolbar, NoResults, NumberInput, useToast } from '@skyempire/ui';
+import { dateOf, defaultConfig, tierAllows } from '@skyempire/sim';
+import { Button, cn, FilterSelect, ListToolbar, Modal, NoResults, NumberInput, useToast } from '@skyempire/ui';
 import { Lock, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useMemo, useState } from 'react';
@@ -19,7 +19,10 @@ const CLASS_OPTIONS = [
   { id: 'narrowbody', label: 'Narrowbody' }, { id: 'longNarrowbody', label: 'Long-range narrowbody' }, { id: 'widebody', label: 'Widebody' },
 ] as const;
 const TIER = { startup: 'Startup', regional: 'Regional', national: 'National', global: 'Global' } as const;
-type Pending = { kind: 'lease' | 'buy'; type: AircraftType } | { kind: 'used'; type: AircraftType; listing: UsedListing };
+type Pending = { kind: 'lease' | 'buy'; type: AircraftType } | { kind: 'used'; type: AircraftType; listing: UsedListing }
+  | { kind: 'convert'; type: AircraftType; listing: UsedListing; target: AircraftType };
+/** The freighter a passenger type converts into, if any. */
+const conversionOf = (typeId: string) => TYPES.find((t) => t.conversion?.from.includes(typeId));
 
 function Spec({ label, value }: { label: string; value: string }) {
   return <div><dt className="text-[11px] text-faint">{label}</dt><dd className="num text-[13px]">{value}</dd></div>;
@@ -38,36 +41,52 @@ export function AircraftMarket() {
   const [availableOnly, setAvailableOnly] = useState(false);
   const [sortNew, setSortNew] = useState<AircraftSort>('price');
   const [sortUsed, setSortUsed] = useState<ListingSort>('price');
+  const airlineKind = view.player.kind ?? 'passenger';
+  const [typeFilter, setTypeFilter] = useState<'all' | 'passenger' | 'freighter'>('all');
+  // What this airline may fly: Passenger → airliners, Cargo only → freighters, Passenger + Cargo → the type filter.
+  const kindFilter = airlineKind === 'cargo' ? 'freighter' : airlineKind === 'passenger' ? 'passenger' : typeFilter;
+  const year = dateOf(view.day, view.startYear).year;
   const clear = () => { setQuery(''); setAircraftClass('all'); setMaker('all'); setAvailableOnly(false); setMinRange(0); setMinSeats(0); };
   const [compare, setCompare] = useState<string[]>([]);
   const [pending, setPending] = useState<Pending | null>(null);
   const [details, setDetails] = useState<string | null>(null);
   const close = () => useUi.getState().setMarketOpen(false);
-  const filter = { query, aircraftClass, manufacturer: maker, availableOnly, tier: view.player.tier, minRange, minSeats };
+  const filter = { query, aircraftClass, manufacturer: maker, availableOnly, tier: view.player.tier, minRange, minSeats, kind: kindFilter };
   const types = useMemo(() => sortAircraftTypes(filterAircraftTypes(TYPES, filter), sortNew),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query, aircraftClass, maker, availableOnly, view.player.tier, minRange, minSeats, sortNew]);
+    [query, aircraftClass, maker, availableOnly, view.player.tier, minRange, minSeats, sortNew, kindFilter]);
   const allListings = view.market.usedListings;
   // Used aircraft: "what I can fly" means my tier allows the type (used-only types are fine here).
-  const okTypes = new Set(filterAircraftTypes(TYPES, { ...filter, availableOnly: false }).filter((t) => !availableOnly || tierAllows(view.player.tier, t.tier)).map((t) => t.id));
+  // A cargo airline also sees used airliners it can buy and convert straight away.
+  const okTypes = new Set(filterAircraftTypes(TYPES, { ...filter, availableOnly: false, kind: 'all' })
+    .filter((t) => (kindFilter === 'all' || (t.kind === 'freighter') === (kindFilter === 'freighter') || (airlineKind === 'cargo' && !!conversionOf(t.id))))
+    .filter((t) => !availableOnly || tierAllows(view.player.tier, t.tier)).map((t) => t.id));
   const listings = sortListings(allListings.filter((l) => okTypes.has(l.typeId)), sortUsed);
   const shown = tab === 'new' ? types.length : listings.length;
-  const total = tab === 'new' ? TYPES.length : allListings.length;
+  // Out of what this airline may fly (a passenger airline never "filters out" freighters).
+  const allowedTotal = TYPES.filter((t) => kindFilter === 'all' || (t.kind === 'freighter') === (kindFilter === 'freighter')).length;
+  const total = tab === 'new' ? allowedTotal : allListings.length;
 
-  const confirm = async (config: CabinConfig) => {
+  const confirm = async (config?: CabinConfig) => {
     if (!pending) return;
-    const cmd = pending.kind === 'used'
-      ? ({ type: 'buyUsedAircraft', listingId: pending.listing.id, config } as const)
-      : ({ type: pending.kind === 'lease' ? 'leaseAircraft' : 'buyAircraft', typeId: pending.type.id, config } as const);
+    const cabin = config ? { config } : {};
+    const cmd = pending.kind === 'convert'
+      ? ({ type: 'buyUsedAircraft', listingId: pending.listing.id, convertTo: pending.target.id } as const)
+      : pending.kind === 'used'
+        ? ({ type: 'buyUsedAircraft', listingId: pending.listing.id, ...cabin } as const)
+        : ({ type: pending.kind === 'lease' ? 'leaseAircraft' : 'buyAircraft', typeId: pending.type.id, ...cabin } as const);
     const r = await window.game.command(cmd);
     if (!r.ok) { toast({ title: r.reason, tone: 'danger' }); return; }
-    toast({ title: `${pending.type.name} added to your fleet`, tone: 'success' });
+    toast({ title: pending.kind === 'convert' ? `${pending.type.name} bought: becoming a ${pending.target.name}` : `${pending.type.name} added to your fleet`, tone: 'success' });
     setPending(null);
   };
 
   const card = (t: AircraftType, extra?: { listing: UsedListing }) => {
     const locked = !tierAllows(view.player.tier, t.tier);
-    const fuelPerSeatHour = t.fuelKgPerH / t.maxSeats;
+    const freighter = t.kind === 'freighter';
+    const fuelPerSeatHour = freighter ? t.fuelKgPerH / (t.payloadT ?? 1) : t.fuelKgPerH / t.maxSeats;
+    const coming = !!t.entryYear && t.entryYear > year;
+    const convertTo = extra && airlineKind === 'cargo' && !freighter ? conversionOf(t.id) : undefined;
     return (
       <article key={extra?.listing.id ?? t.id} className={cn('flex flex-col gap-3 overflow-hidden rounded-lg border bg-surface-1 p-4', compare.includes(t.id) ? 'border-accent' : 'border-border')}>
         <button type="button" aria-label={`About the ${t.name}`} onClick={() => setDetails(t.id)}
@@ -75,13 +94,15 @@ export function AircraftMarket() {
           <AircraftPhoto typeId={t.id} className="aspect-[16/9] transition-transform duration-300 ease-out group-hover:scale-[1.03]" />
         </button>
         <header className="flex items-baseline justify-between gap-2">
-          <h3 className="font-semibold">{t.name}{t.usedOnly && !extra && <span className="ml-2 rounded-full border border-border px-2 py-0.5 text-[11px] font-normal text-muted">Used only</span>}</h3>
+          <h3 className="font-semibold">{t.name}</h3>
+          {t.usedOnly && !extra && <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-[11px] text-muted">{t.conversion ? 'Conversion' : 'Used only'}</span>}
+          {coming && <span className="shrink-0 rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-semibold text-accent">Delivered from {t.entryYear}</span>}
           <span className="text-[12px] text-faint">{t.class === 'longNarrowbody' ? 'long-range narrowbody' : t.class}</span>
         </header>
         <dl className="grid grid-cols-3 gap-2">
-          <Spec label="Seats" value={String(t.maxSeats)} />
+          {freighter ? <Spec label="Payload" value={`${t.payloadT} t`} /> : <Spec label="Seats" value={String(t.maxSeats)} />}
           <Spec label="Range" value={`${t.rangeKm.toLocaleString('en-US')} km`} />
-          <Spec label="Fuel/seat·h" value={`${fuelPerSeatHour.toFixed(1)} kg`} />
+          <Spec label={freighter ? 'Fuel/t·h' : 'Fuel/seat·h'} value={`${fuelPerSeatHour.toFixed(1)} kg`} />
           {extra ? (
             <>
               <Spec label="Age" value={`${Math.round(extra.listing.ageDays / 360)} y`} />
@@ -103,8 +124,14 @@ export function AircraftMarket() {
           </div>
         ) : (
           <div className="mt-auto flex flex-wrap gap-2">
-            {extra ? (
+            {extra && convertTo ? (
+              <Button size="sm" variant="primary" onClick={() => setPending({ kind: 'convert', type: t, listing: extra.listing, target: convertTo })}>
+                Buy & convert to {convertTo.name} · {formatMoney(extra.listing.price + convertTo.conversion!.costUsd)}
+              </Button>
+            ) : extra ? (
               <Button size="sm" variant="primary" onClick={() => setPending({ kind: 'used', type: t, listing: extra.listing })}>Buy for {formatMoney(extra.listing.price)}</Button>
+            ) : t.conversion ? (
+              <p className="text-[13px] text-muted">Convert a {t.conversion.from.map((id) => catalog.aircraftTypes[id]?.name ?? id).join(' or ')} you own, or buy one under Used.</p>
             ) : t.usedOnly ? (
               <p className="text-[13px] text-muted">Out of production — look for it under Used.</p>
             ) : (
@@ -147,6 +174,9 @@ export function AircraftMarket() {
             ? { value: sortNew, onChange: (v) => setSortNew(v as AircraftSort), options: AIRCRAFT_SORTS }
             : { value: sortUsed, onChange: (v) => setSortUsed(v as ListingSort), options: LISTING_SORTS }}
           shown={shown} total={total} onClear={clear}>
+          {airlineKind === 'combination' && (
+            <FilterSelect label="Type" value={typeFilter} onChange={setTypeFilter} options={[{ id: 'all', label: 'All' }, { id: 'passenger', label: 'Airliners' }, { id: 'freighter', label: 'Freighters' }]} />
+          )}
           <FilterSelect label="Class" value={aircraftClass} onChange={setAircraftClass} options={[...CLASS_OPTIONS]} />
           <FilterSelect label="Maker" value={maker} onChange={setMaker} options={[{ id: 'all', label: 'All' }, ...MAKERS.map((m) => ({ id: m, label: m }))]} />
           <label className="inline-flex items-center gap-2 text-[13px] text-muted">
@@ -180,7 +210,22 @@ export function AircraftMarket() {
         </footer>
       )}
       {details && <AircraftDetails typeId={details} open onOpenChange={(o) => !o && setDetails(null)} />}
-      {pending && (
+      {pending && (pending.kind === 'convert' || pending.type.kind === 'freighter') && (
+        <Modal open onOpenChange={(o) => !o && setPending(null)}
+          title={pending.kind === 'convert' ? `Buy this ${pending.type.name} and convert it?` : `${pending.kind === 'lease' ? 'Lease' : 'Buy'} a ${pending.type.name}?`}
+          description={pending.kind === 'convert'
+            ? `It goes straight to the conversion shop and joins your fleet as a ${pending.target.name} (${pending.target.payloadT} t) after ${pending.target.conversion!.days} days.`
+            : `${pending.type.payloadT} t payload · ${pending.type.rangeKm.toLocaleString('en-US')} km range at full payload.${pending.type.entryYear && pending.type.entryYear > year ? ` Delivered on 1 January ${pending.type.entryYear}; no lease payments until then.` : ''}`}
+          footer={<>
+            <Button variant="ghost" onClick={() => setPending(null)}>Cancel</Button>
+            <Button variant="primary" onClick={() => confirm()}>
+              {pending.kind === 'convert' ? `Buy & convert · ${formatMoney(pending.listing.price + pending.target.conversion!.costUsd)}`
+                : pending.kind === 'lease' ? `Lease for ${formatMoney(pending.type.leasePerMonth)}/mo`
+                : `Buy for ${formatMoney(pending.kind === 'used' ? pending.listing.price : pending.type.priceUsd)}`}
+            </Button>
+          </>} />
+      )}
+      {pending && pending.kind !== 'convert' && pending.type.kind !== 'freighter' && (
         <CabinDesigner open onOpenChange={(o) => !o && setPending(null)} typeId={pending.type.id}
           initial={defaultConfig(pending.type, null)}
           mode={{ kind: 'new', confirmLabel: (extra) => `${pending.kind === 'lease' ? `Lease for ${formatMoney(pending.type.leasePerMonth)}/mo` : `Buy for ${formatMoney(pending.kind === 'used' ? pending.listing.price : pending.type.priceUsd)}`}${extra ? ` + ${extra}` : ''}` }}

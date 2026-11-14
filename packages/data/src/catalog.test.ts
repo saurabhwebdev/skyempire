@@ -19,7 +19,7 @@ describe('loadCatalog', () => {
     }
   });
   it('includes aircraft, airlines and real routes', () => {
-    expect(Object.keys(cat.aircraftTypes)).toHaveLength(38);
+    expect(Object.keys(cat.aircraftTypes)).toHaveLength(72);
     expect(cat.airlines.length).toBeGreaterThan(140);
     expect(cat.realRoutes.length).toBeGreaterThan(1000);
   });

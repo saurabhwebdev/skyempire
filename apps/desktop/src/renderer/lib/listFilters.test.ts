@@ -6,7 +6,7 @@ import {
   filterAircraftTypes, filterFleet, filterNews, filterRoutes, filterSaves, fleetStatus, routeHealth, sortAircraftTypes, sortListings, sortSaves, textMatch,
 } from './listFilters';
 
-const TYPES = Object.values(catalog.aircraftTypes);
+const TYPES = Object.values(catalog.aircraftTypes).filter((t) => t.kind !== 'freighter');
 const ids = (xs: { id: string }[]) => xs.map((x) => x.id);
 
 describe('text search', () => {

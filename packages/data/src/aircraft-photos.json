@@ -1,4 +1,12 @@
 {
+ "A124": {
+  "file": "A124.webp",
+  "title": "Polet Airlines An-124 RA-82075 in flight 28-Jul-2011.jpg",
+  "author": "Sergey Kustov",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Polet_Airlines_An-124_RA-82075_in_flight_28-Jul-2011.jpg"
+ },
  "A19N": {
   "file": "A19N.webp",
   "title": "Airbus A319-151N, Airbus Industrie JP9105933.jpg",
@@ -15,6 +23,14 @@
   "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
   "source": "https://commons.wikimedia.org/wiki/File:Airbus_A320-271N_NEO_D-AVVA.jpg"
  },
+ "A21F": {
+  "file": "A21F.webp",
+  "title": "G-POWW - Airbus A321-211(P2F) - Titan Airways STN 130124.jpg",
+  "author": "kitmasterbloke",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:G-POWW_-_Airbus_A321-211(P2F)_-_Titan_Airways_STN_130124.jpg"
+ },
  "A21N": {
   "file": "A21N.webp",
   "title": "Airbus Industrie A321neo D-AVXA (29428329122).jpg",
@@ -30,6 +46,22 @@
   "license": "CC BY-SA 4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.en",
   "source": "https://commons.wikimedia.org/wiki/File:F-WXLR,_ILA_2024,_Schoenefeld_(ILA45378).jpg"
+ },
+ "A2PF": {
+  "file": "A2PF.webp",
+  "title": "SU-GCF Airbus A330-243(P2F) Egyptair Cargo LHR 12.1.22.jpg",
+  "author": "Colin Cooke Photo",
+  "license": "CC BY-SA 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:SU-GCF_Airbus_A330-243(P2F)_Egyptair_Cargo_LHR_12.1.22.jpg"
+ },
+ "A30F": {
+  "file": "A30F.webp",
+  "title": "D-AZMQ A300-600F, DHL Aviation, Luton 05-27-26.jpg",
+  "author": "DUNCAN KIRK",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:D-AZMQ_A300-600F,_DHL_Aviation,_Luton_05-27-26.jpg"
  },
  "A319": {
   "file": "A319.webp",
@@ -54,6 +86,14 @@
   "license": "Public domain",
   "licenseUrl": "",
   "source": "https://commons.wikimedia.org/wiki/File:Lufthansa.a321-100.d-aire.arp.jpg"
+ },
+ "A32F": {
+  "file": "A32F.webp",
+  "title": "9M-MUA - Airbus A330-223F - Malaysia Airlines (MASkargo) - 1136 - VGHS.jpg",
+  "author": "Md Shaifuzzaman Ayon",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:9M-MUA_-_Airbus_A330-223F_-_Malaysia_Airlines_(MASkargo)_-_1136_-_VGHS.jpg"
  },
  "A332": {
   "file": "A332.webp",
@@ -103,6 +143,14 @@
   "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
   "source": "https://commons.wikimedia.org/wiki/File:A6-EDY_A380_Emirates_31_jan_2013_jfk_(8442269364)_(cropped).jpg"
  },
+ "A3PF": {
+  "file": "A3PF.webp",
+  "title": "B-LDR AIR HONG KONG AIRBUS A330-343(P2F) (51189999279).jpg",
+  "author": "km30192002",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:B-LDR_AIR_HONG_KONG_AIRBUS_A330-343(P2F)_(51189999279).jpg"
+ },
  "AJ27": {
   "file": "AJ27.webp",
   "title": "A Transnusa Comac ARJ21-700 PK-TJA In Lombok international Airport indonesia.jpg",
@@ -119,6 +167,14 @@
   "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
   "source": "https://commons.wikimedia.org/wiki/File:ATR_42-600_ATR_%22House_colors%22_F-WWLY_-_MSN_811_(9739866341).jpg"
  },
+ "AT4F": {
+  "file": "AT4F.webp",
+  "title": "EC-IVP ATR.42-300(F) Swift Air PMI 30MAY12 (7303729764).jpg",
+  "author": "Ken Fielding",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:EC-IVP_ATR.42-300(F)_Swift_Air_PMI_30MAY12_(7303729764).jpg"
+ },
  "AT76": {
   "file": "AT76.webp",
   "title": "ATR 72-600 ATR house colors F-WWEY - MSN 98 retusche.jpg",
@@ -126,6 +182,30 @@
   "license": "CC BY-SA 2.0",
   "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
   "source": "https://commons.wikimedia.org/wiki/File:ATR_72-600_ATR_house_colors_F-WWEY_-_MSN_98_retusche.jpg"
+ },
+ "AT7C": {
+  "file": "AT7C.webp",
+  "title": "Zimex Aviation ATR-72 Freighter HB-AFL at EHBK in 2022.jpg",
+  "author": "Robbie Klinkenberg",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Zimex_Aviation_ATR-72_Freighter_HB-AFL_at_EHBK_in_2022.jpg"
+ },
+ "AT7F": {
+  "file": "AT7F.webp",
+  "title": "Hannover Airport Swiftair FedEx Feeder ATR 72-600F EC-OID (DSC00249).jpg",
+  "author": "MarcelX42",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Hannover_Airport_Swiftair_FedEx_Feeder_ATR_72-600F_EC-OID_(DSC00249).jpg"
+ },
+ "B38C": {
+  "file": "B38C.webp",
+  "title": "China Postal Airlines Boeing 737-800BCF B-5306 at Taoyuan February 2026 1.jpg",
+  "author": "4300streetcar",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:China_Postal_Airlines_Boeing_737-800BCF_B-5306_at_Taoyuan_February_2026_1.jpg"
  },
  "B38M": {
   "file": "B38M.webp",
@@ -143,6 +223,14 @@
   "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Alaska_737-9_MAX_N966AK_on_final_approach_to_Boston_Oct_2024_1.jpg"
  },
+ "B3QF": {
+  "file": "B3QF.webp",
+  "title": "Suparna Airlines B737-300SF (B-2112) @ HKG, April 2019.jpg",
+  "author": "N509FZ",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Suparna_Airlines_B737-300SF_(B-2112)_@_HKG,_April_2019.jpg"
+ },
  "B3XM": {
   "file": "B3XM.webp",
   "title": "N27751 B737 MAX 10, Boeing Field 09-15-26.jpg",
@@ -150,6 +238,30 @@
   "license": "CC BY 4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
   "source": "https://commons.wikimedia.org/wiki/File:N27751_B737_MAX_10,_Boeing_Field_09-15-26.jpg"
+ },
+ "B46F": {
+  "file": "B46F.webp",
+  "title": "OO-TAK BAe 146-300QT TNT Airways STN 2001.jpg",
+  "author": "kitmasterbloke",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:OO-TAK_BAe_146-300QT_TNT_Airways_STN_2001.jpg"
+ },
+ "B48F": {
+  "file": "B48F.webp",
+  "title": "Cargolux Boeing 747-8F LX-VCG on final approach to Taoyuan February 2026.jpg",
+  "author": "4300streetcar",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Cargolux_Boeing_747-8F_LX-VCG_on_final_approach_to_Taoyuan_February_2026.jpg"
+ },
+ "B4QF": {
+  "file": "B4QF.webp",
+  "title": "Leipzig Halle Airport ASL Airlines Ireland Boeing 737-4Q8(SF) EI-STN (DSC07277).jpg",
+  "author": "MarcelX42",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Leipzig_Halle_Airport_ASL_Airlines_Ireland_Boeing_737-4Q8(SF)_EI-STN_(DSC07277).jpg"
  },
  "B737": {
   "file": "B737.webp",
@@ -175,6 +287,22 @@
   "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Lufthansa_Boeing_747-830_D-ABYL_%22Hessen%22_(29613598941).jpg"
  },
+ "B74C": {
+  "file": "B74C.webp",
+  "title": "Martinair Cargo Boeing 747-400BCF PH-MPS landing at Schiphol.jpg",
+  "author": "Mees Jansen",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "source": "https://commons.wikimedia.org/wiki/File:Martinair_Cargo_Boeing_747-400BCF_PH-MPS_landing_at_Schiphol.jpg"
+ },
+ "B74F": {
+  "file": "B74F.webp",
+  "title": "China Airlines Cargo Boeing 747-400F B-18720 departing Taoyuan February 2026 2.jpg",
+  "author": "4300streetcar",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:China_Airlines_Cargo_Boeing_747-400F_B-18720_departing_Taoyuan_February_2026_2.jpg"
+ },
  "B752": {
   "file": "B752.webp",
   "title": "American Airlines Boeing 757-200 N605AA SJC.jpg",
@@ -183,6 +311,14 @@
   "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
   "source": "https://commons.wikimedia.org/wiki/File:American_Airlines_Boeing_757-200_N605AA_SJC.jpg"
  },
+ "B75F": {
+  "file": "B75F.webp",
+  "title": "Leipzig Halle Airport European Air Transport Leipzig DHL Boeing 757-28A(PCF) D-ALET (DSC01269).jpg",
+  "author": "MarcelX42",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Leipzig_Halle_Airport_European_Air_Transport_Leipzig_DHL_Boeing_757-28A(PCF)_D-ALET_(DSC01269).jpg"
+ },
  "B763": {
   "file": "B763.webp",
   "title": "Boeing 767-300ER (Japan Airlines) JA616J .jpg",
@@ -190,6 +326,22 @@
   "license": "CC BY-SA 2.0",
   "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
   "source": "https://commons.wikimedia.org/wiki/File:Boeing_767-300ER_(Japan_Airlines)_JA616J_.jpg"
+ },
+ "B76C": {
+  "file": "B76C.webp",
+  "title": "CC-CXK Boeing 767-300BCF Latam Cargo MIA 17.1.23 (52747650694).jpg",
+  "author": "Colin Cooke Photo",
+  "license": "CC BY-SA 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:CC-CXK_Boeing_767-300BCF_Latam_Cargo_MIA_17.1.23_(52747650694).jpg"
+ },
+ "B76F": {
+  "file": "B76F.webp",
+  "title": "FedEx Boeing 767-300F N191FE departing Boston March 2025.jpg",
+  "author": "4300streetcar",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:FedEx_Boeing_767-300F_N191FE_departing_Boston_March_2025.jpg"
  },
  "B772": {
   "file": "B772.webp",
@@ -206,6 +358,14 @@
   "license": "CC BY 4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
   "source": "https://commons.wikimedia.org/wiki/File:N779XX_B777-9,_Boeing,_Boeing_Field_09-15-26.jpg"
+ },
+ "B77F": {
+  "file": "B77F.webp",
+  "title": "China Airlines Cargo Boeing 777F B-18772 landing at Taoyuan February 2026.jpg",
+  "author": "4300streetcar",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:China_Airlines_Cargo_Boeing_777F_B-18772_landing_at_Taoyuan_February_2026.jpg"
  },
  "B77W": {
   "file": "B77W.webp",
@@ -239,6 +399,14 @@
   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
   "source": "https://commons.wikimedia.org/wiki/File:United_Airlines_Boeing_787-10_on_finals_at_Beijing_Capital_Airport.jpg"
  },
+ "B7SF": {
+  "file": "B7SF.webp",
+  "title": "Hannover Airport Challenge Airlines MT Boeing 777-36NER(SF) 9H-CAZ (DSC0376).jpg",
+  "author": "MarcelX42",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Hannover_Airport_Challenge_Airlines_MT_Boeing_777-36NER(SF)_9H-CAZ_(DSC0376).jpg"
+ },
  "BCS1": {
   "file": "BCS1.webp",
   "title": "Airbus A220-100 ‘HB-JBI’ Swiss International Air Lines (53751161228).jpg",
@@ -255,6 +423,22 @@
   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Frankfurt_Airport_airBaltic_Airbus_A220-300_YL-ABL_(DSC09548).jpg"
  },
+ "C08F": {
+  "file": "C08F.webp",
+  "title": "N768FE FedEx Feeder Cessna 208B Super Cargomaster (C-N 208B0263) (10034515095).jpg",
+  "author": "Tomás Del Coro from Las Vegas, Nevada, USA",
+  "license": "CC BY-SA 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:N768FE_FedEx_Feeder_Cessna_208B_Super_Cargomaster_(C-N_208B0263)_(10034515095).jpg"
+ },
+ "C408": {
+  "file": "C408.webp",
+  "title": "Cessna 408F SkyCourier (N760FX, cn 408-0016) (7-29-2023).jpg",
+  "author": "ZLEA",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Cessna_408F_SkyCourier_(N760FX,_cn_408-0016)_(7-29-2023).jpg"
+ },
  "C919": {
   "file": "C919.webp",
   "title": "COMAC B-001A May 2017.jpg",
@@ -262,6 +446,14 @@
   "license": "CC BY-SA 4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
   "source": "https://commons.wikimedia.org/wiki/File:COMAC_B-001A_May_2017.jpg"
+ },
+ "CR2F": {
+  "file": "CR2F.webp",
+  "title": "SE-DUX West Air Sweden Canadair CL-600-2B19 Regional Jet CRJ-200PF cn-7010.jpg",
+  "author": "Jan Lennart Gulbrandsen",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:SE-DUX_West_Air_Sweden_Canadair_CL-600-2B19_Regional_Jet_CRJ-200PF_cn-7010.jpg"
  },
  "CRJ9": {
   "file": "CRJ9.webp",
@@ -302,5 +494,37 @@
   "license": "CC BY-SA 4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
   "source": "https://commons.wikimedia.org/wiki/File:Embraer_E195-E2,_Air_Show_2019,_Le_Bourget_(SIAE0873).jpg"
+ },
+ "IL76": {
+  "file": "IL76.webp",
+  "title": "Aviacon Zitotrans - Ilyushin Il-76TD - RA-76842 - VGHS.jpg",
+  "author": "Md Shaifuzzaman Ayon",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Aviacon_Zitotrans_-_Ilyushin_Il-76TD_-_RA-76842_-_VGHS.jpg"
+ },
+ "MD1F": {
+  "file": "MD1F.webp",
+  "title": "Lufthansa Cargo McDonnell Douglas MD-11F 20180513 3692.jpg",
+  "author": "Premkudva",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Lufthansa_Cargo_McDonnell_Douglas_MD-11F_20180513_3692.jpg"
+ },
+ "SB3F": {
+  "file": "SB3F.webp",
+  "title": "Saab-Fairchild SF-340A(F) Fleet Air International HA-TAB.jpg",
+  "author": "Björn Strey",
+  "license": "CC BY-SA 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Saab-Fairchild_SF-340A(F)_Fleet_Air_International_HA-TAB.jpg"
+ },
+ "T20C": {
+  "file": "T20C.webp",
+  "title": "Tu-204C RA-64024 in full DHL colors 02-Dec-2010.jpg",
+  "author": "Sergey Kustov",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Tu-204C_RA-64024_in_full_DHL_colors_02-Dec-2010.jpg"
  }
 }

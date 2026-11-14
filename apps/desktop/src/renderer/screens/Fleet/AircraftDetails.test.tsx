@@ -11,7 +11,7 @@ import { AircraftDetails } from './AircraftDetails';
 
 describe('cabin presets', () => {
   it('always fit the aircraft and use full business rows', () => {
-    for (const t of Object.values(catalog.aircraftTypes)) {
+    for (const t of Object.values(catalog.aircraftTypes).filter((x) => x.kind !== 'freighter')) {
       for (const p of cabinPresets(t)) {
         const jRow = rowShape(t.abreast!, p.config.product).business.reduce((a, b) => a + b, 0);
         expect(checkConfig(p.config, t), `${t.id} ${p.id}`).toBeNull();
@@ -52,8 +52,10 @@ describe('seat map', () => {
 });
 
 describe('aircraft page', () => {
-  it('every type has a photo with a credit', () => {
-    for (const id of Object.keys(catalog.aircraftTypes)) {
+  it('every type has a photo with a credit (6 freighters with no free photo use their silhouette)', () => {
+    const noPhoto = ['A20F', 'A35F', 'B78F', 'DH4F', 'E90F', 'E95F'];
+    for (const id of noPhoto) expect(photoOf(id), id).toBeNull();
+    for (const id of Object.keys(catalog.aircraftTypes).filter((x) => !noPhoto.includes(x))) {
       const p = photoOf(id);
       expect(p, id).not.toBeNull();
       expect(p!.author.length, id).toBeGreaterThan(0);

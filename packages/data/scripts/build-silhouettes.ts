@@ -98,9 +98,18 @@ function top(d: Dims): string {
 const here = import.meta.dirname;
 const out = join(here, '..', 'src', 'silhouettes');
 mkdirSync(out, { recursive: true });
-const aircraft = JSON.parse(readFileSync(join(here, '..', 'src', 'aircraft.json'), 'utf8')) as { id: string }[];
+const aircraft = JSON.parse(readFileSync(join(here, '..', 'src', 'aircraft.json'), 'utf8')) as { id: string; class: string }[];
+const details = JSON.parse(readFileSync(join(here, '..', 'src', 'aircraft-details.json'), 'utf8')) as Record<string, { lengthM: number; spanM: number }>;
+// v0.6 freighters: real length and span from aircraft-details.json; fuselage width and sweep typical for the class.
+const BODY: Record<string, { diam: number; sweep: number; prop: boolean }> = {
+  turboprop: { diam: 2.6, sweep: 0, prop: true }, regional: { diam: 3.0, sweep: 24, prop: false }, narrowbody: { diam: 3.8, sweep: 25, prop: false },
+  longNarrowbody: { diam: 3.8, sweep: 25, prop: false }, widebody: { diam: 5.9, sweep: 31, prop: false },
+};
+const WIDER: Record<string, number> = { B48F: 6.5, B74F: 6.5, B74C: 6.5, A124: 6.4, IL76: 4.8, A30F: 5.64, MD1F: 6.0 };
 for (const a of aircraft) {
-  const d = DIMS[a.id];
+  const det = details[a.id];
+  const body = BODY[a.class];
+  const d = DIMS[a.id] ?? (det && body ? { length: det.lengthM, span: det.spanM, diam: WIDER[a.id] ?? body.diam, prop: body.prop, sweep: body.sweep } : undefined);
   if (!d) throw new Error(`No dimensions for ${a.id}`);
   writeFileSync(join(out, `${a.id}-side.svg`), side(d));
   writeFileSync(join(out, `${a.id}-top.svg`), top(d));

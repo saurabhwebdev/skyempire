@@ -42,8 +42,8 @@ describe('AI airlines', () => {
   });
   it('lowers fares on a weak route', () => {
     const s = structuredClone(s90);
-    const al = ais(s)[0]!;
-    const r = Object.values(s.routes).find((x) => x.airlineId === al.id && x.status === 'active')!;
+    const al = ais(s).find((a) => a.kind !== 'cargo')!;
+    const r = Object.values(s.routes).find((x) => x.airlineId === al.id && x.status === 'active' && x.kind !== 'cargo')!;
     r.last = { ...r.last!, loadFactor: 0.4 };
     const before = r.fares.economy;
     runAi(s, al.id, catalog, new Rng(1));

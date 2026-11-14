@@ -13,7 +13,7 @@ const catalog: Catalog = {
     exportIndex: { CN: 1.6, HK: 1.5, KR: 1.3, DE: 1.2, US: 0.85, GB: 0.9 } },
   aircraftTypes: { ...base.aircraftTypes, TF77: f('TF77', base.aircraftTypes.B77W!, { tier: 'national', special: true }), TF76: f('TF76', base.aircraftTypes.B763!, { payloadT: 52, tier: 'regional' }) },
   airlines: [
-    ...base.airlines.map((a) => (a.iata === 'LH' ? { ...a, kind: 'combination' as const, fleetTypes: [...a.fleetTypes, 'TF77'] } : a)),
+    ...base.airlines.filter((a) => a.kind !== 'cargo').map((a) => (a.iata === 'LH' ? { ...a, kind: 'combination' as const, fleetTypes: [...a.fleetTypes, 'TF77'] } : a)),
     { iata: 'ZX', icao: 'ZXX', name: 'Test Express', country: 'DE', wikidata: 'Q1', hubId: 'LEJ', personality: 'integrator', sizeRank: 200, brandColor: '#ffcc00', fleetTypes: ['TF76', 'TF77'], sources: ['test'], kind: 'cargo' },
     { iata: 'ZY', icao: 'ZYY', name: 'Test Freight', country: 'LU', wikidata: 'Q2', hubId: 'LUX', personality: 'freightCarrier', sizeRank: 201, brandColor: '#0055aa', fleetTypes: ['TF77'], sources: ['test'], kind: 'cargo' },
   ],

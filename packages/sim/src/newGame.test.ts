@@ -41,10 +41,10 @@ describe('newGame', () => {
       expect(Object.values(s.aircraft).filter((a) => a.ownerId === al.id)).toHaveLength(6);
   });
   it('rival aircraft fly products that suit the airline', () => {
-    const s = newGame(opts(), catalog);
+    const s = newGame(opts({ homeBaseId: 'DXB' }), catalog);
     const fleetOf = (personality: string) => Object.values(s.aircraft).filter((a) => s.airlines[a.ownerId]!.personality === personality);
     expect(fleetOf('budget').every((a) => a.product.economy.seat === 'slimline' && a.product.economy.meal === 'buyOnBoard')).toBe(true);
-    const gulfWide = fleetOf('gulf').filter((a) => catalog.aircraftTypes[a.typeId]!.class === 'widebody');
+    const gulfWide = fleetOf('gulf').filter((a) => catalog.aircraftTypes[a.typeId]!.class === 'widebody' && catalog.aircraftTypes[a.typeId]!.kind !== 'freighter');
     expect(gulfWide.length).toBeGreaterThan(0);
     expect(gulfWide.every((a) => a.product.business.seat === 'suite' && a.cabin.business > 0)).toBe(true);
     expect(Object.values(s.airlines).every((a) => Array.isArray(a.cabinTemplates))).toBe(true);

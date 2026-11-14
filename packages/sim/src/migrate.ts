@@ -4,7 +4,7 @@ import { standardProduct } from './cabin';
 export const CURRENT_SCHEMA = 5;
 
 /** Real airlines in the catalogue that fly freighters as well as passengers. */
-export const COMBINATION_CARRIERS = ['LH', 'EK', 'QR', 'CX', 'KE', 'CI', 'TK', 'SQ', 'ET', 'AF', 'KL', 'CA', 'CZ', 'MU', 'NH', 'JL', 'UA', 'AA', 'DL', 'BA'];
+export const COMBINATION_CARRIERS = ['LH', 'EK', 'QR', 'CX', 'KE', 'CI', 'TK', 'SQ', 'ET', 'AF', 'CA', 'CZ', 'NH', 'JL'];
 
 type Raw = Record<string, unknown>;
 

@@ -319,5 +319,9 @@
  },
  "CMB": {
   "slotCapacity": 300
- }
+ },
+ "MEM": {},
+ "SDF": {},
+ "CVG": {},
+ "ANC": {}
 }

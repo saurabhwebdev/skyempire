@@ -117,12 +117,14 @@
    "B77W",
    "C919",
    "AJ27",
-   "A332"
+   "A332",
+   "B77F"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q291090",
    "OpenFlights airlines.dat (ODbL)"
-  ]
+  ],
+  "kind": "combination"
  },
  {
   "iata": "MU",
@@ -171,12 +173,14 @@
    "B77W",
    "A359",
    "C919",
-   "B748"
+   "B748",
+   "B77F"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q51747",
    "OpenFlights airlines.dat (ODbL)"
-  ]
+  ],
+  "kind": "combination"
  },
  {
   "iata": "FR",
@@ -215,12 +219,15 @@
    "B77W",
    "B38M",
    "A332",
-   "B78X"
+   "B78X",
+   "B77F",
+   "A32F"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q4548",
    "OpenFlights airlines.dat (ODbL)"
-  ]
+  ],
+  "kind": "combination"
  },
  {
   "iata": "6E",
@@ -258,12 +265,14 @@
    "A359",
    "A388",
    "B779",
-   "A35K"
+   "A35K",
+   "B77F"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q180432",
    "OpenFlights airlines.dat (ODbL)"
-  ]
+  ],
+  "kind": "combination"
  },
  {
   "iata": "U2",
@@ -304,12 +313,14 @@
    "A333",
    "A388",
    "B748",
-   "B779"
+   "B779",
+   "B77F"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q9325",
    "OpenFlights airlines.dat (ODbL)"
-  ]
+  ],
+  "kind": "combination"
  },
  {
   "iata": "AF",
@@ -328,12 +339,14 @@
    "B789",
    "B77W",
    "A332",
-   "A35K"
+   "A35K",
+   "B77F"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q131005",
    "OpenFlights airlines.dat (ODbL)"
-  ]
+  ],
+  "kind": "combination"
  },
  {
   "iata": "BA",
@@ -379,12 +392,15 @@
    "B38M",
    "A35K",
    "B779",
-   "A388"
+   "A388",
+   "B77F",
+   "B48F"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q208033",
    "OpenFlights airlines.dat (ODbL)"
-  ]
+  ],
+  "kind": "combination"
  },
  {
   "iata": "AC",
@@ -472,12 +488,15 @@
    "B77W",
    "B788",
    "B78X",
-   "B779"
+   "B779",
+   "B77F",
+   "B76F"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q204284",
    "OpenFlights airlines.dat (ODbL)"
-  ]
+  ],
+  "kind": "combination"
  },
  {
   "iata": "AK",
@@ -617,12 +636,14 @@
    "B77W",
    "E175",
    "A35K",
-   "B788"
+   "B788",
+   "B76C"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q213140",
    "OpenFlights airlines.dat (ODbL)"
-  ]
+  ],
+  "kind": "combination"
  },
  {
   "iata": "SQ",
@@ -640,12 +661,14 @@
    "B789",
    "B77W",
    "A388",
-   "B78X"
+   "B78X",
+   "B77F"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q32245",
    "OpenFlights airlines.dat (ODbL)"
-  ]
+  ],
+  "kind": "combination"
  },
  {
   "iata": "QF",
@@ -687,12 +710,15 @@
    "B77W",
    "BCS3",
    "A388",
-   "B748"
+   "B748",
+   "B48F",
+   "B77F"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q213147",
    "OpenFlights airlines.dat (ODbL)"
-  ]
+  ],
+  "kind": "combination"
  },
  {
   "iata": "G3",
@@ -876,12 +902,14 @@
    "A359",
    "B77W",
    "A35K",
-   "B779"
+   "B779",
+   "B48F"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q32141",
    "OpenFlights airlines.dat (ODbL)"
-  ]
+  ],
+  "kind": "combination"
  },
  {
   "iata": "SV",
@@ -948,7 +976,7 @@
  {
   "iata": "AM",
   "icao": "AMX",
-  "name": "Aeroméxico",
+  "name": "Aerom\u00e9xico",
   "country": "MX",
   "wikidata": "Q381563",
   "hubId": "MEX",
@@ -1457,7 +1485,7 @@
  {
   "iata": "WF",
   "icao": "WIF",
-  "name": "Widerøe",
+  "name": "Wider\u00f8e",
   "country": "NO",
   "wikidata": "Q28344",
   "hubId": "BOO",
@@ -1768,12 +1796,14 @@
    "B38M",
    "B789",
    "A359",
-   "B77W"
+   "B77W",
+   "B77F"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q245233",
    "OpenFlights airlines.dat (ODbL)"
-  ]
+  ],
+  "kind": "combination"
  },
  {
   "iata": "KQ",
@@ -1878,7 +1908,7 @@
  {
   "iata": "AH",
   "icao": "DAH",
-  "name": "Air Algérie",
+  "name": "Air Alg\u00e9rie",
   "country": "DZ",
   "wikidata": "Q406764",
   "hubId": "ALG",
@@ -1938,7 +1968,7 @@
  {
   "iata": "HF",
   "icao": "VRE",
-  "name": "Air Côte d'Ivoire",
+  "name": "Air C\u00f4te d'Ivoire",
   "country": "CI",
   "wikidata": "Q392864",
   "hubId": "ABJ",
@@ -2653,12 +2683,14 @@
    "A21N",
    "A333",
    "A359",
-   "B77W"
+   "B77W",
+   "B77F"
   ],
   "sources": [
    "https://www.wikidata.org/wiki/Q51756",
    "OpenFlights airlines.dat (ODbL)"
-  ]
+  ],
+  "kind": "combination"
  },
  {
   "iata": "JX",
@@ -2979,7 +3011,7 @@
  {
   "iata": "AR",
   "icao": "ARG",
-  "name": "Aerolíneas Argentinas",
+  "name": "Aerol\u00edneas Argentinas",
   "country": "AR",
   "wikidata": "Q83535",
   "hubId": "EZE",
@@ -3015,5 +3047,249 @@
    "https://www.wikidata.org/wiki/Q1427299",
    "OpenFlights airlines.dat (ODbL)"
   ]
+ },
+ {
+  "iata": "O3",
+  "icao": "CSS",
+  "name": "SF Airlines",
+  "country": "CN",
+  "wikidata": "Q4253231",
+  "hubId": "SZX",
+  "personality": "integrator",
+  "sizeRank": 147,
+  "brandColor": "#1A1A1A",
+  "fleetTypes": [
+   "B75F",
+   "B76C",
+   "B38C",
+   "B3QF",
+   "B4QF",
+   "B74F"
+  ],
+  "sources": [
+   "https://www.wikidata.org/wiki/Q4253231",
+   "https://en.wikipedia.org/wiki/SF_Airlines",
+   "Fleet: Wikipedia fleet table (as of Aug 2025); brand colour approximate"
+  ],
+  "kind": "cargo"
+ },
+ {
+  "iata": "QY",
+  "icao": "BCS",
+  "name": "European Air Transport Leipzig (DHL)",
+  "country": "DE",
+  "wikidata": "Q479159",
+  "hubId": "LEJ",
+  "personality": "integrator",
+  "sizeRank": 148,
+  "brandColor": "#FFCC00",
+  "fleetTypes": [
+   "A30F",
+   "A32F",
+   "A3PF",
+   "B75F"
+  ],
+  "sources": [
+   "https://www.wikidata.org/wiki/Q479159",
+   "https://en.wikipedia.org/wiki/European_Air_Transport_Leipzig",
+   "Fleet: Wikipedia fleet table (as of Aug 2025); brand colour approximate"
+  ],
+  "kind": "cargo"
+ },
+ {
+  "iata": "3S",
+  "icao": "BOX",
+  "name": "AeroLogic",
+  "country": "DE",
+  "wikidata": "Q381509",
+  "hubId": "LEJ",
+  "personality": "freightCarrier",
+  "sizeRank": 149,
+  "brandColor": "#D40511",
+  "fleetTypes": [
+   "B77F"
+  ],
+  "sources": [
+   "https://www.wikidata.org/wiki/Q381509",
+   "https://en.wikipedia.org/wiki/AeroLogic",
+   "Fleet: Wikipedia fleet table (as of Aug 2025); brand colour approximate"
+  ],
+  "kind": "cargo"
+ },
+ {
+  "iata": "CV",
+  "icao": "CLX",
+  "name": "Cargolux",
+  "country": "LU",
+  "wikidata": "Q1036100",
+  "hubId": "LUX",
+  "personality": "freightCarrier",
+  "sizeRank": 150,
+  "brandColor": "#E2001A",
+  "fleetTypes": [
+   "B48F",
+   "B74F",
+   "B78F"
+  ],
+  "sources": [
+   "https://www.wikidata.org/wiki/Q1036100",
+   "https://en.wikipedia.org/wiki/Cargolux",
+   "Fleet: Wikipedia fleet table (as of Aug 2025); brand colour approximate"
+  ],
+  "kind": "cargo"
+ },
+ {
+  "iata": "CK",
+  "icao": "CKK",
+  "name": "China Cargo Airlines",
+  "country": "CN",
+  "wikidata": "Q1073234",
+  "hubId": "PVG",
+  "personality": "freightCarrier",
+  "sizeRank": 151,
+  "brandColor": "#1B3D8F",
+  "fleetTypes": [
+   "B77F"
+  ],
+  "sources": [
+   "https://www.wikidata.org/wiki/Q1073234",
+   "https://en.wikipedia.org/wiki/China_Cargo_Airlines",
+   "Fleet: Wikipedia fleet table (as of Aug 2025); brand colour approximate"
+  ],
+  "kind": "cargo"
+ },
+ {
+  "iata": "7L",
+  "icao": "AZG",
+  "name": "Silk Way West Airlines",
+  "country": "AZ",
+  "wikidata": "Q18434260",
+  "hubId": "GYD",
+  "personality": "freightCarrier",
+  "sizeRank": 152,
+  "brandColor": "#0A4B8F",
+  "fleetTypes": [
+   "B48F",
+   "B74F",
+   "B77F",
+   "A35F",
+   "B78F"
+  ],
+  "sources": [
+   "https://www.wikidata.org/wiki/Q18434260",
+   "https://en.wikipedia.org/wiki/Silk_Way_West_Airlines",
+   "Fleet: Wikipedia fleet table (as of Aug 2025); brand colour approximate"
+  ],
+  "kind": "cargo"
+ },
+ {
+  "iata": "KZ",
+  "icao": "NCA",
+  "name": "Nippon Cargo Airlines",
+  "country": "JP",
+  "wikidata": "Q1364998",
+  "hubId": "NRT",
+  "personality": "freightCarrier",
+  "sizeRank": 153,
+  "brandColor": "#00429A",
+  "fleetTypes": [
+   "B48F"
+  ],
+  "sources": [
+   "https://www.wikidata.org/wiki/Q1364998",
+   "https://en.wikipedia.org/wiki/Nippon_Cargo_Airlines",
+   "Fleet: Wikipedia fleet table (as of Aug 2025); brand colour approximate"
+  ],
+  "kind": "cargo"
+ },
+ {
+  "iata": "FX",
+  "icao": "FDX",
+  "name": "FedEx Express",
+  "country": "US",
+  "wikidata": "Q782557",
+  "hubId": "MEM",
+  "personality": "integrator",
+  "sizeRank": 154,
+  "brandColor": "#4D148C",
+  "fleetTypes": [
+   "B77F",
+   "B76F",
+   "MD1F",
+   "A30F",
+   "B75F",
+   "AT7F",
+   "C408",
+   "C08F"
+  ],
+  "sources": [
+   "https://www.wikidata.org/wiki/Q782557",
+   "https://en.wikipedia.org/wiki/FedEx_Express"
+  ],
+  "kind": "cargo"
+ },
+ {
+  "iata": "5X",
+  "icao": "UPS",
+  "name": "UPS Airlines",
+  "country": "US",
+  "wikidata": "Q1318737",
+  "hubId": "SDF",
+  "personality": "integrator",
+  "sizeRank": 155,
+  "brandColor": "#351C15",
+  "fleetTypes": [
+   "B48F",
+   "B74F",
+   "B76F",
+   "B75F",
+   "A30F"
+  ],
+  "sources": [
+   "https://www.wikidata.org/wiki/Q1318737",
+   "https://en.wikipedia.org/wiki/UPS_Airlines"
+  ],
+  "kind": "cargo"
+ },
+ {
+  "iata": "5Y",
+  "icao": "GTI",
+  "name": "Atlas Air",
+  "country": "US",
+  "wikidata": "Q757135",
+  "hubId": "CVG",
+  "personality": "freightCarrier",
+  "sizeRank": 156,
+  "brandColor": "#002855",
+  "fleetTypes": [
+   "B48F",
+   "B74F",
+   "B77F",
+   "B76C"
+  ],
+  "sources": [
+   "https://www.wikidata.org/wiki/Q757135",
+   "https://en.wikipedia.org/wiki/Atlas_Air"
+  ],
+  "kind": "cargo"
+ },
+ {
+  "iata": "PO",
+  "icao": "PAC",
+  "name": "Polar Air Cargo",
+  "country": "US",
+  "wikidata": "Q1186574",
+  "hubId": "CVG",
+  "personality": "freightCarrier",
+  "sizeRank": 157,
+  "brandColor": "#0D3B66",
+  "fleetTypes": [
+   "B77F"
+  ],
+  "sources": [
+   "https://www.wikidata.org/wiki/Q1186574",
+   "https://en.wikipedia.org/wiki/Polar_Air_Cargo"
+  ],
+  "kind": "cargo"
  }
 ]

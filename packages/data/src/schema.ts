@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const TierSchema = z.enum(['startup', 'regional', 'national', 'global']);
-export const PersonalitySchema = z.enum(['budget', 'legacy', 'regional', 'gulf', 'expander']);
+export const PersonalitySchema = z.enum(['budget', 'legacy', 'regional', 'gulf', 'expander', 'integrator', 'freightCarrier']);
 
 export const AircraftTypeSchema = z.object({
   id: z.string().min(3).max(4),
@@ -9,7 +9,7 @@ export const AircraftTypeSchema = z.object({
   name: z.string(),
   manufacturer: z.string(),
   class: z.enum(['turboprop', 'regional', 'narrowbody', 'longNarrowbody', 'widebody']),
-  maxSeats: z.number().int().positive(),
+  maxSeats: z.number().int().nonnegative(),
   rangeKm: z.number().positive(),
   cruiseKmh: z.number().positive(),
   fuelKgPerH: z.number().positive(),
@@ -24,6 +24,15 @@ export const AircraftTypeSchema = z.object({
   tier: TierSchema,
   usedOnly: z.boolean().optional(),
   sources: z.array(z.string()).min(1),
+  // v0.6 cargo
+  kind: z.literal('freighter').optional(),
+  payloadT: z.number().positive().optional(),
+  bellyT: z.number().nonnegative().optional(),
+  entryYear: z.number().int().min(2026).optional(),
+  conversion: z.object({ from: z.array(z.string()).min(1), costUsd: z.number().int().positive(), days: z.number().int().positive() }).optional(),
+  special: z.boolean().optional(),
+}).refine((t) => (t.kind === 'freighter' ? t.payloadT !== undefined && t.maxSeats === 0 : t.maxSeats > 0 && t.bellyT !== undefined), {
+  message: 'A freighter needs a payload and no seats; an airliner needs seats and a belly hold',
 });
 
 export const AirportSchema = z.object({
@@ -57,6 +66,7 @@ export const AirlineDataSchema = z.object({
   brandColor: z.string().regex(/^#[0-9a-fA-F]{6}$/),
   fleetTypes: z.array(z.string()).min(1),
   sources: z.array(z.string()).min(1),
+  kind: z.enum(['passenger', 'combination', 'cargo']).optional(),
 });
 
 /** Real-world facts shown on the aircraft page (v0.3), from Wikipedia. */
@@ -68,7 +78,8 @@ export const AircraftDetailsSchema = z.object({
   firstFlight: z.string().regex(/^\d{4}-\d{2}$/),
   typicalSeats: z.string().min(1),
   /** Economy seats per row. */
-  abreast: z.number().int().min(3).max(11),
+  /** 0 for freighters. */
+  abreast: z.number().int().min(0).max(11),
   denseAbreast: z.number().int().min(4).max(11).optional(),
   source: z.string().url(),
 });
