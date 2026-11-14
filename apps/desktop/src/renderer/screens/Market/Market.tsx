@@ -1,6 +1,7 @@
 import type { Airport, PreviewResult, RivalSummary } from '@skyempire/shared';
 import { formatPax } from '@skyempire/shared';
-import { Combobox, DataTable, Panel } from '@skyempire/ui';
+import { Combobox, DataTable, FilterSelect, ListToolbar, NoResults, Panel } from '@skyempire/ui';
+import { textMatch } from '../../lib/listFilters';
 import { useEffect, useState } from 'react';
 import { AirlineLogo } from '../../components/AirlineLogo';
 import { catalog } from '../../lib/catalog';
@@ -34,13 +35,23 @@ function DemandLookup() {
   );
 }
 
+type Kind = keyof typeof PERSONALITY_LABEL | 'all';
+
 export function Market() {
   const view = useGameStore((s) => s.view)!;
+  const [query, setQuery] = useState('');
+  const [kind, setKind] = useState<Kind>('all');
+  const clear = () => { setQuery(''); setKind('all'); };
+  const rows = view.rivals.filter((r) => textMatch(query, r.name, r.code) && (kind === 'all' || r.personality === kind));
   return (
     <div className="flex flex-col gap-4">
       <Panel title="Competitors">
-        <DataTable<RivalSummary>
-          rows={view.rivals}
+        <ListToolbar className="mb-3" search={{ value: query, onChange: setQuery, label: 'Search airlines', placeholder: 'Name or code' }} shown={rows.length} total={view.rivals.length} onClear={clear}>
+          <FilterSelect label="Type" value={kind} onChange={setKind}
+            options={[{ id: 'all', label: 'All' }, ...Object.entries(PERSONALITY_LABEL).map(([id, label]) => ({ id: id as Kind, label }))]} />
+        </ListToolbar>
+        {rows.length === 0 ? <NoResults text="No airlines match these filters." onClear={clear} /> : <DataTable<RivalSummary>
+          rows={rows}
           getKey={(r) => r.id}
           onRowClick={(r) => useUi.setState({ selection: { kind: 'airline', id: r.id }, section: 'network' })}
           maxHeight={420}
@@ -52,7 +63,7 @@ export function Market() {
             { key: 'rep', header: 'Reputation', numeric: true, cell: (r) => r.reputation, sortValue: (r) => r.reputation },
             { key: 'overlap', header: 'Head-to-head', numeric: true, cell: (r) => r.overlapRoutes || '—', sortValue: (r) => r.overlapRoutes },
           ]}
-        />
+        />}
       </Panel>
       <DemandLookup />
     </div>

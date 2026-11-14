@@ -1,7 +1,8 @@
 import type { Aircraft } from '@skyempire/shared';
-import { Button, DataTable, EmptyState, Meter } from '@skyempire/ui';
+import { Button, DataTable, EmptyState, FilterSelect, ListToolbar, Meter, NoResults, Segmented } from '@skyempire/ui';
 import { AlertTriangle, Plane, ShoppingCart } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { filterFleet, fleetStatus, type FleetStatus } from '../../lib/listFilters';
 import { AircraftSilhouette } from '../../components/AircraftSilhouette';
 import { aircraftLabel, hoursUsed, WEEKLY_HOURS } from '../../lib/fleet';
 import { useGameStore, useUi } from '../../store';
@@ -19,9 +20,15 @@ export function FleetTray() {
   const select = useUi((s) => s.select);
   const used = useMemo(() => hoursUsed(view), [view]);
   const routesOf = (id: string) => view.routes.filter((r) => r.assignments.some((a) => a.aircraftId === id));
-  return (
+  const [query, setQuery] = useState('');
+  const [status, setStatus] = useState<FleetStatus | 'all'>('all');
+  const [ownership, setOwnership] = useState<'all' | 'owned' | 'leased'>('all');
+  const clear = () => { setQuery(''); setStatus('all'); setOwnership('all'); };
+  const rows = filterFleet(view.aircraft, { query, status, ownership }, used);
+  const count = (k: FleetStatus) => view.aircraft.filter((a) => fleetStatus(a, used.get(a.id) ?? 0) === k).length;
+  const table = (
     <DataTable<Aircraft>
-      rows={view.aircraft}
+      rows={rows}
       getKey={(a) => a.id}
       maxHeight={280}
       selectedKey={selection?.kind === 'aircraft' ? selection.id : null}
@@ -46,5 +53,18 @@ export function FleetTray() {
         } },
       ]}
     />
+  );
+  if (view.aircraft.length === 0) return table;
+  return (
+    <div className="flex flex-col gap-2">
+      <ListToolbar search={{ value: query, onChange: setQuery, label: 'Search fleet', placeholder: 'Aircraft type' }} shown={rows.length} total={view.aircraft.length} onClear={clear}>
+        <Segmented label="Status" value={status} onChange={setStatus} options={[
+          { id: 'all', label: 'All', count: view.aircraft.length }, { id: 'flying', label: 'Flying', count: count('flying') }, { id: 'idle', label: 'Idle', count: count('idle') },
+          { id: 'maintenance', label: 'Maintenance', count: count('maintenance') }, { id: 'refit', label: 'Refit', count: count('refit') },
+        ]} />
+        <FilterSelect label="Owned or leased" value={ownership} onChange={setOwnership} options={[{ id: 'all', label: 'All' }, { id: 'owned', label: 'Owned' }, { id: 'leased', label: 'Leased' }]} />
+      </ListToolbar>
+      {rows.length ? table : <NoResults text="No aircraft match these filters." onClear={clear} />}
+    </div>
   );
 }

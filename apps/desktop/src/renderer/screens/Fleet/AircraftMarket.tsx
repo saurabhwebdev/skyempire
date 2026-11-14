@@ -1,7 +1,7 @@
 import type { AircraftType, CabinConfig, UsedListing } from '@skyempire/shared';
 import { formatMoney } from '@skyempire/shared';
 import { defaultConfig, tierAllows } from '@skyempire/sim';
-import { Button, cn, NumberInput, useToast } from '@skyempire/ui';
+import { Button, cn, FilterSelect, ListToolbar, NoResults, NumberInput, useToast } from '@skyempire/ui';
 import { Lock, X } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useMemo, useState } from 'react';
@@ -9,9 +9,15 @@ import { AircraftPhoto } from '../../components/AircraftPhoto';
 import { catalog } from '../../lib/catalog';
 import { useGameStore, useUi } from '../../store';
 import { AircraftDetails } from './AircraftDetails';
+import { AIRCRAFT_SORTS, filterAircraftTypes, LISTING_SORTS, sortAircraftTypes, sortListings, type AircraftSort, type ListingSort } from '../../lib/listFilters';
 import { CabinDesigner } from './CabinDesigner';
 
-const TYPES = Object.values(catalog.aircraftTypes).sort((a, b) => a.priceUsd - b.priceUsd);
+const TYPES = Object.values(catalog.aircraftTypes);
+const MAKERS = [...new Set(TYPES.map((t) => t.manufacturer))].sort();
+const CLASS_OPTIONS = [
+  { id: 'all', label: 'All' }, { id: 'turboprop', label: 'Turboprop' }, { id: 'regional', label: 'Regional jet' },
+  { id: 'narrowbody', label: 'Narrowbody' }, { id: 'longNarrowbody', label: 'Long-range narrowbody' }, { id: 'widebody', label: 'Widebody' },
+] as const;
 const TIER = { startup: 'Startup', regional: 'Regional', national: 'National', global: 'Global' } as const;
 type Pending = { kind: 'lease' | 'buy'; type: AircraftType } | { kind: 'used'; type: AircraftType; listing: UsedListing };
 
@@ -26,15 +32,27 @@ export function AircraftMarket() {
   const [tab, setTab] = useState<'new' | 'used'>('new');
   const [minRange, setMinRange] = useState(0);
   const [minSeats, setMinSeats] = useState(0);
+  const [query, setQuery] = useState('');
+  const [aircraftClass, setAircraftClass] = useState<(typeof CLASS_OPTIONS)[number]['id']>('all');
+  const [maker, setMaker] = useState('all');
+  const [availableOnly, setAvailableOnly] = useState(false);
+  const [sortNew, setSortNew] = useState<AircraftSort>('price');
+  const [sortUsed, setSortUsed] = useState<ListingSort>('price');
+  const clear = () => { setQuery(''); setAircraftClass('all'); setMaker('all'); setAvailableOnly(false); setMinRange(0); setMinSeats(0); };
   const [compare, setCompare] = useState<string[]>([]);
   const [pending, setPending] = useState<Pending | null>(null);
   const [details, setDetails] = useState<string | null>(null);
   const close = () => useUi.getState().setMarketOpen(false);
-  const types = useMemo(() => TYPES.filter((t) => t.rangeKm >= minRange && t.maxSeats >= minSeats), [minRange, minSeats]);
-  const listings = view.market.usedListings.filter((l) => {
-    const t = catalog.aircraftTypes[l.typeId];
-    return t && t.rangeKm >= minRange && t.maxSeats >= minSeats;
-  });
+  const filter = { query, aircraftClass, manufacturer: maker, availableOnly, tier: view.player.tier, minRange, minSeats };
+  const types = useMemo(() => sortAircraftTypes(filterAircraftTypes(TYPES, filter), sortNew),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [query, aircraftClass, maker, availableOnly, view.player.tier, minRange, minSeats, sortNew]);
+  const allListings = view.market.usedListings;
+  // Used aircraft: "what I can fly" means my tier allows the type (used-only types are fine here).
+  const okTypes = new Set(filterAircraftTypes(TYPES, { ...filter, availableOnly: false }).filter((t) => !availableOnly || tierAllows(view.player.tier, t.tier)).map((t) => t.id));
+  const listings = sortListings(allListings.filter((l) => okTypes.has(l.typeId)), sortUsed);
+  const shown = tab === 'new' ? types.length : listings.length;
+  const total = tab === 'new' ? TYPES.length : allListings.length;
 
   const confirm = async (config: CabinConfig) => {
     if (!pending) return;
@@ -123,13 +141,31 @@ export function AircraftMarket() {
         <span className="num ml-auto text-muted">Cash {formatMoney(view.player.cash)}</span>
         <button type="button" aria-label="Close market" onClick={close} className="rounded-md p-1.5 text-muted hover:bg-surface-2 hover:text-text"><X className="size-5" /></button>
       </header>
-      <div className="flex gap-4 border-b border-border px-6 py-3">
-        <NumberInput label="Min range (km)" value={minRange} step={500} min={0} max={16000} onChange={setMinRange} className="w-40" />
-        <NumberInput label="Min seats" value={minSeats} step={10} min={0} max={450} onChange={setMinSeats} className="w-32" />
+      <div className="flex flex-col gap-3 border-b border-border px-6 py-3">
+        <ListToolbar search={{ value: query, onChange: setQuery, label: 'Search aircraft', placeholder: 'Name or maker' }}
+          sort={tab === 'new'
+            ? { value: sortNew, onChange: (v) => setSortNew(v as AircraftSort), options: AIRCRAFT_SORTS }
+            : { value: sortUsed, onChange: (v) => setSortUsed(v as ListingSort), options: LISTING_SORTS }}
+          shown={shown} total={total} onClear={clear}>
+          <FilterSelect label="Class" value={aircraftClass} onChange={setAircraftClass} options={[...CLASS_OPTIONS]} />
+          <FilterSelect label="Maker" value={maker} onChange={setMaker} options={[{ id: 'all', label: 'All' }, ...MAKERS.map((m) => ({ id: m, label: m }))]} />
+          <label className="inline-flex items-center gap-2 text-[13px] text-muted">
+            <input type="checkbox" checked={availableOnly} onChange={(e) => setAvailableOnly(e.target.checked)} className="size-4 accent-[var(--color-accent)]" />
+            Only what I can fly now
+          </label>
+        </ListToolbar>
+        <div className="flex gap-4">
+          <NumberInput label="Min range (km)" value={minRange} step={500} min={0} max={16000} onChange={setMinRange} className="w-40" />
+          <NumberInput label="Min seats" value={minSeats} step={10} min={0} max={450} onChange={setMinSeats} className="w-32" />
+        </div>
       </div>
-      <div className="grid flex-1 auto-rows-min grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4 overflow-y-auto p-6">
-        {tab === 'new' ? types.map((t) => card(t)) : listings.map((l) => card(catalog.aircraftTypes[l.typeId]!, { listing: l }))}
-      </div>
+      {shown === 0 && total > 0 ? (
+        <div className="flex-1 overflow-y-auto"><NoResults text="No aircraft match these filters." onClear={clear} /></div>
+      ) : (
+        <div className="grid flex-1 auto-rows-min grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4 overflow-y-auto p-6">
+          {tab === 'new' ? types.map((t) => card(t)) : listings.map((l) => card(catalog.aircraftTypes[l.typeId]!, { listing: l }))}
+        </div>
+      )}
       {compared.length > 0 && (
         <footer className="border-t border-border bg-surface-1 px-6 py-3">
           <table className="w-full text-[13px]">

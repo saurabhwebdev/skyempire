@@ -1,6 +1,7 @@
 import type { SaveInfo } from '@skyempire/shared';
 import { formatDate } from '@skyempire/sim';
-import { EmptyState, Modal, Skeleton } from '@skyempire/ui';
+import { EmptyState, ListToolbar, Modal, NoResults, Skeleton } from '@skyempire/ui';
+import { filterSaves, sortSaves, type SaveSort } from '../../lib/listFilters';
 import { FolderOpen } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useGameStore, useUi } from '../../store';
@@ -10,6 +11,9 @@ export function LoadDialog({ open, onOpenChange }: { open: boolean; onOpenChange
   const [saves, setSaves] = useState<SaveInfo[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState<SaveSort>('recent');
+  const shown = saves ? sortSaves(filterSaves(saves, query), sort) : [];
   useEffect(() => {
     if (!open) return;
     setError(null);
@@ -40,8 +44,13 @@ export function LoadDialog({ open, onOpenChange }: { open: boolean; onOpenChange
       ) : saves.length === 0 ? (
         <EmptyState icon={<FolderOpen />} text="No saved careers yet. Start a new one from the title screen." />
       ) : (
+        <div className="flex flex-col gap-3">
+        <ListToolbar search={{ value: query, onChange: setQuery, label: 'Search saves', placeholder: 'Airline or save name' }}
+          sort={{ value: sort, onChange: (v) => setSort(v as SaveSort), options: [{ id: 'recent', label: 'Last played' }, { id: 'name', label: 'Airline: A–Z' }, { id: 'progress', label: 'Furthest in' }] }}
+          shown={shown.length} total={saves.length} onClear={() => setQuery('')} />
+        {shown.length === 0 ? <NoResults text="No saves match your search." onClear={() => setQuery('')} /> : (
         <ul className="flex max-h-[50vh] flex-col gap-2 overflow-auto">
-          {saves.map((s) => (
+          {shown.map((s) => (
             <li key={s.id}>
               <button type="button" disabled={loading !== null} onClick={() => load(s)}
                 className="flex w-full items-center justify-between rounded-lg border border-border bg-surface-1 p-3 text-left hover:border-border-strong disabled:opacity-60">
@@ -57,6 +66,8 @@ export function LoadDialog({ open, onOpenChange }: { open: boolean; onOpenChange
             </li>
           ))}
         </ul>
+        )}
+        </div>
       )}
     </Modal>
   );

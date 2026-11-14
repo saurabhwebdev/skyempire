@@ -1,6 +1,8 @@
 import type { Route } from '@skyempire/shared';
 import { formatMoney } from '@skyempire/shared';
-import { Button, cn, DataTable, EmptyState, Meter } from '@skyempire/ui';
+import { Button, cn, DataTable, EmptyState, ListToolbar, Meter, NoResults, Segmented } from '@skyempire/ui';
+import { useState } from 'react';
+import { filterRoutes, routeHealth, type RouteHealth } from '../../lib/listFilters';
 import { Plus, Waypoints } from 'lucide-react';
 import { shortTypeName } from '../../lib/fleet';
 import { useGameStore, useUi } from '../../store';
@@ -20,9 +22,14 @@ export function NetworkTray() {
   const select = useUi((s) => s.select);
   const aircraftOf = (r: Route) =>
     r.assignments.map((a) => shortTypeName(view.aircraft.find((x) => x.id === a.aircraftId)?.typeId ?? '')).join(', ') || '—';
-  return (
+  const [query, setQuery] = useState('');
+  const [health, setHealth] = useState<RouteHealth | 'all'>('all');
+  const clear = () => { setQuery(''); setHealth('all'); };
+  const rows = filterRoutes(view.routes, { query, health }, view.routeStatus);
+  const count = (k: RouteHealth) => view.routes.filter((r) => routeHealth(r, view.routeStatus[r.id]) === k).length;
+  const table = (
     <DataTable<Route>
-      rows={view.routes}
+      rows={rows}
       getKey={(r) => r.id}
       selectedKey={selection?.kind === 'route' ? selection.id : null}
       onRowClick={(r) => select({ kind: 'route', id: r.id })}
@@ -49,5 +56,17 @@ export function NetworkTray() {
         { key: 'profit', header: 'Profit/day', numeric: true, cell: (r) => (r.last ? <Profit value={r.last.profit} /> : <span className="text-faint">—</span>), sortValue: (r) => r.last?.profit ?? -Infinity },
       ]}
     />
+  );
+  if (view.routes.length === 0) return table;
+  return (
+    <div className="flex flex-col gap-2">
+      <ListToolbar search={{ value: query, onChange: setQuery, label: 'Search routes', placeholder: 'Airport or city' }} shown={rows.length} total={view.routes.length} onClear={clear}>
+        <Segmented label="Route health" value={health} onChange={setHealth} options={[
+          { id: 'all', label: 'All', count: view.routes.length }, { id: 'profitable', label: 'Profitable', count: count('profitable') },
+          { id: 'losing', label: 'Losing', count: count('losing') }, { id: 'suspended', label: 'Suspended', count: count('suspended') }, { id: 'grounded', label: 'Grounded', count: count('grounded') },
+        ]} />
+      </ListToolbar>
+      {rows.length ? table : <NoResults text="No routes match these filters." onClear={clear} />}
+    </div>
   );
 }

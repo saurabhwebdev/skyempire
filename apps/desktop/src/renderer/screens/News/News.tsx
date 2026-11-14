@@ -1,6 +1,7 @@
 import type { Notification } from '@skyempire/shared';
 import { formatDate } from '@skyempire/sim';
-import { cn, EmptyState } from '@skyempire/ui';
+import { cn, EmptyState, ListToolbar, NoResults } from '@skyempire/ui';
+import { filterNews } from '../../lib/listFilters';
 import { AlertTriangle, BadgeCheck, CloudLightning, Info, Newspaper, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useGameStore } from '../../store';
@@ -16,17 +17,23 @@ export function News() {
   const markRead = useGameStore((s) => s.markRead);
   const startYear = useGameStore((s) => s.view?.startYear ?? 2026);
   const [filter, setFilter] = useState<Filter>('all');
+  const [query, setQuery] = useState('');
+  const clear = () => { setQuery(''); setFilter('all'); };
   useEffect(() => markRead(), [markRead, notes.length]);
-  const shown = notes.filter((n) => match(filter, n));
+  const shown = filterNews(notes.filter((n) => match(filter, n)), query);
   return (
     <div className="flex flex-col gap-4">
-      <div role="tablist" aria-label="Filter news" className="flex w-fit rounded-md border border-border p-0.5">
-        {FILTERS.map(([k, label]) => (
-          <button key={k} role="tab" aria-selected={filter === k} onClick={() => setFilter(k)}
-            className={cn('h-8 rounded-[6px] px-3 text-[13px] font-semibold', filter === k ? 'bg-surface-3 text-text' : 'text-muted hover:text-text')}>{label}</button>
-        ))}
-      </div>
-      {shown.length === 0 ? (
+      <ListToolbar search={{ value: query, onChange: setQuery, label: 'Search news' }} shown={shown.length} total={notes.length} onClear={clear}>
+        <div role="tablist" aria-label="Filter news" className="flex w-fit rounded-md border border-border p-0.5">
+          {FILTERS.map(([k, label]) => (
+            <button key={k} role="tab" aria-selected={filter === k} onClick={() => setFilter(k)}
+              className={cn('h-8 rounded-[6px] px-3 text-[13px] font-semibold', filter === k ? 'bg-surface-3 text-text' : 'text-muted hover:text-text')}>{label}</button>
+          ))}
+        </div>
+      </ListToolbar>
+      {shown.length === 0 && notes.length > 0 ? (
+        <NoResults text="No news matches these filters." onClear={clear} />
+      ) : shown.length === 0 ? (
         <EmptyState icon={<Newspaper />} text="Nothing here yet. Events, rival moves and alerts will appear as days pass." />
       ) : (
         <ul className="flex flex-col gap-2">

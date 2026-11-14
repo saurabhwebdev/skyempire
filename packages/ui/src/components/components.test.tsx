@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
-import { Button, Combobox, DataTable, KpiTile, Modal, NumberInput } from '../index';
+import { Button, Combobox, DataTable, KpiTile, ListToolbar, Modal, NoResults, NumberInput, Segmented } from '../index';
 
 describe('Button', () => {
   it('shows a busy state without changing its label width', () => {
@@ -105,5 +105,46 @@ describe('Modal', () => {
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     await waitFor(() => expect(trigger).toHaveFocus());
+  });
+});
+
+describe('ListToolbar', () => {
+  function Harness() {
+    const [q, setQ] = useState('');
+    const [kind, setKind] = useState('all');
+    const [sort, setSort] = useState('price');
+    const items = ['Airbus A320neo', 'Boeing 737 MAX 8', 'ATR 72-600'].filter((x) => x.toLowerCase().includes(q.toLowerCase()) && (kind === 'all' || x.startsWith(kind)));
+    return (
+      <>
+        <ListToolbar search={{ value: q, onChange: setQ, label: 'Search aircraft' }}
+          sort={{ value: sort, onChange: setSort, options: [{ id: 'price', label: 'Price' }, { id: 'range', label: 'Range' }] }}
+          shown={items.length} total={3} onClear={() => { setQ(''); setKind('all'); }}>
+          <Segmented label="Maker" value={kind} onChange={setKind} options={[{ id: 'all', label: 'All' }, { id: 'Airbus', label: 'Airbus' }, { id: 'Boeing', label: 'Boeing' }]} />
+        </ListToolbar>
+        {items.length ? <ul>{items.map((x) => <li key={x}>{x}</li>)}</ul> : <NoResults onClear={() => { setQ(''); setKind('all'); }} />}
+        <output>{sort}</output>
+      </>
+    );
+  }
+  it('searches, filters, sorts, counts and clears', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    expect(screen.queryByText(/Showing/)).not.toBeInTheDocument();
+    await user.type(screen.getByRole('searchbox', { name: 'Search aircraft' }), 'a');
+    await user.click(screen.getByRole('radio', { name: 'Boeing' }));
+    expect(screen.getByText('Showing 1 of 3')).toBeInTheDocument();
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Sort by' }), 'range');
+    expect(screen.getByRole('status')).toHaveTextContent('range');
+    await user.type(screen.getByRole('searchbox'), 'zzz');
+    expect(screen.getByText('Nothing matches these filters.')).toBeInTheDocument();
+    await user.click(screen.getAllByRole('button', { name: 'Clear filters' })[0]!);
+    expect(screen.getAllByRole('listitem')).toHaveLength(3);
+    expect(screen.getByRole('searchbox')).toHaveValue('');
+  });
+  it('Escape clears the search box', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    await user.type(screen.getByRole('searchbox'), 'atr{Escape}');
+    expect(screen.getByRole('searchbox')).toHaveValue('');
   });
 });

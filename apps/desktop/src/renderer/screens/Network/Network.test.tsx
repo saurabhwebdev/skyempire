@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Toaster, TooltipProvider } from '@skyempire/ui';
 import type { Aircraft, Route } from '@skyempire/shared';
@@ -73,7 +73,7 @@ describe('NetworkTray', () => {
   it('marks suspended routes', () => {
     useGameStore.setState({ view: fakeView({}, { routes: [route(), route({ id: 'r2', to: 'AMS', status: 'suspended', assignments: [], last: null })] }) });
     wrap(<NetworkTray />);
-    expect(screen.getByText('Suspended')).toBeInTheDocument();
+    expect(within(screen.getByRole('table')).getByText('Suspended')).toBeInTheDocument();
     expect(screen.getByText('LHR → CDG')).toBeInTheDocument();
   });
 });
@@ -83,7 +83,7 @@ describe('route status chips', () => {
     useGameStore.setState({ view: fakeView({}, { aircraft: [ac], routes: [route(), route({ id: 'r2', to: 'MAD' })], routeStatus: { r1: { detourKm: 480, blocked: null }, r2: { detourKm: 0, blocked: 'Flights banned between United Kingdom and Spain' } } }) });
     wrap(<NetworkTray />);
     expect(screen.getByText('Detour +480 km')).toBeInTheDocument();
-    expect(screen.getByText('Grounded')).toBeInTheDocument();
+    expect(within(screen.getByRole('table')).getByText('Grounded')).toBeInTheDocument();
   });
   it('explain a block in the route inspector', async () => {
     const { RouteInspector } = await import('./RouteInspector');
