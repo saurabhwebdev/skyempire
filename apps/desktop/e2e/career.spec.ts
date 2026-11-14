@@ -35,7 +35,7 @@ test('a full first career: found, lease, fly, save, continue', async () => {
   const card = win.locator('article').filter({ hasText: 'Airbus A320neo' });
   await card.getByRole('button', { name: /^Lease for/ }).click();
   await win.getByRole('dialog').getByRole('button', { name: /^Lease for/ }).click();
-  await expect(win.getByText('Airbus A320neo added to your fleet')).toBeVisible();
+  await expect(win.getByText('Airbus A320neo added to your fleet').first()).toBeVisible();
   await win.getByRole('button', { name: 'Close market' }).click();
 
   // Open LHR–MAD with the suggested fare
@@ -45,7 +45,7 @@ test('a full first career: found, lease, fly, save, continue', async () => {
   await win.keyboard.press('Enter');
   await expect(win.getByText(/Expected load/)).toBeVisible();
   await win.getByRole('button', { name: 'Open route' }).click();
-  await expect(win.getByText('Route LHR–MAD opened')).toBeVisible();
+  await expect(win.getByText('Route LHR–MAD opened').first()).toBeVisible(); // the toast can briefly render twice (live region)
   await expect(win.getByText('LHR → MAD')).toBeVisible();
 
   // Fly a week at 8×
