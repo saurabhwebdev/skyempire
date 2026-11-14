@@ -23,6 +23,14 @@ describe('Coachmarks', () => {
     act(() => useGameStore.setState({ view: fakeView({ completedObjectives: ['lease-first'] }) }));
     expect(screen.getByText(/Open your first route/)).toBeInTheDocument();
   });
+  it('a cargo airline gets cargo steps that follow its goals', () => {
+    useGameStore.setState({ view: fakeView({ kind: 'cargo' }) });
+    wrap(<Coachmarks />);
+    expect(screen.getByText(/Lease your first freighter/)).toBeInTheDocument();
+    expect(screen.getByText(/ATR 72-600F/)).toBeInTheDocument();
+    act(() => useGameStore.setState({ view: fakeView({ kind: 'cargo', completedObjectives: ['lease-freighter'] }) }));
+    expect(screen.getByText(/Open your first cargo route/)).toBeInTheDocument();
+  });
   it('can be skipped for good', async () => {
     const user = userEvent.setup();
     wrap(<Coachmarks />);

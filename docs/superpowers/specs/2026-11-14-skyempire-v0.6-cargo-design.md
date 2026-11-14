@@ -122,7 +122,7 @@ Agreed with the user on 2026-11-14 (the cargo plan, extended twice): every freig
   - **cargo:** freighters, rate per kg, accepted types, expected tonnes, load and profit;
   - **passenger:** a "Belly cargo" section with Default or Custom (rate, types, hold share).
 - **Map, lists and screens:**
-  - Cargo routes are drawn dashed.
+  - Cargo routes are drawn in amber (dashed arcs aren't practical with deck.gl arcs).
   - Lists show a text badge "Cargo".
   - Finance splits revenue into passenger and cargo.
   - The Overview shows tonnes moved.
@@ -138,3 +138,11 @@ Agreed with the user on 2026-11-14 (the cargo plan, extended twice): every freig
 - Cargo connections across routes (transshipment).
 - ULD/volume limits (weight only).
 - Charter flights.
+
+## Notes from building it (2026-11-14)
+- **Missing hubs:**
+  - MEM, SDF, CVG and ANC were added to the airports, the same way as the others (`build-airports.ts --add`).
+  - Kalitta's Willow Run (YIP) has no scheduled service in OurAirports, so Kalitta isn't in the game.
+- **Belly holds:** `bellyT` is the total hold. The default cargo share is 60% on widebodies and 35% on narrowbodies (mostly bags). Low-cost rivals don't sell belly cargo.
+- **Photos:** 6 freighters have no freely licensed photo (A320P2F, A350F, 777-8F, Dash 8-400 conversion, E190F, E195F) and show their silhouette.
+- **Unlisted airports:** cargo estimates are capped at 300,000 t a year.

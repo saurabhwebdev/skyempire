@@ -12,7 +12,7 @@
 
 A free, open-source airline-management game for Windows. Found an airline with $50M and a dream, lease your first A320neo, build a network across ~1,000 real airports, and take on 19 real rival airlines — Emirates, IndiGo, Lufthansa, Ryanair, Delta and more — in a world with real demand, real aircraft and real costs.
 
-**Status:** v0.5 "Connections" — single-player; works offline.
+**Status:** v0.6 "Cargo" — single-player; works offline.
 
 ## Features
 
@@ -20,6 +20,7 @@ A free, open-source airline-management game for Windows. Found an airline with $
 - **38 real aircraft** — ATR 42 to A380, each with a real photo (Wikimedia Commons), real-world specs and a seat map; lease, buy new or buy used (some classics are used-only).
 - **Cabin designer** — up to three classes; seats from slimline to private suites, denser rows where real airlines fly them, screens and Wi-Fi, meals from buy-on-board to chef-designed dining. Products change your fares and costs; refits take aircraft out of service. Save layouts and reuse them.
 - **Routes with stops** — fly London → Dubai → Singapore with one aircraft and sell every pair along the way; a **Use free hours** helper suggests profitable routes for idle aircraft.
+- **Cargo** — run a passenger airline, a passenger + cargo airline, or a cargo-only airline: 34 real freighters, conversions, belly cargo, six kinds of cargo between real cargo hubs, and rivals like FedEx, UPS, DHL and Cargolux.
 - **Real rival airlines** — 19 per game, picked from 145 real airlines: the incumbents near your hub plus global majors. Each flies like its real self: low-cost, network or super-connector.
 - **Living economy** — fuel price swings, recessions, strikes, storms, airport expansions; slots, bases, loans, credit ratings.
 - **A living world** — real and simulated weather (snow, fog, storms, cyclones) that delays and cancels flights; airspace closures that force detours; route bans and travel advisories; real holidays and festivals that fill planes.

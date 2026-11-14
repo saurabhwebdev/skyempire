@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.6.0 — "Cargo"
+
+- **Three kinds of airline.** When you start a career, choose **Passenger**, **Passenger + Cargo**, or **Cargo only**. Cargo only is for good: a cargo airline can never fly passengers.
+- **34 real freighters**, each with real specs, an aircraft page, and a real photo where a free one exists:
+  - new: 747-8F, 777F, 767-300F, A330-200F, ATR 72-600F, Cessna 408 SkyCourier, Cessna 208B;
+  - coming: A350F from 2027 and 777-8F from 2028. You can order them now; they're delivered on their real entry dates, and lease payments start then;
+  - conversions of the airliners you fly, e.g. 777-300ERSF, A321P2F, 737-800BCF, 767-300BCF, 757-200PCF;
+  - used only: 747-400F, MD-11F, An-124, A300-600F, Il-76 and more.
+- **Convert to freighter.** Send an airliner you own to the conversion shop. It keeps its age and condition and comes back as a freighter after 2–5 months. A cargo airline can also buy a used airliner and convert it in one go.
+- **Cargo demand in tonnes.**
+  - It runs between real cargo hubs (Hong Kong, Memphis, Shanghai, Anchorage, Louisville, Leipzig…), using real annual tonnages for 70 airports.
+  - It's one-sided: China → USA is busy, the way back is half empty.
+  - It peaks before Christmas and dips at Lunar New Year.
+- **Six kinds of cargo:**
+  - general;
+  - express (frequency and punctuality matter);
+  - mail (steady all year);
+  - perishables (late flights spoil them);
+  - dangerous goods (they need a licence: $250k on the Airline screen);
+  - live animals and outsize (main-deck freighters only).
+- **Belly cargo.** Your passenger aircraft sell cargo in their holds automatically. On any route you can switch to Custom to set the rate, the cargo types and how much of the hold to give cargo. Too much, and bags get left behind. You can switch belly cargo off on the Airline screen.
+- **Cargo rivals.**
+  - Real cargo airlines join every game: FedEx, UPS, DHL, Cargolux, AeroLogic, SF Airlines, China Cargo, Nippon Cargo, Silk Way West, Atlas Air and Polar.
+  - Lufthansa, Emirates, Qatar, Cathay and other big carriers fly freighters too.
+- **Cargo on every screen.** The route editor gets a Passengers / Cargo switch, a rate per kg and the cargo types. Cargo routes are amber on the map. The Overview shows tonnes moved, and Finance shows cargo revenue.
+- **Cargo-only careers** grow by tonnes moved and have their own goals and tutorial.
+- **Four big cargo hubs added:** Memphis, Louisville, Cincinnati and Anchorage.
+
 ## 0.5.0 — "Connections"
 
 - **Routes with stops.** A route can now have up to 2 stops, e.g. London → Dubai → Singapore.

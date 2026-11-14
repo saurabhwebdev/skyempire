@@ -10,6 +10,13 @@ const STEPS = [
   { id: 'first-day', title: 'Press Play', text: 'Time is paused. Press Space or the play button to start flying.', action: 'Play', run: () => useUi.getState().setSpeed(1) },
   { id: 'first-profit', title: 'Watch your first profit', text: 'Cash updates every day at the top. Check the Overview for alerts and goals.', action: 'Open Overview', run: () => useUi.getState().setSection('overview') },
 ];
+/** Cargo-only airlines: the same tour, following their own goals. */
+const CARGO_STEPS = [
+  { id: 'lease-freighter', title: 'Lease your first freighter', text: 'An ATR 72-600F or a Cessna 408 SkyCourier fits a startup budget. Bigger freighters unlock as you grow.', action: 'Browse aircraft', run: () => useUi.getState().setMarketOpen(true) },
+  { id: 'open-cargo-route', title: 'Open your first cargo route', text: 'Pick a big cargo airport within range. The editor suggests a rate per kg.', action: 'New route', run: () => useUi.getState().openRouteEditor({}) },
+  STEPS[2]!,
+  STEPS[3]!,
+];
 
 /** Skippable first-run guide tied to the first four objectives. */
 export function Coachmarks() {
@@ -19,7 +26,8 @@ export function Coachmarks() {
   // Over the map (Network/Fleet) sit top-left; on full-page sections sit bottom-left, clear of titles.
   const onMap = section === 'network' || section === 'fleet';
   const done = view?.player.completedObjectives ?? [];
-  const step = STEPS.find((s) => !done.includes(s.id));
+  const steps = view?.player.kind === 'cargo' ? CARGO_STEPS : STEPS;
+  const step = steps.find((s) => !done.includes(s.id));
   const finished = !step;
   useEffect(() => {
     if (finished && !settings.tutorialDone) void window.game.setSettings({ tutorialDone: true }).then((s) => useGameStore.getState().setSettings(s));
@@ -29,7 +37,7 @@ export function Coachmarks() {
     const s = await window.game.setSettings({ tutorialDone: true });
     useGameStore.getState().setSettings(s);
   };
-  const index = step ? STEPS.indexOf(step) : STEPS.length;
+  const index = step ? steps.indexOf(step) : steps.length;
   return (
     <AnimatePresence>
       {!settings.tutorialDone && step && (
@@ -42,7 +50,7 @@ export function Coachmarks() {
           className={`absolute ${onMap ? 'top-3' : 'bottom-4'} left-3 z-20 w-[320px] rounded-xl border border-accent/40 bg-surface-1/95 p-4 shadow-overlay backdrop-blur-md`}
         >
           <div className="mb-2 flex items-center gap-2 text-[12px] font-semibold text-accent">
-            <GraduationCap className="size-4" /> Step {index + 1} of {STEPS.length}
+            <GraduationCap className="size-4" /> Step {index + 1} of {steps.length}
           </div>
           <h2 className="text-[16px] font-semibold">{step.title}</h2>
           <p className="mt-1 text-[13px] text-muted">{step.text}</p>

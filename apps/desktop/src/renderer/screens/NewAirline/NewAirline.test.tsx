@@ -46,6 +46,10 @@ describe('NewAirline', () => {
     const kinds = screen.getByRole('radiogroup', { name: 'Airline type' });
     expect(screen.getByRole('radio', { name: /^Passenger\b(?! \+)/ })).toHaveAttribute('aria-checked', 'true');
     await user.click(screen.getByRole('radio', { name: /Cargo only/ }));
+    expect(screen.getByRole('radio', { name: /Cargo only/ })).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByRole('radio', { name: /^Passenger\b(?! \+)/ })).toHaveAttribute('aria-checked', 'false');
+    expect(screen.getByRole('radio', { name: /Cargo only/ }).className).toMatch(/border-accent/);
+    expect(screen.getByRole('radio', { name: /^Passenger\b(?! \+)/ }).className).not.toMatch(/border-accent/);
     expect(kinds).toHaveTextContent(/can never fly passengers/);
     await user.click(screen.getByRole('button', { name: 'Found airline' }));
     expect(newGame).toHaveBeenCalledWith(expect.objectContaining({ airlineKind: 'cargo', homeBaseId: 'LEJ' }));
