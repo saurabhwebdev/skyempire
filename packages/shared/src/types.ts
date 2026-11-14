@@ -201,6 +201,17 @@ export interface ActiveTension {
   endDay: number;
 }
 
+/** A generic geographic airspace region (packages/data/src/airspace.json). */
+export interface AirspaceRegion {
+  id: string;
+  name: string;
+  countries: string[];
+  /** Outer rings, [lon, lat], simplified. */
+  rings: [number, number][][];
+  /** Detour waypoints just outside the region (its convex hull, pushed outward). */
+  nodes: [number, number][];
+}
+
 export interface World {
   /** Real year of game day 0 (Jan 1). */
   startYear: number;

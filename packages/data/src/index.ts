@@ -1,8 +1,9 @@
-import type { AircraftType, AirlineData, Airport, Catalog, HolidayData } from '@skyempire/shared';
+import type { AircraftType, AirlineData, AirspaceRegion, Airport, Catalog, HolidayData } from '@skyempire/shared';
 import aircraft from './aircraft.json';
 import airlines from './airlines.world.json';
 import airports from './airports.world.json';
 import basemap from './basemap/countries-50m.json';
+import airspace from './airspace.json';
 import holidays from './holidays.json';
 import reserved from './reserved.json';
 import routes from './routes.world.json';
@@ -40,4 +41,9 @@ const reservedCodes = new Set(reserved.codes);
 /** True when the name or code belongs to a real airline. */
 export function isReservedAirline(name: string, code: string): boolean {
   return reservedNames.has(name.trim().toLowerCase()) || reservedCodes.has(code.trim().toUpperCase());
+}
+
+/** Generic airspace regions used by tension events (closures and detours). */
+export function loadAirspace(): AirspaceRegion[] {
+  return airspace as AirspaceRegion[];
 }
