@@ -16,7 +16,8 @@ test('a second launch exits and brings the open game forward', async () => {
   expect(await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.isVisible())).toBe(true);
 
   const electronPath = await app.evaluate(() => process.execPath);
-  const second = spawn(electronPath, [main], { env });
+  // --no-sandbox as Playwright passes it: CI Linux runners can't start Chromium's sandbox.
+  const second = spawn(electronPath, ['--no-sandbox', main], { env });
   const code = await new Promise<number | null>((resolve) => second.on('exit', resolve));
   expect(code).toBe(0);
   expect(await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().length)).toBe(1);
