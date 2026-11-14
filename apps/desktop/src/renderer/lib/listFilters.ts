@@ -1,3 +1,4 @@
+import { routeChain } from '@skyempire/sim';
 import type { Aircraft, AircraftClass, AircraftType, Notification, Route, SaveInfo, TierId, UsedListing } from '@skyempire/shared';
 import { tierAllows } from '@skyempire/sim';
 import { catalog } from './catalog';
@@ -95,8 +96,8 @@ export function routeHealth(r: Route, status?: { blocked: string | null }, aircr
 export interface RouteFilter { query: string; health: RouteHealth | 'all' }
 export function filterRoutes(routes: Route[], f: RouteFilter, status: Record<string, { blocked: string | null }>, aircraft?: Map<string, Aircraft>): Route[] {
   return routes.filter((r) => {
-    const a = catalog.airports[r.from], b = catalog.airports[r.to];
-    return textMatch(f.query, r.from, r.to, a?.city, b?.city, a?.name, b?.name)
+    const airports = routeChain(r).map((id) => catalog.airports[id]);
+    return textMatch(f.query, ...routeChain(r), ...airports.flatMap((a) => [a?.city, a?.name]))
       && (f.health === 'all' || routeHealth(r, status[r.id], aircraft) === f.health);
   });
 }

@@ -9,6 +9,7 @@ import { catalog } from '../../lib/catalog';
 import { aircraftLabel, hoursUsed, WEEKLY_HOURS } from '../../lib/fleet';
 import { useGameStore, useUi } from '../../store';
 import { airportFilter, airportRank } from '../NewAirline/NewAirline';
+import { routeLabel, routeLegs, routeMarkets, pairKey } from '../../lib/routes';
 
 const AIRPORTS = Object.values(catalog.airports).sort((a, b) => b.population - a.population);
 type Fares = Record<CabinClass, number>;
@@ -28,6 +29,12 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
 
   const [from, setFrom] = useState(existing?.from ?? editor.from ?? view.player.homeBaseId);
   const [to, setTo] = useState<string | undefined>(existing?.to ?? editor.to);
+  // Up to 2 stops; undefined = a stop row whose airport isn't chosen yet.
+  const [stops, setStops] = useState<(string | undefined)[]>(() => existing?.stops ?? []);
+  const chosenStops = stops.filter((x): x is string => !!x);
+  const stopsReady = stops.every(Boolean);
+  const chain = { from, to: to ?? '', stops: chosenStops };
+  const markets = to ? routeMarkets(chain) : [];
   const used = useMemo(() => hoursUsed(view, existing?.id), [view, existing?.id]);
   const [assignments, setAssignments] = useState<Assignment[]>(() => {
     if (existing?.assignments.length) return existing.assignments.map((a) => ({ ...a }));
@@ -35,6 +42,9 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
     return free ? [{ aircraftId: free.id, roundTripsPerWeek: 7 }] : [];
   });
   const dist = to && catalog.airports[from] && catalog.airports[to] ? distanceKm(catalog.airports[from]!, catalog.airports[to]!) : 0;
+  const legKm = to ? routeLegs(chain).map(([x, y]) => (catalog.airports[x] && catalog.airports[y] ? distanceKm(catalog.airports[x]!, catalog.airports[y]!) : 0)) : [];
+  const flownKm = legKm.reduce((a, b) => a + b, 0);
+  const [legFares, setLegFares] = useState<Record<string, Fares>>(() => existing?.legFares ?? {});
   const [fares, setFares] = useState<Fares>(() => existing?.fares ?? { economy: 0, premium: 0, business: 0 });
   const [faresTouched, setFaresTouched] = useState(!!existing);
   const [more, setMore] = useState(false);
@@ -55,12 +65,26 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
     [fares, dist],
   );
 
+  // Fares for the other markets of a stop route: the player's, else the reference fare for that distance.
+  const effectiveLegFares: Record<string, Fares> = useMemo(() => {
+    const out: Record<string, Fares> = {};
+    for (const m of markets) {
+      if (m.key === pairKey(from, to ?? '')) continue;
+      const km = distanceKm(catalog.airports[m.a]!, catalog.airports[m.b]!);
+      out[m.key] = legFares[m.key] ?? { economy: refFare(km, 'economy'), premium: refFare(km, 'premium'), business: refFare(km, 'business') };
+    }
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [legFares, markets.map((m) => m.key).join(','), from, to]);
+
   const cmd: Command | null = useMemo(() => {
-    if (!to) return null;
-    if (existing) return { type: 'updateRoute', routeId: existing.id, fares: effectiveFares, assignments };
+    if (!to || !stopsReady) return null;
+    const leg = chosenStops.length ? { legFares: effectiveLegFares } : {};
+    if (existing) return { type: 'updateRoute', routeId: existing.id, fares: effectiveFares, assignments, ...leg };
     if (!assignments.length) return null;
-    return { type: 'openRoute', from, to, fares: effectiveFares, assignments };
-  }, [to, from, effectiveFares, assignments, existing]);
+    return { type: 'openRoute', from, to, ...(chosenStops.length ? { stops: chosenStops } : {}), fares: effectiveFares, assignments, ...leg };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [to, from, effectiveFares, effectiveLegFares, assignments, existing, chosenStops.join(','), stopsReady]);
 
   useEffect(() => {
     if (!cmd) return;
@@ -68,6 +92,7 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
       void window.game.preview(cmd).then((p) => {
         setPreview(p);
         if (p.ok && p.suggestedFares && !faresTouched) setFares(p.suggestedFares);
+        if (p.ok && p.suggestedLegFares && !faresTouched) setLegFares(p.suggestedLegFares);
       });
     }, 150);
     return () => clearTimeout(id);
@@ -75,6 +100,8 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
 
   const blocking = !to
     ? 'Choose a destination.'
+    : !stopsReady
+      ? 'Choose the stop airport, or remove the stop.'
     : assignments.length === 0
       ? view.aircraft.length === 0 ? 'Lease an aircraft first.' : 'Add an aircraft.'
       : preview && !preview.ok
@@ -90,7 +117,8 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
       setPreview({ ok: false, reason: r.reason });
       return;
     }
-    toast({ title: existing ? `Route ${from}–${to} updated` : `Route ${from}–${to} opened`, tone: 'success' });
+    const label = chosenStops.length ? routeLabel({ from, to: to!, stops: chosenStops }) : `${from}–${to}`;
+    toast({ title: existing ? `Route ${label} updated` : `Route ${label} opened`, tone: 'success' });
     close();
   };
 
@@ -98,11 +126,39 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
     const ac = view.aircraft.find((a) => a.id === acId);
     const t = ac && catalog.aircraftTypes[ac.typeId];
     if (!t || !dist) return 1;
-    return Math.max(1, Math.floor((WEEKLY_HOURS - (used.get(acId) ?? 0) - otherHours(acId)) / roundTripHours(dist, t)));
+    const perTrip = legKm.reduce((h, km) => h + roundTripHours(km, t), 0);
+    return Math.max(1, Math.floor((WEEKLY_HOURS - (used.get(acId) ?? 0) - otherHours(acId)) / perTrip));
   };
   // Hours used by this editor's other rows (same aircraft can't be listed twice, so 0) — kept for clarity.
   const otherHours = (_acId: string) => 0;
-  const candidates = view.aircraft.filter((a) => !rangeOnly || (catalog.aircraftTypes[a.typeId]?.rangeKm ?? 0) >= dist);
+  const longestLeg = Math.max(0, ...legKm);
+  const candidates = view.aircraft.filter((a) => !rangeOnly || (catalog.aircraftTypes[a.typeId]?.rangeKm ?? 0) >= longestLeg);
+  const stopPicker = (i: number) => (
+    <div key={i} className="flex items-end gap-2">
+      <div className="flex-1">
+        <Combobox<Airport>
+          label={`Stop ${i + 1}`}
+          items={AIRPORTS.filter((a) => a.id !== from && a.id !== to && !stops.some((x, j) => j !== i && x === a.id))}
+          getKey={(a) => a.id}
+          render={(a) => <span><span className="font-mono text-text">{a.id}</span> {a.city} <span className="text-faint">· {a.country}</span></span>}
+          filter={airportFilter}
+          rank={airportRank}
+          onSelect={(a) => setStops(stops.map((x, j) => (j === i ? a.id : x)))}
+          value={stops[i] ? catalog.airports[stops[i]!] ?? null : null}
+          renderValue={(a) => `${a.id} · ${a.city}`}
+          placeholder="City or airport code"
+        />
+      </div>
+      <button type="button" aria-label={`Remove stop ${i + 1}`} onClick={() => setStops(stops.filter((_, j) => j !== i))} className="mb-1 rounded-md p-2 text-faint hover:bg-surface-3 hover:text-danger">
+        <Trash2 className="size-4" />
+      </button>
+    </div>
+  );
+  const fareInput = (label: string, value: number, onChange: (v: number) => void) => (
+    <input aria-label={label} inputMode="numeric" value={String(value)}
+      onChange={(e) => { const v = Number(e.target.value.replace(/[^0-9]/g, '')); if (Number.isFinite(v)) { setFaresTouched(true); onChange(Math.min(50000, Math.max(1, v))); } }}
+      className="num h-8 w-full rounded-md border border-border bg-surface-1 px-2 text-right text-[13px] outline-none focus:border-accent" />
+  );
 
   return (
     <motion.aside
@@ -112,7 +168,7 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
       className="absolute top-3 right-3 z-30 flex max-h-[calc(100%-24px)] w-[400px] flex-col rounded-xl border border-border bg-surface-1/95 shadow-overlay backdrop-blur-md"
     >
       <header className="flex items-center justify-between border-b border-border px-4 py-3">
-        <h2 className="text-[16px] font-semibold">{existing ? `Edit ${existing.from} → ${existing.to}` : 'New route'}</h2>
+        <h2 className="text-[16px] font-semibold">{existing ? `Edit ${routeLabel(existing)}` : 'New route'}</h2>
         <button type="button" aria-label="Close" onClick={close} className="rounded-md p-1 text-muted hover:bg-surface-3 hover:text-text"><X className="size-4" /></button>
       </header>
       <div className="flex flex-col gap-4 overflow-y-auto p-4">
@@ -138,11 +194,18 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
                 placeholder="City or airport code — or click it on the map"
               />
             </div>
+            {stops.map((_, i) => stopPicker(i))}
+            {stops.length < 2 && (
+              <Button size="sm" variant="ghost" className="self-start" onClick={() => setStops([...stops, undefined])}>
+                <Plus className="size-4" /> Add a stop
+              </Button>
+            )}
+            {stops.length > 0 && <p className="text-[12px] text-faint">One aircraft flies the whole way and back. You sell every pair along the route, including through trips.</p>}
           </>
         )}
         {to && preview?.ok && (
           <p className="num text-[13px] text-muted">
-            {Math.round(dist).toLocaleString('en-US')} km · demand ~{(preview.demandPerDay ?? 0).toLocaleString('en-US')}/day · {preview.competitors ?? 0} competitor{preview.competitors === 1 ? '' : 's'}
+            {Math.round(chosenStops.length ? flownKm : dist).toLocaleString('en-US')} km{chosenStops.length ? ' flown' : ''} · demand ~{(preview.demandPerDay ?? 0).toLocaleString('en-US')}/day · {preview.competitors ?? 0} competitor{preview.competitors === 1 ? '' : 's'}
           </p>
         )}
         {to && preview?.ok && (preview.detourKm ?? 0) > 0 && (
@@ -188,27 +251,50 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
           )}
         </fieldset>
 
+        {chosenStops.length > 0 && to ? (
+          <table aria-label="Fares by market" className="w-full text-[13px]">
+            <thead>
+              <tr className="text-left text-muted"><th className="pb-1 font-semibold">Market</th><th className="pb-1 font-semibold">Economy</th><th className="pb-1 font-semibold">Premium</th><th className="pb-1 font-semibold">Business</th></tr>
+            </thead>
+            <tbody>
+              {markets.map((m) => {
+                const end = m.key === pairKey(from, to);
+                const f = end ? effectiveFares : effectiveLegFares[m.key]!;
+                const set = (c: CabinClass) => (v: number) => end ? setFares({ ...effectiveFares, [c]: v }) : setLegFares({ ...effectiveLegFares, [m.key]: { ...f, [c]: v } });
+                return (
+                  <tr key={m.key}>
+                    <th scope="row" className="py-1 pr-2 text-left font-mono font-normal">{m.a} → {m.b}</th>
+                    {(['economy', 'premium', 'business'] as const).map((c) => <td key={c} className="py-1 pr-1">{fareInput(`${m.a} → ${m.b} ${c} fare`, f[c], set(c))}</td>)}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        ) : (
+          <>
         <NumberInput
-          label="Economy fare"
-          prefix="$"
-          value={effectiveFares.economy}
-          min={1}
-          max={20000}
-          step={1}
-          onChange={(v) => { setFaresTouched(true); setFares({ ...effectiveFares, economy: v }); }}
-          hint={preview?.suggestedFares ? `Suggested ${formatMoney(preview.suggestedFares.economy)}` : undefined}
-        />
-        <button type="button" aria-expanded={more} onClick={() => setMore(!more)} className="inline-flex items-center gap-1 self-start text-[13px] font-semibold text-muted hover:text-text">
-          {more ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />} Premium & business fares
-        </button>
-        {more && (
-          <div className="grid grid-cols-2 gap-3">
-            {(['premium', 'business'] as const).map((c) => (
-              <NumberInput key={c} label={c === 'premium' ? 'Premium fare' : 'Business fare'} prefix="$" value={effectiveFares[c]} min={1} max={50000}
-                onChange={(v) => { setFaresTouched(true); setFares({ ...effectiveFares, [c]: v }); }}
-                hint={preview?.suggestedFares ? `Suggested ${formatMoney(preview.suggestedFares[c])}` : undefined} />
-            ))}
-          </div>
+            label="Economy fare"
+            prefix="$"
+            value={effectiveFares.economy}
+            min={1}
+            max={20000}
+            step={1}
+            onChange={(v) => { setFaresTouched(true); setFares({ ...effectiveFares, economy: v }); }}
+            hint={preview?.suggestedFares ? `Suggested ${formatMoney(preview.suggestedFares.economy)}` : undefined}
+          />
+          <button type="button" aria-expanded={more} onClick={() => setMore(!more)} className="inline-flex items-center gap-1 self-start text-[13px] font-semibold text-muted hover:text-text">
+            {more ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />} Premium & business fares
+          </button>
+          {more && (
+            <div className="grid grid-cols-2 gap-3">
+              {(['premium', 'business'] as const).map((c) => (
+                <NumberInput key={c} label={c === 'premium' ? 'Premium fare' : 'Business fare'} prefix="$" value={effectiveFares[c]} min={1} max={50000}
+                  onChange={(v) => { setFaresTouched(true); setFares({ ...effectiveFares, [c]: v }); }}
+                  hint={preview?.suggestedFares ? `Suggested ${formatMoney(preview.suggestedFares[c])}` : undefined} />
+              ))}
+            </div>
+          )}
+          </>
         )}
       </div>
 

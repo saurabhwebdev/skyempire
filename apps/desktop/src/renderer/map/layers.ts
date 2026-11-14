@@ -3,6 +3,7 @@ import type { Layer } from '@deck.gl/core';
 import { loadAirspace } from '@skyempire/data';
 import { ArcLayer, GeoJsonLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers';
 import type { Selection } from '../store';
+import { routeChain, routeLegs } from '../lib/routes';
 import { ACCENT, AIRPORT, AIRPORT_ACTIVE, AIRSPACE, hexToRgba, RIVAL_PALETTE, WEATHER_COLORS, type RGBA } from './colors';
 
 const REGIONS = new Map(loadAirspace().map((r) => [r.id, r]));
@@ -40,7 +41,7 @@ export function buildLayers(m: MapInput): Layer[] {
   const byId = new Map(m.airports.map((a) => [a.id, a]));
   const bases = new Set(m.view.player.baseIds);
   const used = new Set<string>();
-  for (const r of m.view.routes) used.add(r.from).add(r.to);
+  for (const r of m.view.routes) for (const id of routeChain(r)) used.add(id);
   const rivalColor = new Map(
     m.view.rivals.map((r, i) => [r.id, m.colorBlind ? RIVAL_PALETTE[i % RIVAL_PALETTE.length]! : hexToRgba(r.color)]),
   );
@@ -104,12 +105,15 @@ export function buildLayers(m: MapInput): Layer[] {
   const player = hexToRgba(m.view.player.colors.primary);
   const mine: Arc[] = [];
   for (const r of m.view.routes) {
-    const from = byId.get(r.from), to = byId.get(r.to);
-    if (!from || !to) continue;
     const selected = m.selection?.kind === 'route' && m.selection.id === r.id;
     const fresh = m.fresh?.routeId === r.id && !m.reduceMotion ? m.fresh.t : 1;
     const alpha = r.status === 'active' ? 255 : 110;
-    mine.push({ id: r.id, from, to, color: [player[0], player[1], player[2], Math.round(alpha * fresh)], width: (selected ? 4 : 2) * (0.5 + fresh / 2) });
+    // A stop route is drawn leg by leg; every leg selects the route.
+    for (const [x, y] of routeLegs(r)) {
+      const from = byId.get(x), to = byId.get(y);
+      if (!from || !to) continue;
+      mine.push({ id: r.id, from, to, color: [player[0], player[1], player[2], Math.round(alpha * fresh)], width: (selected ? 4 : 2) * (0.5 + fresh / 2) });
+    }
   }
   layers.push(
     new ArcLayer<Arc>({

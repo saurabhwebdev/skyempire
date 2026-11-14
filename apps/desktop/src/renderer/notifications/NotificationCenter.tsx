@@ -1,3 +1,4 @@
+import { routeChain } from '../lib/routes';
 import type { ClientView, Notification } from '@skyempire/shared';
 import { Button, Modal, useToast } from '@skyempire/ui';
 import { useEffect, useState } from 'react';
@@ -8,7 +9,7 @@ export function isRelevant(n: Notification, view: ClientView | null): boolean {
   if (n.category === 'goal' || n.category === 'airline') return true;
   if (n.category === 'rival') return false;
   if (!view || !n.link || n.link.kind !== 'airport') return n.level !== 'info';
-  const mine = new Set([...view.player.baseIds, ...view.routes.flatMap((r) => [r.from, r.to])]);
+  const mine = new Set([...view.player.baseIds, ...view.routes.flatMap((r) => routeChain(r))]);
   return mine.has(n.link.id);
 }
 

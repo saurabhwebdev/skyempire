@@ -1,3 +1,4 @@
+import { routeShort } from '../../lib/routes';
 import type { ClientView } from '@skyempire/shared';
 import { formatMoney } from '@skyempire/shared';
 import { monthlyCosts } from '../../lib/finance';
@@ -22,12 +23,12 @@ export function deriveAlerts(view: ClientView): Alert[] {
   for (const r of view.routes) {
     const blocked = view.routeStatus[r.id]?.blocked;
     if (blocked)
-      out.push({ id: `grounded-${r.id}`, level: 'danger', text: `${r.from}–${r.to} is grounded: ${blocked}.`, action: { label: 'Review route', run: go('network', { kind: 'route', id: r.id }) } });
+      out.push({ id: `grounded-${r.id}`, level: 'danger', text: `${routeShort(r)} is grounded: ${blocked}.`, action: { label: 'Review route', run: go('network', { kind: 'route', id: r.id }) } });
     const sum = r.profit30.reduce((a, b) => a + b, 0);
     if (r.status === 'active' && r.profit30.length >= 7 && sum < 0)
-      out.push({ id: `loss-${r.id}`, level: 'warning', text: `${r.from}–${r.to} lost ${formatMoney(-sum)} in the last ${r.profit30.length} days.`, action: { label: 'Review route', run: go('network', { kind: 'route', id: r.id }) } });
+      out.push({ id: `loss-${r.id}`, level: 'warning', text: `${routeShort(r)} lost ${formatMoney(-sum)} in the last ${r.profit30.length} days.`, action: { label: 'Review route', run: go('network', { kind: 'route', id: r.id }) } });
     if (r.status === 'suspended')
-      out.push({ id: `suspended-${r.id}`, level: 'warning', text: `${r.from}–${r.to} is suspended — it has no aircraft.`, action: { label: 'Assign aircraft', run: () => useUi.getState().openRouteEditor({ routeId: r.id }) } });
+      out.push({ id: `suspended-${r.id}`, level: 'warning', text: `${routeShort(r)} is suspended — it has no aircraft.`, action: { label: 'Assign aircraft', run: () => useUi.getState().openRouteEditor({ routeId: r.id }) } });
   }
   const used = hoursUsed(view);
   for (const ac of view.aircraft) {

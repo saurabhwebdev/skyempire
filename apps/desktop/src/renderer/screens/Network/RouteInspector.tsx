@@ -1,3 +1,4 @@
+import { routeLabel, routeLegs, routeMarkets, routeShort } from '../../lib/routes';
 import { formatMoney, formatPct } from '@skyempire/shared';
 import { distanceKm } from '@skyempire/sim';
 import { Button, KpiTile, Modal, useToast } from '@skyempire/ui';
@@ -21,7 +22,7 @@ export function RouteInspector({ id }: { id: string }) {
     const res = await window.game.command({ type: 'closeRoute', routeId: r.id });
     setConfirm(false);
     if (res.ok) {
-      toast({ title: `Route ${r.from}–${r.to} closed`, tone: 'info' });
+      toast({ title: `Route ${routeShort(r)} closed`, tone: 'info' });
       useUi.getState().select(null);
     } else toast({ title: res.reason, tone: 'danger' });
   };
@@ -29,8 +30,10 @@ export function RouteInspector({ id }: { id: string }) {
     <div className="flex flex-col gap-5">
       <header>
         <span className="label-caps">Route</span>
-        <h2 className="mt-1 font-mono text-[24px] font-semibold">{r.from} → {r.to}</h2>
-        <p className="text-muted">{a.city} – {b.city} · {Math.round(distanceKm(a, b)).toLocaleString('en-US')} km</p>
+        <h2 className="mt-1 font-mono text-[24px] font-semibold">{routeLabel(r)}</h2>
+        <p className="text-muted">{r.stops?.length
+          ? `${[r.from, ...r.stops, r.to].map((id) => catalog.airports[id]?.city ?? id).join(' – ')} · ${Math.round(routeLegs(r).reduce((x, [p, q]) => x + distanceKm(catalog.airports[p]!, catalog.airports[q]!), 0)).toLocaleString('en-US')} km flown`
+          : `${a.city} – ${b.city} · ${Math.round(distanceKm(a, b)).toLocaleString('en-US')} km`}</p>
         {r.status === 'suspended' && <p className="mt-2 rounded-md bg-warning/10 p-2 text-[13px] text-warning">Suspended — assign an aircraft to fly it again.</p>}
         {view.routeStatus[r.id]?.blocked && (
           <p className="mt-2 rounded-md bg-danger/10 p-2 text-[13px] text-danger">
@@ -55,12 +58,26 @@ export function RouteInspector({ id }: { id: string }) {
         <dt className="text-muted">Aircraft</dt>
         <dd className="text-right">{r.assignments.map((x) => { const ac = view.aircraft.find((y) => y.id === x.aircraftId); return ac ? <div key={x.aircraftId}>{aircraftLabel(ac)}</div> : null; })}</dd>
       </dl>
+      {r.stops?.length && r.last?.marketPax ? (
+        <section className="flex flex-col gap-2 text-[13px]">
+          <table aria-label="Passengers by market" className="w-full">
+            <thead><tr className="text-left text-muted"><th className="font-semibold">Market</th><th className="text-right font-semibold">Passengers/day</th></tr></thead>
+            <tbody>
+              {routeMarkets(r).map((m) => {
+                const p = r.last!.marketPax![m.key];
+                return <tr key={m.key}><td className="py-0.5 font-mono">{m.a} → {m.b}</td><td className="num text-right">{p ? Math.round(p.economy + p.premium + p.business) : 0}</td></tr>;
+              })}
+            </tbody>
+          </table>
+          {r.last.legLoad && <p className="num text-muted">{routeLegs(r).map(([x, y], i) => `${x} → ${y} ${Math.round((r.last!.legLoad![i] ?? 0) * 100)}%`).join(' · ')}</p>}
+        </section>
+      ) : null}
       <SeasonalFares route={r} />
       <div className="flex flex-col gap-2">
         <Button variant="primary" onClick={() => useUi.getState().openRouteEditor({ routeId: r.id })}>Edit route</Button>
         <Button variant="ghost" onClick={() => setConfirm(true)}>Close route</Button>
       </div>
-      <Modal open={confirm} onOpenChange={setConfirm} title={`Close ${r.from}–${r.to}?`} description="Its slots will be released and its aircraft freed up."
+      <Modal open={confirm} onOpenChange={setConfirm} title={`Close ${routeShort(r)}?`} description="Its slots will be released and its aircraft freed up."
         footer={<><Button variant="ghost" onClick={() => setConfirm(false)}>Keep route</Button><Button variant="danger" onClick={closeRoute}>Close route</Button></>} />
     </div>
   );

@@ -47,6 +47,15 @@ describe('buildLayers', () => {
     expect(data.map((d) => [d.id, d.active])).toEqual([['caucasus', true], ['sahel', false]]);
     expect(ids()).not.toContain('airspace');
   });
+  it('draws a stop route as one arc per leg, all selecting the route', () => {
+    const v = input().view;
+    const view = { ...v, routes: [{ ...v.routes[0]!, to: 'SIN', stops: ['DXB'] }] };
+    const layer = buildLayers(input({ view })).find((l) => l.id === 'player-routes')!;
+    const data = layer.props.data as { id: string; from: { id: string }; to: { id: string } }[];
+    expect(data.map((d) => `${d.id}:${d.from.id}-${d.to.id}`)).toEqual(['r1:LHR-DXB', 'r1:DXB-SIN']);
+    const airportsLayer = buildLayers(input({ view, zoom: 1 })).find((l) => l.id === 'airports')!;
+    expect((airportsLayer.props.data as { id: string; active: boolean }[]).find((a) => a.id === 'DXB')!.active).toBe(true);
+  });
   it('flags player bases', () => {
     const layer = buildLayers(input()).find((l) => l.id === 'airports')!;
     const data = layer.props.data as { id: string; isBase: boolean }[];

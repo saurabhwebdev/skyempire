@@ -1,3 +1,4 @@
+import { routeLabel } from '../../lib/routes';
 import { formatMoney, type CabinConfig } from '@skyempire/shared';
 import { aircraftMarketValue } from '@skyempire/sim';
 import { Button, Meter, Modal, useToast } from '@skyempire/ui';
@@ -71,7 +72,7 @@ export function AircraftInspector({ id }: { id: string }) {
         <span className="label-caps">Routes</span>
         <ul className="mt-2 flex flex-col gap-1">
           {routes.length ? routes.map((r) => (
-            <li key={r.id}><button type="button" className="font-mono text-accent hover:underline" onClick={() => useUi.getState().select({ kind: 'route', id: r.id })}>{r.from} → {r.to}</button></li>
+            <li key={r.id}><button type="button" className="font-mono text-accent hover:underline" onClick={() => useUi.getState().select({ kind: 'route', id: r.id })}>{routeLabel(r)}</button></li>
           )) : <li className="text-muted">Not assigned. <button type="button" className="text-accent hover:underline" onClick={() => useUi.getState().openRouteEditor({})}>Open a route</button></li>}
         </ul>
       </div>
@@ -85,7 +86,7 @@ export function AircraftInspector({ id }: { id: string }) {
       <Modal open={confirm} onOpenChange={setConfirm} title={leased ? 'Return this lease?' : 'Sell this aircraft?'}
         description={routes.length ? 'These routes will be suspended until you assign another aircraft:' : leased ? 'The aircraft goes back to the lessor. No refund.' : `You'll receive ${formatMoney(value)}.`}
         footer={<><Button variant="ghost" onClick={() => setConfirm(false)}>Keep aircraft</Button><Button variant="danger" onClick={remove}>{leased ? 'Return lease' : 'Sell aircraft'}</Button></>}>
-        {routes.length > 0 && <ul className="flex flex-col gap-1 font-mono">{routes.map((r) => <li key={r.id}>{r.from} → {r.to}</li>)}</ul>}
+        {routes.length > 0 && <ul className="flex flex-col gap-1 font-mono">{routes.map((r) => <li key={r.id}>{routeLabel(r)}</li>)}</ul>}
       </Modal>
     </div>
   );

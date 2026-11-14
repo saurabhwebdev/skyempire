@@ -1,3 +1,4 @@
+import { routeChain } from '../../lib/routes';
 import { Button, EmptyState, Modal, Panel, useToast } from '@skyempire/ui';
 import { Check, Sun } from 'lucide-react';
 import { useState } from 'react';
@@ -15,7 +16,7 @@ export function WeatherCard() {
     .filter((r) => SEVERE.includes(r.cond))
     .sort((a, b) => a.k - b.k || SEVERE.indexOf(a.cond) - SEVERE.indexOf(b.cond))
     .slice(0, 5);
-  const routesAt = (id: string) => view.routes.filter((r) => r.status === 'active' && (r.from === id || r.to === id));
+  const routesAt = (id: string) => view.routes.filter((r) => r.status === 'active' && routeChain(r).includes(id));
   const cancelledAhead = (id: string, day: number) => {
     const rs = routesAt(id);
     return rs.length > 0 && rs.every((r) => view.preCancelled[r.id]?.includes(day));

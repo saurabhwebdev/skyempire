@@ -14,3 +14,4 @@ export { baseSetupCost } from './finance';
 export { aircraftMarketValue, tierAllows } from './fleet';
 export * from './cabin';
 export { suggestRoutes } from './suggest';
+export { marketFare, pairKey, routeChain, routeLegs, routeMarkets, type RouteMarket } from './routing';

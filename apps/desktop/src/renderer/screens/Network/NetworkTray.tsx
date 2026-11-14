@@ -1,3 +1,4 @@
+import { routeLabel } from '../../lib/routes';
 import type { Route } from '@skyempire/shared';
 import { formatMoney } from '@skyempire/shared';
 import { Button, cn, DataTable, EmptyState, ListToolbar, Meter, NoResults, Segmented } from '@skyempire/ui';
@@ -42,7 +43,7 @@ export function NetworkTray() {
       columns={[
         { key: 'route', header: 'Route', cell: (r) => (
           <span className="inline-flex items-center gap-2">
-            <span className="font-mono">{r.from} → {r.to}</span>
+            <span className="font-mono">{routeLabel(r)}</span>
             {r.status === 'suspended' && <span className="rounded-full bg-warning/15 px-2 py-0.5 text-[11px] font-semibold text-warning">Suspended</span>}
             {view.routeStatus[r.id]?.blocked && <span title={view.routeStatus[r.id]!.blocked!} className="rounded-full bg-danger/15 px-2 py-0.5 text-[11px] font-semibold text-danger">Grounded</span>}
             {!view.routeStatus[r.id]?.blocked && (view.routeStatus[r.id]?.detourKm ?? 0) > 0 && (

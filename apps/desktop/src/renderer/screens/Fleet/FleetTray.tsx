@@ -1,3 +1,4 @@
+import { routeShort } from '../../lib/routes';
 import type { Aircraft } from '@skyempire/shared';
 import { Button, DataTable, EmptyState, FilterSelect, ListToolbar, Meter, NoResults, Segmented } from '@skyempire/ui';
 import { AlertTriangle, Plane, ShoppingCart } from 'lucide-react';
@@ -49,7 +50,7 @@ export function FleetTray() {
         ), sortValue: (a) => a.typeId },
         { key: 'age', header: 'Age', numeric: true, cell: (a) => `${(a.ageDays / 360).toFixed(1)} y`, sortValue: (a) => a.ageDays },
         { key: 'cond', header: 'Condition', width: '140px', cell: (a) => <Meter label="Condition" value={a.condition} max={100} tone={a.condition < 60 ? 'danger' : a.condition < 75 ? 'warning' : 'success'} />, sortValue: (a) => a.condition },
-        { key: 'routes', header: 'Routes', cell: (a) => routesOf(a.id).map((r) => `${r.from}–${r.to}`).join(', ') || <span className="text-faint">—</span> },
+        { key: 'routes', header: 'Routes', cell: (a) => routesOf(a.id).map(routeShort).join(', ') || <span className="text-faint">—</span> },
         { key: 'util', header: 'Use', numeric: true, cell: (a) => `${Math.round(((used.get(a.id) ?? 0) / WEEKLY_HOURS) * 100)}%`, sortValue: (a) => used.get(a.id) ?? 0 },
         { key: 'status', header: 'Status', cell: (a) => {
           const s = aircraftStatus(a, used.get(a.id) ?? 0);

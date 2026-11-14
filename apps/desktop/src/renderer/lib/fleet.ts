@@ -1,3 +1,4 @@
+import { routeLegs } from '@skyempire/sim';
 import type { Aircraft, ClientView } from '@skyempire/shared';
 import { distanceKm, roundTripHours } from '@skyempire/sim';
 import { catalog } from './catalog';
@@ -12,14 +13,13 @@ export function hoursUsed(view: ClientView, excludeRouteId?: string): Map<string
   const m = new Map<string, number>();
   for (const r of view.routes) {
     if (r.status !== 'active' || r.id === excludeRouteId) continue;
-    const a = catalog.airports[r.from], b = catalog.airports[r.to];
-    if (!a || !b) continue;
-    const dist = distanceKm(a, b);
+    const legs = routeLegs(r).map(([x, y]) => (catalog.airports[x] && catalog.airports[y] ? distanceKm(catalog.airports[x]!, catalog.airports[y]!) : null));
+    if (legs.some((d) => d === null)) continue;
     for (const asg of r.assignments) {
       const ac = view.aircraft.find((x) => x.id === asg.aircraftId);
       const t = ac && catalog.aircraftTypes[ac.typeId];
       if (!t) continue;
-      m.set(asg.aircraftId, (m.get(asg.aircraftId) ?? 0) + asg.roundTripsPerWeek * roundTripHours(dist, t));
+      m.set(asg.aircraftId, (m.get(asg.aircraftId) ?? 0) + asg.roundTripsPerWeek * legs.reduce((h: number, d) => h + roundTripHours(d!, t), 0));
     }
   }
   return m;

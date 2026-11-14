@@ -1,3 +1,4 @@
+import { routeLabel } from '../../lib/routes';
 import type { AirlineDaily } from '@skyempire/shared';
 import { formatMoney } from '@skyempire/shared';
 import { Button, cn, EmptyState, KpiTile, Meter, Panel } from '@skyempire/ui';
@@ -81,7 +82,7 @@ export function Overview() {
             <ul className="flex flex-col gap-2">
               {top.map((r) => (
                 <li key={r.id} className="flex items-center justify-between">
-                  <button type="button" className="font-mono hover:text-accent" onClick={() => useUi.setState({ section: 'network', selection: { kind: 'route', id: r.id } })}>{r.from} → {r.to}</button>
+                  <button type="button" className="font-mono hover:text-accent" onClick={() => useUi.setState({ section: 'network', selection: { kind: 'route', id: r.id } })}>{routeLabel(r)}</button>
                   <Profit value={r.last!.profit} suffix="/day" />
                 </li>
               ))}

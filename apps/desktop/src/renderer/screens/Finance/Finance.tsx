@@ -1,3 +1,4 @@
+import { routeLegs } from '../../lib/routes';
 import type { AirlineDaily, CostBreakdown } from '@skyempire/shared';
 import { formatMoney, formatPct } from '@skyempire/shared';
 import { distanceKm, formatDate } from '@skyempire/sim';
@@ -61,7 +62,7 @@ export function Finance() {
       if (!r.last || r.last.loadFactor <= 0) continue;
       const p = r.last.pax.economy + r.last.pax.premium + r.last.pax.business;
       const s = p / r.last.loadFactor;
-      const d = distanceKm(catalog.airports[r.from]!, catalog.airports[r.to]!);
+      const d = routeLegs(r).reduce((x, [p, q]) => x + distanceKm(catalog.airports[p]!, catalog.airports[q]!), 0) / routeLegs(r).length;
       ask += s * d; seats += s; pax += p; revDay += r.last.revenue; costDay += r.last.cost;
     }
     return { ask, seats, pax, revDay, costDay };

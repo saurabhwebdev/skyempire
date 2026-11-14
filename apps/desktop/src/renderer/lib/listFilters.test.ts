@@ -106,3 +106,23 @@ describe('news and saves', () => {
     expect(ids(sortSaves(saves, 'progress'))).toEqual(['c', 'a', 'b']);
   });
 });
+
+describe('routes with stops', () => {
+  it('search finds a route by its stop', async () => {
+    const { filterRoutes: fr } = await import('./listFilters');
+    const r = { id: 'r9', airlineId: 'p', from: 'LHR', to: 'SIN', stops: ['DXB'], fares: { economy: 1, premium: 1, business: 1 }, assignments: [], status: 'active', openedDay: 0, last: null, profit30: [] } as Route;
+    expect(fr([r], { query: 'dubai', health: 'all' }, {}).map((x) => x.id)).toEqual(['r9']);
+  });
+  it('free hours count every leg', async () => {
+    const { hoursUsed } = await import('./fleet');
+    const { fakeView } = await import('../testing');
+    const { roundTripHours, distanceKm: dk } = await import('@skyempire/sim');
+    const ac = { id: 'a1', typeId: 'A20N', ownerId: 'al_player', ownership: 'leased', ageDays: 0, condition: 90, flightHours: 0, hoursSinceA: 0, hoursSinceC: 0,
+      cabin: { economy: 194, premium: 0, business: 0 }, product: standardProduct(), dense: false, refitDaysLeft: 0, status: 'active', maintenanceDaysLeft: 0, bookValue: 0 } as Aircraft;
+    const r = { id: 'r9', airlineId: 'al_player', from: 'LHR', to: 'SIN', stops: ['DXB'], fares: { economy: 1, premium: 1, business: 1 }, assignments: [{ aircraftId: 'a1', roundTripsPerWeek: 2 }], status: 'active', openedDay: 0, last: null, profit30: [] } as Route;
+    const t = catalog.aircraftTypes.A20N!;
+    const ap = catalog.airports;
+    const expected = 2 * (roundTripHours(dk(ap.LHR!, ap.DXB!), t) + roundTripHours(dk(ap.DXB!, ap.SIN!), t));
+    expect(hoursUsed(fakeView({}, { aircraft: [ac], routes: [r] })).get('a1')).toBeCloseTo(expected);
+  });
+});

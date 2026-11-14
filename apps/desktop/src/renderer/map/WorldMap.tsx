@@ -1,3 +1,4 @@
+import { routeChain } from '../lib/routes';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import { loadBasemap, loadCatalog } from '@skyempire/data';
 import type { Airport } from '@skyempire/shared';
@@ -127,9 +128,10 @@ export function WorldMap() {
       if (a) target = [a.lon, a.lat];
     } else if (selection.kind === 'route') {
       const r = view.routes.find((x) => x.id === selection.id);
-      const a = r && catalog.airports[r.from], b = r && catalog.airports[r.to];
-      if (a && b) {
-        m.fitBounds([[Math.min(a.lon, b.lon), Math.min(a.lat, b.lat)], [Math.max(a.lon, b.lon), Math.max(a.lat, b.lat)]], {
+      const pts = r ? routeChain(r).map((id) => catalog.airports[id]).filter((x) => !!x) : [];
+      if (pts.length >= 2) {
+        const lons = pts.map((p) => p!.lon), lats = pts.map((p) => p!.lat);
+        m.fitBounds([[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]], {
           padding: { top: 80, bottom: 260, left: 80, right: 420 }, maxZoom: 6, duration: reduceMotion ? 0 : 600, easing: EASE_IO,
         });
         return;

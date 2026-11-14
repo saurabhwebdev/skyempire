@@ -1,3 +1,4 @@
+import { routeShort } from '../../lib/routes';
 import type { AirlineDaily } from '@skyempire/shared';
 import { formatMoney, formatPax } from '@skyempire/shared';
 import { formatDate } from '@skyempire/sim';
@@ -16,7 +17,7 @@ export function GameOver() {
   const peakCash = history.reduce((m, d) => Math.max(m, d.cash), view.player.cash);
   const worst = [...view.routes].map((r) => ({ r, p: r.profit30.reduce((a, b) => a + b, 0) })).sort((a, b) => a.p - b.p)[0];
   const hints = [
-    worst && worst.p < 0 ? `Most of your recent losses came from ${worst.r.from}–${worst.r.to} (${formatMoney(worst.p)} in 30 days).` : null,
+    worst && worst.p < 0 ? `Most of your recent losses came from ${routeShort(worst.r)} (${formatMoney(worst.p)} in 30 days).` : null,
     view.player.loans.length ? 'Debt interest kept draining cash — borrow only for aircraft that will earn it back.' : null,
     'Watch the Overview alerts: idle aircraft and losing routes cost money every day.',
   ].filter(Boolean) as string[];
