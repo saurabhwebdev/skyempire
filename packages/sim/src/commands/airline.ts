@@ -46,9 +46,6 @@ export function applyAirline(state: GameState, airlineId: string, cmd: Command, 
       if (loan.principal === 0) al.loans = al.loans.filter((l) => l !== loan);
       return { ok: true };
     }
-    case 'setServiceLevel':
-      al.serviceLevel = cmd.level;
-      return { ok: true };
     case 'setMarketing':
       al.marketingPerMonth = cmd.perMonth;
       return { ok: true };

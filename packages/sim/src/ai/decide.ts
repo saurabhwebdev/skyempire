@@ -6,7 +6,8 @@ import { hoursByAircraft, pairKey, revenueOf, routeOps, simulatePair } from '../
 import { refFare } from '../demand';
 import { routeDayCosts } from '../economics';
 import { availableCredit, monthlyFixedCosts } from '../finance';
-import { defaultCabin, tierAllows } from '../fleet';
+import { tierAllows } from '../fleet';
+import { defaultConfig } from '../cabin';
 import { distanceKm } from '../geo';
 import { maxRoundTripsPerWeek, roundTripHours } from '../ops';
 import type { Rng } from '../rng';
@@ -189,7 +190,7 @@ export function runAi(state: GameState, airlineId: string, catalog: Catalog, rng
       const needTotal = need.leases + need.overhead + need.bases + need.marketing;
       if (!t || al.cash < 3 * needTotal + t.leasePerMonth) break;
       const buy = al.cash > 2 * t.priceUsd && p.riskTolerance < 0.5;
-      if (!act({ type: buy ? 'buyAircraft' : 'leaseAircraft', typeId: t.id, cabin: defaultCabin(t, al.personality) })) break;
+      if (!act({ type: buy ? 'buyAircraft' : 'leaseAircraft', typeId: t.id, config: defaultConfig(t, al.personality) })) break;
       hours = hoursByAircraft(state, catalog);
       ac = freeAircraft()[0];
       if (!ac) break;

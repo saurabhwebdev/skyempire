@@ -191,3 +191,8 @@ export function defaultConfig(t: AircraftType, personality: PersonalityId | null
   const economy = Math.max(0, Math.floor(left / unitsPerSeat(draft, 'economy', t) + 1e-9));
   return { ...draft, seats: { economy, premium, business } };
 }
+
+/** The aircraft fields a cabin config sets. */
+export function cabinFields(config: CabinConfig): { cabin: CabinConfig['seats']; product: CabinProduct; dense: boolean; refitDaysLeft: number } {
+  return { cabin: { ...config.seats }, product: structuredClone(config.product), dense: config.dense, refitDaysLeft: 0 };
+}

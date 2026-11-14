@@ -14,7 +14,8 @@ export const type = (id: string): AircraftType => {
   return t;
 };
 
-import type { Command, GameState } from '@skyempire/shared';
+import type { Cabin, CabinConfig, CabinProduct, Command, GameState } from '@skyempire/shared';
+import { standardProduct } from './cabin';
 import { newGame } from './newGame';
 
 export function playerGame(hub = 'FRA', aiCount = 3): GameState {
@@ -33,5 +34,7 @@ export function playerGame(hub = 'FRA', aiCount = 3): GameState {
 
 export const fares = { economy: 120, premium: 220, business: 420 };
 export const allEconomy = (typeId: string) => ({ economy: type(typeId).maxSeats, premium: 0, business: 0 });
-export const lease = (typeId: string): Command => ({ type: 'leaseAircraft', typeId, cabin: allEconomy(typeId) });
+/** A standard-fit cabin config for tests. */
+export const config = (seats: Cabin, product: CabinProduct = standardProduct(), dense = false): CabinConfig => ({ seats, product: structuredClone(product), dense });
+export const lease = (typeId: string): Command => ({ type: 'leaseAircraft', typeId, config: config(allEconomy(typeId)) });
 export const playerAircraft = (s: GameState) => Object.values(s.aircraft).filter((a) => a.ownerId === s.playerId);

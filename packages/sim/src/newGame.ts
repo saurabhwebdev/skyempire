@@ -2,7 +2,8 @@ import { isReservedAirline } from '@skyempire/data';
 import type { Airline, AirlineData, Catalog, GameState, NewGameOptions } from '@skyempire/shared';
 import { PERSONALITIES } from './ai/personalities';
 import { BALANCE } from './config/balance';
-import { aircraftMarketValue, defaultCabin, tierAllows } from './fleet';
+import { aircraftMarketValue, tierAllows } from './fleet';
+import { cabinFields, defaultConfig } from './cabin';
 import { distanceKm } from './geo';
 import { nextId } from './ids';
 import { Rng } from './rng';
@@ -15,7 +16,7 @@ function blankAirline(id: string, cash: number): Omit<Airline, 'name' | 'code' |
     cash,
     loans: [],
     reputation: 50,
-    serviceLevel: 3,
+    cabinTemplates: [],
     marketingPerMonth: 0,
     tier: 'startup',
     completedObjectives: [],
@@ -105,7 +106,6 @@ export function newGame(opts: NewGameOptions, catalog: Catalog): GameState {
       homeBaseId: data.hubId,
       baseIds: [data.hubId],
       reputation: p.startReputation,
-      serviceLevel: p.serviceLevel,
       // The biggest network and super-connector carriers start with the whole catalog open.
       tier: data.sizeRank <= 10 && (data.personality === 'legacy' || data.personality === 'gulf') ? 'global' : p.startTier,
       creditRating: 'A',
@@ -130,7 +130,7 @@ export function newGame(opts: NewGameOptions, catalog: Catalog): GameState {
         flightHours: 0,
         hoursSinceA: rng.int(0, 400),
         hoursSinceC: rng.int(0, 5000),
-        cabin: defaultCabin(type, data.personality),
+        ...cabinFields(defaultConfig(type, data.personality)),
         status: 'active',
         maintenanceDaysLeft: 0,
         bookValue: aircraftMarketValue(type, ageDays, condition),

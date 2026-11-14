@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { refreshUsedListings } from '../newGame';
 import { Rng } from '../rng';
 import { applyCommand } from './apply';
-import { catalog, fares, lease, playerAircraft, playerGame } from '../testing';
+import { catalog, config, fares, lease, playerAircraft, playerGame } from '../testing';
+import { refitCost, standardProduct, upgradeCost } from '../cabin';
 
 const P = 'al_player';
 const run = (s: ReturnType<typeof playerGame>, cmd: Parameters<typeof applyCommand>[2]) => applyCommand(s, P, cmd, catalog);
@@ -27,7 +28,7 @@ describe('fleet commands', () => {
     const s = playerGame();
     s.airlines[P]!.tier = 'national';
     expect(run(s, lease('B752'))).toEqual({ ok: false, reason: 'Only available used' });
-    expect(run(s, { type: 'buyAircraft', typeId: 'B763', cabin: { economy: 200, premium: 0, business: 0 } })).toEqual({ ok: false, reason: 'Only available used' });
+    expect(run(s, { type: 'buyAircraft', typeId: 'B763', config: config({ economy: 200, premium: 0, business: 0 }) })).toEqual({ ok: false, reason: 'Only available used' });
   });
   it('the used market can list used-only types', () => {
     const s = playerGame();
@@ -40,14 +41,14 @@ describe('fleet commands', () => {
     expect(seen.has('B752')).toBe(true);
   });
   it('rejects too many seats', () => {
-    const r = run(playerGame(), { type: 'leaseAircraft', typeId: 'A20N', cabin: { economy: 180, premium: 0, business: 12 } });
+    const r = run(playerGame(), { type: 'leaseAircraft', typeId: 'A20N', config: config({ economy: 180, premium: 0, business: 12 }) });
     expect(r).toEqual({ ok: false, reason: 'Too many seats — max 194 seat units' });
   });
   it('reports the exact cash shortfall', () => {
     const s = playerGame();
     s.airlines[P]!.cash = 1_000_000;
     const price = catalog.aircraftTypes.A20N!.priceUsd;
-    expect(run(s, { type: 'buyAircraft', typeId: 'A20N', cabin: { economy: 194, premium: 0, business: 0 } })).toEqual({
+    expect(run(s, { type: 'buyAircraft', typeId: 'A20N', config: config({ economy: 194, premium: 0, business: 0 }) })).toEqual({
       ok: false,
       reason: `Not enough cash — you need ${formatMoney(price - 1_000_000)} more`,
     });
@@ -57,6 +58,58 @@ describe('fleet commands', () => {
     const before = structuredClone(s);
     run(s, lease('B77W'));
     expect(s).toEqual(before);
+  });
+});
+
+describe('cabin commands', () => {
+  const p = standardProduct();
+  const wifiScreens = { ...p, economy: { ...p.economy, ife: 'seatback' as const } };
+  it('a new aircraft gets its cabin and pays for upgrades over the standard fit', () => {
+    const s = playerGame();
+    const before = s.airlines[P]!.cash;
+    const c = config({ economy: 180, premium: 0, business: 0 }, wifiScreens);
+    expect(run(s, { type: 'leaseAircraft', typeId: 'A20N', config: c })).toEqual({ ok: true });
+    const ac = playerAircraft(s)[0]!;
+    expect(ac).toMatchObject({ cabin: c.seats, product: c.product, dense: false, refitDaysLeft: 0 });
+    expect(s.airlines[P]!.cash).toBe(before - catalog.aircraftTypes.A20N!.leasePerMonth - upgradeCost(c));
+  });
+  it('rejects a product the class does not offer', () => {
+    const c = config({ economy: 180, premium: 0, business: 0 }, { ...p, economy: { ...p.economy, meal: 'chef' } });
+    expect(run(playerGame(), { type: 'leaseAircraft', typeId: 'A20N', config: c }).ok).toBe(false);
+  });
+  it('changing seats starts a paid refit; changing meals is free and instant', () => {
+    const { s, ac } = withA20N();
+    const old = config(playerAircraft(s)[0]!.cabin);
+    const cash = s.airlines[P]!.cash;
+    const meals = config(old.seats, { ...p, economy: { ...p.economy, meal: 'hot' } });
+    expect(run(s, { type: 'setCabin', aircraftId: ac, config: meals })).toEqual({ ok: true });
+    expect(s.aircraft[ac]).toMatchObject({ refitDaysLeft: 0, product: meals.product });
+    expect(s.airlines[P]!.cash).toBe(cash);
+    const refit = config({ economy: 150, premium: 0, business: 12 }, meals.product);
+    expect(run(s, { type: 'setCabin', aircraftId: ac, config: refit })).toEqual({ ok: true });
+    expect(s.aircraft[ac]).toMatchObject({ refitDaysLeft: 5, cabin: refit.seats });
+    expect(s.airlines[P]!.cash).toBe(cash - refitCost(meals, refit));
+  });
+  it('no second refit while one is running, and no refit without the cash', () => {
+    const { s, ac } = withA20N();
+    s.aircraft[ac]!.refitDaysLeft = 3;
+    expect(run(s, { type: 'setCabin', aircraftId: ac, config: config({ economy: 150, premium: 0, business: 12 }) })).toEqual({ ok: false, reason: 'This aircraft is already being refitted (3 days left)' });
+    s.aircraft[ac]!.refitDaysLeft = 0;
+    s.airlines[P]!.cash = 0;
+    const r = run(s, { type: 'setCabin', aircraftId: ac, config: config({ economy: 150, premium: 0, business: 12 }) });
+    expect(!r.ok && r.reason).toMatch(/^Not enough cash/);
+  });
+  it('saves and deletes cabin layouts, up to 30', () => {
+    const s = playerGame();
+    const c = config({ economy: 150, premium: 0, business: 12 });
+    expect(run(s, { type: 'saveCabinTemplate', name: 'Short haul', typeId: 'A20N', config: c })).toEqual({ ok: true });
+    const [t] = s.airlines[P]!.cabinTemplates;
+    expect(t).toMatchObject({ name: 'Short haul', typeId: 'A20N', config: c });
+    expect(run(s, { type: 'saveCabinTemplate', name: 'Too big', typeId: 'A20N', config: config({ economy: 400, premium: 0, business: 0 }) }).ok).toBe(false);
+    expect(run(s, { type: 'deleteCabinTemplate', templateId: t!.id })).toEqual({ ok: true });
+    expect(s.airlines[P]!.cabinTemplates).toEqual([]);
+    for (let i = 0; i < 30; i++) run(s, { type: 'saveCabinTemplate', name: `L${i}`, typeId: 'A20N', config: c });
+    expect(run(s, { type: 'saveCabinTemplate', name: 'One more', typeId: 'A20N', config: c })).toEqual({ ok: false, reason: 'You can keep up to 30 layouts — delete one first' });
   });
 });
 
@@ -160,10 +213,9 @@ describe('airline and finance commands', () => {
     expect(r.ok).toBe(false);
     expect(!r.ok && r.reason).toMatch(/^Credit limit reached/);
   });
-  it('sets service level and marketing', () => {
+  it('sets marketing', () => {
     const s = playerGame();
-    run(s, { type: 'setServiceLevel', level: 5 });
     run(s, { type: 'setMarketing', perMonth: 250_000 });
-    expect(s.airlines[P]).toMatchObject({ serviceLevel: 5, marketingPerMonth: 250_000 });
+    expect(s.airlines[P]).toMatchObject({ marketingPerMonth: 250_000 });
   });
 });
