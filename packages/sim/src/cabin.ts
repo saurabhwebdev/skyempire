@@ -179,7 +179,12 @@ const PRODUCTS: Record<PersonalityId | 'player', (s: CabinProduct) => CabinProdu
 
 /** A sensible cabin for a type and airline style. The player (null) starts all-economy on the standard fit. */
 export function defaultConfig(t: AircraftType, personality: PersonalityId | null): CabinConfig {
-  const product = PRODUCTS[personality ?? 'player'](standardProduct());
+  let product = PRODUCTS[personality ?? 'player'](standardProduct());
+  // Short-haul aircraft: full-service airlines fit simpler business seats and lighter meals.
+  if (t.class !== 'widebody' && personality === 'legacy')
+    product = { ...product, economy: { ...product.economy, ife: 'wifi', meal: 'snack' }, business: { ...product.business, seat: 'recliner', ife: 'wifi', meal: 'hot' } };
+  if (t.class !== 'widebody' && personality === 'gulf')
+    product = { ...product, economy: { ...product.economy, seat: 'standard', ife: 'seatback' }, business: { ...product.business, seat: 'flat', ife: 'seatback', meal: 'dining' } };
   const max = t.maxSeats;
   const wide = t.class === 'widebody';
   let business = 0, premium = 0;

@@ -1,4 +1,5 @@
 /** Route economics diagnostic. Usage: tsx packages/sim/scripts/route-diag.ts */
+import { standardProduct } from '../src/cabin';
 import { loadCatalog } from '@skyempire/data';
 import { applyCommand } from '../src/commands/apply';
 import { refFare } from '../src/demand';
@@ -27,7 +28,7 @@ for (const [from, to, type, rt] of cases) {
   );
   s.airlines[s.playerId]!.tier = 'national';
   const t = catalog.aircraftTypes[type]!;
-  applyCommand(s, s.playerId, { type: 'leaseAircraft', typeId: type, cabin: { economy: t.maxSeats, premium: 0, business: 0 } }, catalog);
+  applyCommand(s, s.playerId, { type: 'leaseAircraft', typeId: type, config: { seats: { economy: t.maxSeats, premium: 0, business: 0 }, product: standardProduct(), dense: false } }, catalog);
   const ac = Object.values(s.aircraft).find((a) => a.ownerId === s.playerId)!.id;
   const cmd = { type: 'openRoute' as const, from, to, fares: { economy: 1, premium: 1, business: 1 }, assignments: [{ aircraftId: ac, roundTripsPerWeek: rt }] };
   const p = preview(s, s.playerId, cmd, catalog);

@@ -1,6 +1,7 @@
-import type { GameState } from '@skyempire/shared';
+import type { CabinProduct, GameState, Ife, Meal } from '@skyempire/shared';
+import { standardProduct } from './cabin';
 
-export const CURRENT_SCHEMA = 2;
+export const CURRENT_SCHEMA = 3;
 
 type Raw = Record<string, unknown>;
 
@@ -8,7 +9,30 @@ type Raw = Record<string, unknown>;
 export const migrations: Record<number, (s: Raw) => Raw> = {
   // v0.1 → v0.2: real calendar (v0.1 careers start in 2026), weather and tensions.
   1: (s) => ({ ...s, schemaVersion: 2, world: { startYear: 2026, liveWeather: {}, tensions: [], preCancelled: {} } }),
+  // v0.3 → v0.4: the airline-wide service level becomes a cabin product on every aircraft.
+  2: (s) => {
+    const airlines = s.airlines as Record<string, Raw>;
+    const level = (id: unknown) => Number((airlines[String(id)] ?? {}).serviceLevel ?? 3);
+    const aircraft = Object.fromEntries(Object.entries(s.aircraft as Record<string, Raw>).map(([id, ac]) => [id, { ...ac, product: productForLevel(level(ac.ownerId)), dense: false, refitDaysLeft: 0 }]));
+    const next = Object.fromEntries(Object.entries(airlines).map(([id, al]) => {
+      const { serviceLevel: _gone, ...rest } = al;
+      return [id, { ...rest, cabinTemplates: [] }];
+    }));
+    return { ...s, schemaVersion: 3, airlines: next, aircraft };
+  },
 };
+
+/** The v0.3 service levels 1–5 as products. Seats keep the standard fit, so every cabin still fits. */
+export function productForLevel(level: number): CabinProduct {
+  const p = standardProduct();
+  const [ife, meal]: [Ife, Meal] = ([['none', 'none'], ['none', 'buyOnBoard'], ['wifi', 'snack'], ['seatback', 'hot'], ['premium', 'hot']] as [Ife, Meal][])[Math.min(5, Math.max(1, level)) - 1]!;
+  const top = level >= 4;
+  return {
+    economy: { ...p.economy, ife, meal },
+    premium: { ...p.premium, ife, meal: level >= 4 ? 'dining' : 'hot', amenityKit: top },
+    business: { ...p.business, ife, meal: level >= 3 ? 'dining' : 'hot', amenityKit: top, lounge: top },
+  };
+}
 
 /** Upgrade a saved state of any older schema version to the current one. */
 export function migrate(raw: unknown): GameState {

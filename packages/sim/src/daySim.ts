@@ -10,7 +10,7 @@ import { holidayDemandFactors } from './holidays';
 import { isAirportClosed, isStormAffected } from './events';
 import { distanceKm } from './geo';
 import { onTimeFor } from './maintenance';
-import { blockHours, roundTripHours, seatUnits, slotCapacity } from './ops';
+import { blockHours, roundTripHours, slotCapacity } from './ops';
 import { offerQuality } from './quality';
 import { productScore } from './cabin';
 import { weatherAt, weatherEffect, type WeatherEffect } from './weather';
@@ -71,7 +71,6 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
   const struck = isAirportClosed(state, a.id) || isAirportClosed(state, b.id);
   const cyclone = wa === 'cyclone' || wb === 'cyclone';
   const closed = struck || cyclone;
-  const al = state.airlines[route.airlineId]!;
   const roundTrips = new Map<string, number>();
   const seats = emptyCabin();
   let rangeBlocked: string | null = null;

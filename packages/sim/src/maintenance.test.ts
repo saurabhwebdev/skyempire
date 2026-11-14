@@ -1,10 +1,11 @@
 import type { Aircraft } from '@skyempire/shared';
 import { describe, expect, it } from 'vitest';
 import { advanceAircraft, incidentChance, onTimeFor } from './maintenance';
+import { standardProduct } from './cabin';
 
 const ac = (o: Partial<Aircraft> = {}): Aircraft => ({
   id: 'a', typeId: 'A20N', ownerId: 'x', ownership: 'leased', ageDays: 0, condition: 90, flightHours: 0,
-  hoursSinceA: 0, hoursSinceC: 0, cabin: { economy: 194, premium: 0, business: 0 }, status: 'active', maintenanceDaysLeft: 0, bookValue: 0, ...o,
+  hoursSinceA: 0, hoursSinceC: 0, cabin: { economy: 194, premium: 0, business: 0 }, product: standardProduct(), dense: false, refitDaysLeft: 0, status: 'active', maintenanceDaysLeft: 0, bookValue: 0, ...o,
 });
 
 describe('maintenance', () => {

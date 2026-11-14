@@ -134,6 +134,11 @@ describe('default cabins', () => {
       for (const p of [null, 'budget', 'legacy', 'regional', 'gulf', 'expander'] as const)
         expect(checkConfig(defaultConfig(t, p), t), `${t.id} ${p}`).toBeNull();
   });
+  it('full-service rivals fit simpler business seats on short-haul aircraft', () => {
+    expect(defaultConfig(type('A20N'), 'legacy').product.business).toMatchObject({ seat: 'recliner', meal: 'hot', lounge: true });
+    expect(defaultConfig(type('A21N'), 'gulf').product.business).toMatchObject({ seat: 'flat', meal: 'dining' });
+    expect(defaultConfig(type('A21N'), 'gulf').product.economy.ife).toBe('seatback');
+  });
   it('gulf carriers fly suites, budget airlines slimline seats and buy-on-board', () => {
     expect(defaultConfig(type('B77W'), 'gulf').product.business.seat).toBe('suite');
     const budget = defaultConfig(type('A20N'), 'budget');
