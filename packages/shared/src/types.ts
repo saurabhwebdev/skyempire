@@ -98,7 +98,14 @@ export interface Catalog {
   airspace: AirspaceRegion[];
   /** ISO 3166 alpha-2 → English short name (Natural Earth). */
   countryNames: Record<string, string>;
+  /** Air cargo (v0.6): real annual tonnes for the big cargo airports, and each country's export strength. */
+  cargo?: { airportT: Record<string, number>; exportIndex: Record<string, number> };
 }
+
+/** Kinds of air cargo (v0.6). */
+export type CargoType = 'general' | 'express' | 'mail' | 'perishable' | 'dangerous' | 'special';
+export const CARGO_TYPES: readonly CargoType[] = ['general', 'express', 'mail', 'perishable', 'dangerous', 'special'] as const;
+export type CargoTonnes = Record<CargoType, number>;
 
 export interface Aircraft {
   id: string;
