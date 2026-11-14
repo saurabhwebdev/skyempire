@@ -8,6 +8,7 @@ export const ERR = {
   tooManySeats: (max: number) => `Too many seats — max ${max} seat units`,
   unknownType: 'Unknown aircraft type',
   usedOnly: 'Only available used',
+  preCancelWindow: 'You can cancel flights 1–3 days ahead',
   seasonalPast: 'Seasonal fares must start today or later',
   unknownAircraft: 'That aircraft isn’t in your fleet',
   unknownListing: 'That aircraft is no longer for sale',

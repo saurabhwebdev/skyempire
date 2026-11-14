@@ -40,6 +40,13 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
   const notes: Notification[] = [];
   s.day += 1;
 
+  // Cancellations-ahead for days already past are dropped.
+  for (const [routeId, days] of Object.entries(s.world.preCancelled)) {
+    const keep = s.routes[routeId] ? days.filter((d) => d >= s.day) : [];
+    if (keep.length) s.world.preCancelled[routeId] = keep;
+    else delete s.world.preCancelled[routeId];
+  }
+
   // 1. Commands
   const results = commands.map((c) => applyCommand(s, c.airlineId, c.cmd, catalog));
 
@@ -90,6 +97,7 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
         hoursFlown.set(acId, (hoursFlown.get(acId) ?? 0) + 2 * rt * ops.blockH);
       }
       const c = routeDayCosts(r, s, catalog, legs, p, ops.closed);
+      c.fees += ops.weatherFees;
       const revenue = ops.closed ? 0 : revenueOf(r, p, s.day);
       const cost = c.fuel + c.crew + c.maintenance + c.fees + c.service;
       const seats = totalSeats(ops);

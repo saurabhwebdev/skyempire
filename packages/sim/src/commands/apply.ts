@@ -22,6 +22,7 @@ export function applyCommand(state: GameState, airlineId: string, cmd: Command, 
     case 'openRoute':
     case 'updateRoute':
     case 'closeRoute':
+    case 'preCancel':
       return applyRoutes(state, airlineId, cmd, catalog);
     default:
       return applyAirline(state, airlineId, cmd, catalog);

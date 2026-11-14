@@ -2,7 +2,7 @@ import type { Cabin, CabinClass, Catalog, GameState, Route } from '@skyempire/sh
 import { CABIN_CLASSES } from '@skyempire/shared';
 import { allocate, type Offer } from './allocation';
 import { dateOf } from './calendar';
-import { BALANCE } from './config/balance';
+import { BALANCE, WEATHER } from './config/balance';
 import { baseDemand, classSplit, elasticDemand, refFare } from './demand';
 import { flightsToday } from './economics';
 import { effectiveFare } from './fares';
@@ -12,6 +12,7 @@ import { distanceKm } from './geo';
 import { onTimeFor } from './maintenance';
 import { blockHours, roundTripHours, seatUnits, slotCapacity } from './ops';
 import { offerQuality } from './quality';
+import { weatherAt, weatherEffect, type WeatherEffect } from './weather';
 
 export const emptyCabin = (): Cabin => ({ economy: 0, premium: 0, business: 0 });
 export const pairKey = (a: string, b: string) => (a < b ? `${a}-${b}` : `${b}-${a}`);
@@ -42,17 +43,30 @@ export interface RouteOps {
   quality: number;
   onTime: number;
   blockH: number;
+  /** Weather extras today: de-icing plus passenger care for cancelled or pre-cancelled seats. */
+  weatherFees: number;
 }
 
 /** What a route operates today. `average` = typical day (rtpw / 7) for previews. */
 export function routeOps(route: Route, state: GameState, catalog: Catalog, hours: Map<string, number>, average: boolean): RouteOps {
   const a = catalog.airports[route.from]!, b = catalog.airports[route.to]!;
   const dist = distanceKm(a, b);
-  const closed = isAirportClosed(state, a.id) || isAirportClosed(state, b.id);
+  // Weather applies to real days only; previews show a typical day.
+  const wa = average ? 'clear' : weatherAt(state, catalog, a.id, state.day);
+  const wb = average ? 'clear' : weatherAt(state, catalog, b.id, state.day);
+  const preCancelled = !average && (state.world.preCancelled[route.id]?.includes(state.day) ?? false);
+  const closed = isAirportClosed(state, a.id) || isAirportClosed(state, b.id) || wa === 'cyclone' || wb === 'cyclone';
   const al = state.airlines[route.airlineId]!;
   const roundTrips = new Map<string, number>();
   const seats = emptyCabin();
-  let weeklyFrequency = 0, condSum = 0, utilSum = 0, qualSum = 0, n = 0, blockH = 0;
+  let weeklyFrequency = 0, condSum = 0, utilSum = 0, qualSum = 0, penaltySum = 0, n = 0, blockH = 0, weatherFees = 0;
+  // Share of flights the weather cancels at one end: its own cancellations, or what reduced capacity can't handle.
+  const endCancel = (ap: typeof a, eff: WeatherEffect) => {
+    if (eff.capacityCut <= 0) return eff.cancelShare;
+    const used = state.slotsUsed[ap.id] ?? 0;
+    const overflow = used > 0 ? 1 - ((1 - eff.capacityCut) * slotCapacity(state, catalog, ap.id)) / used : 0;
+    return Math.min(1, Math.max(eff.cancelShare, overflow));
+  };
   for (const asg of route.assignments) {
     const ac = state.aircraft[asg.aircraftId];
     if (!ac) continue;
@@ -60,11 +74,25 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
     const t = catalog.aircraftTypes[ac.typeId]!;
     blockH = blockHours(dist, t.cruiseKmh);
     const flying = !closed && ac.status === 'active';
-    const rt = flying ? (average ? asg.roundTripsPerWeek / 7 : flightsToday(asg.roundTripsPerWeek, state.day)) : 0;
+    const scheduled = flying ? (average ? asg.roundTripsPerWeek / 7 : flightsToday(asg.roundTripsPerWeek, state.day)) : 0;
+    const acSeats = CABIN_CLASSES.reduce((s, c) => s + ac.cabin[c], 0);
+    const util = (hours.get(ac.id) ?? 0) / BALANCE.weeklyHours;
+    let rt = scheduled;
+    if (preCancelled) {
+      weatherFees += WEATHER.preCancelCostPerSeat * 2 * scheduled * acSeats;
+      rt = 0;
+    } else if (scheduled > 0) {
+      const ea = weatherEffect(wa, a, t.class), eb = weatherEffect(wb, b, t.class);
+      const cancel = Math.max(endCancel(a, ea), endCancel(b, eb));
+      rt = scheduled * (1 - cancel);
+      weatherFees += WEATHER.cancelCostPerSeat * 2 * (scheduled - rt) * acSeats;
+      weatherFees += rt * (ea.deicePerDeparture + eb.deicePerDeparture);
+      penaltySum += Math.max(ea.onTimePenalty, eb.onTimePenalty) * (util < WEATHER.spareUtilisation ? 0.5 : 1);
+    }
     roundTrips.set(ac.id, rt);
     for (const c of CABIN_CLASSES) seats[c] += rt * ac.cabin[c];
     condSum += ac.condition;
-    utilSum += (hours.get(ac.id) ?? 0) / BALANCE.weeklyHours;
+    utilSum += util;
     n += 1;
   }
   const congestion = Math.max(
@@ -74,7 +102,7 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
   const onTime = closed
     ? 40 // flights cancelled: counts as a bad day for punctuality
     : n
-    ? onTimeFor(condSum / n, congestion, utilSum / n, isStormAffected(state, a.id) || isStormAffected(state, b.id))
+    ? Math.max(40, onTimeFor(condSum / n, congestion, utilSum / n, isStormAffected(state, a.id) || isStormAffected(state, b.id)) - penaltySum / n)
     : BALANCE.baseOnTime;
   for (const asg of route.assignments) {
     const ac = state.aircraft[asg.aircraftId];
@@ -85,7 +113,7 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
       serviceLevel: al.serviceLevel, onTime,
     });
   }
-  return { route, closed, roundTrips, seats, weeklyFrequency, quality: n ? qualSum / n : 50, onTime, blockH };
+  return { route, closed, roundTrips, seats, weeklyFrequency, quality: n ? qualSum / n : 50, onTime, blockH, weatherFees: Math.round(weatherFees) };
 }
 
 export interface PairResult {

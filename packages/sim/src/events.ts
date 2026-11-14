@@ -1,5 +1,4 @@
 import type { ActiveEvent, Catalog, EventKind, GameState, Notification } from '@skyempire/shared';
-import { dateOf } from './calendar';
 import { nextId } from './ids';
 import type { Rng } from './rng';
 
@@ -36,8 +35,6 @@ export function rollEvents(state: GameState, catalog: Catalog, rng: Rng): Notifi
   }
 
   const airports = Object.values(catalog.airports);
-  const month = dateOf(state.day, state.world.startYear).month;
-  const winter = month === 11 || month === 12 || month === 1 || month === 2;
   const start = (kind: EventKind, days: number, magnitude: number, airportId?: string): ActiveEvent => {
     const e: ActiveEvent = { id: nextId(state, 'ev'), kind, startDay: state.day, endDay: state.day + days - 1, magnitude, ...(airportId ? { airportId } : {}) };
     state.events.push(e);
@@ -66,12 +63,7 @@ export function rollEvents(state: GameState, catalog: Catalog, rng: Rng): Notifi
     const level = playerBases(state).includes(ap.id) ? 'major' : 'warning';
     out.push(note(state, level, `Strike at ${ap.id}`, `${ap.name} is closed for ${days} day${days > 1 ? 's' : ''}. Flights there are cancelled.`, ap.id));
   }
-  if (rng.chance((winter ? 6 : 2) / 360)) {
-    const ap = rng.pick(airports);
-    const days = rng.int(1, 3);
-    start('storm', days, 1, ap.id);
-    out.push(note(state, 'warning', `Storm at ${ap.id}`, `${ap.name} is closed for ${days} day${days > 1 ? 's' : ''}.`, ap.id));
-  }
+  // Storms come from the weather model now (weather.ts); old saves' storm events still expire normally.
   if (rng.chance(2 / 360)) {
     const ap = rng.pick(airports.filter((a) => a.sizeClass >= 3));
     const bonus = Math.round(rng.range(0.2, 0.5) * 100) / 100;

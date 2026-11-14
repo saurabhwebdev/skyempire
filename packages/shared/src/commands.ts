@@ -40,6 +40,7 @@ export const CommandSchema = z.discriminatedUnion('type', [
     seasonalFares: z.array(SeasonalFareSchema).max(4).optional(),
   }),
   z.object({ type: z.literal('closeRoute'), routeId: id }),
+  z.object({ type: z.literal('preCancel'), routeId: id, day: z.number().int().nonnegative() }),
   z.object({ type: z.literal('openBase'), airportId: code }),
   z.object({ type: z.literal('closeBase'), airportId: code }),
   z.object({ type: z.literal('takeLoan'), amount: positiveMoney }),
@@ -58,6 +59,7 @@ export type Command =
   | { type: 'openRoute'; from: string; to: string; fares: Fares; assignments: Assignment[] }
   | { type: 'updateRoute'; routeId: string; fares?: Fares; assignments?: Assignment[]; seasonalFares?: SeasonalFare[] }
   | { type: 'closeRoute'; routeId: string }
+  | { type: 'preCancel'; routeId: string; day: number }
   | { type: 'openBase'; airportId: string }
   | { type: 'closeBase'; airportId: string }
   | { type: 'takeLoan'; amount: Money }

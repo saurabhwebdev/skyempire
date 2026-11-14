@@ -93,3 +93,35 @@ export const BALANCE = {
   msPerDay: { 1: 6000, 2: 3000, 4: 1500, 8: 750 },
   tickBudgetMs: 200,
 } as const;
+
+/** Weather (v0.2 design §2). Per-condition effects at one airport. */
+export const WEATHER = {
+  effects: {
+    clear: { capacityCut: 0, onTimePenalty: 0, cancelShare: 0 },
+    wind: { capacityCut: 0.1, onTimePenalty: 5, cancelShare: 0 },
+    rain: { capacityCut: 0.1, onTimePenalty: 5, cancelShare: 0 },
+    thunderstorm: { capacityCut: 0.3, onTimePenalty: 15, cancelShare: 0.05 },
+    snow: { capacityCut: 0.4, onTimePenalty: 20, cancelShare: 0.1 },
+    fog: { capacityCut: 0.35, onTimePenalty: 15, cancelShare: 0.05 },
+    cyclone: { capacityCut: 1, onTimePenalty: 0, cancelShare: 1 },
+  },
+  turbopropStormFactor: 1.5,
+  fogShortRunwayM: 2500,
+  fogShortRunwayFactor: 3,
+  deicePerDeparture: 300,
+  cancelCostPerSeat: 20, // passenger care when flights are cancelled on the day
+  preCancelCostPerSeat: 5, // cancelling ahead is cheaper
+  spareUtilisation: 0.85, // aircraft busier than this recover delays slower
+  // Climatology (daily probabilities)
+  pRain: 0.15,
+  pWind: 0.08,
+  pFog: 0.03,
+  pFogColdSeason: 0.06,
+  pStormTropicalWet: 0.1,
+  pStormSummer: 0.04,
+  pStormOther: 0.01,
+  pSnowBase: 0.04,
+  pSnowPerDegree: 0.002,
+  pSnowMax: 0.12,
+  pCycloneStart: 0.004,
+} as const;

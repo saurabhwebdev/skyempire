@@ -87,6 +87,14 @@ export function applyRoutes(state: GameState, airlineId: string, cmd: Command, c
       recomputeSlots(state);
       return { ok: true };
     }
+    case 'preCancel': {
+      const r = state.routes[cmd.routeId];
+      if (!r || r.airlineId !== airlineId) return fail(ERR.unknownRoute);
+      if (cmd.day < state.day + 1 || cmd.day > state.day + 3) return fail(ERR.preCancelWindow);
+      const days = state.world.preCancelled[r.id] ?? [];
+      if (!days.includes(cmd.day)) state.world.preCancelled[r.id] = [...days, cmd.day].sort((x, y) => x - y);
+      return { ok: true };
+    }
     default:
       throw new Error(`not a route command: ${cmd.type}`);
   }
