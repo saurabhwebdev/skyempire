@@ -1,4 +1,4 @@
-import type { Cabin, CabinClass, Catalog, GameState, Route } from '@skyempire/shared';
+import type { AircraftType, Cabin, CabinClass, Catalog, GameState, Route } from '@skyempire/shared';
 import { CABIN_CLASSES } from '@skyempire/shared';
 import { allocate, type Offer } from './allocation';
 import { dateOf } from './calendar';
@@ -55,7 +55,20 @@ export interface RouteOps {
   detourKm: number;
   /** Why the route (or some of its aircraft) can't fly today: a ban, no way around closed airspace, or out of range. */
   blocked: string | null;
+  /** Cargo tonnes it can carry today per direction on each leg: freighter payload, or belly holds. */
+  cargoCapT: number;
+  /** Has a main-deck freighter (live animals, outsize). */
+  special: boolean;
 }
+
+/** Hold tonnes for cargo and bags: the type's figure, else a typical one for its size. */
+export function bellyTOf(t: AircraftType): number {
+  return t.bellyT ?? ({ turboprop: 0.8, regional: 1.2, narrowbody: 2.5, longNarrowbody: 3, widebody: 12 } as const)[t.class];
+}
+/** Share of the hold sold for cargo on the default setting: narrowbody holds are mostly bags. */
+export const defaultHoldShare = (t: AircraftType) => (t.class === 'widebody' || t.class === 'longNarrowbody' ? 0.6 : 0.35);
+/** Above this hold share, bags start being left behind. */
+const BAG_ROOM = 0.75;
 
 /** What a route operates today. `average` = typical day (rtpw / 7) for previews. */
 export function routeOps(route: Route, state: GameState, catalog: Catalog, hours: Map<string, number>, average: boolean): RouteOps {
@@ -76,6 +89,11 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
   const roundTrips = new Map<string, number>();
   const seats = emptyCabin();
   let rangeBlocked: string | null = null;
+  const al = state.airlines[route.airlineId]!;
+  const cargoRoute = route.kind === 'cargo';
+  const customShare = route.belly?.mode === 'custom' ? route.belly.holdShare : null;
+  const bellyOn = !cargoRoute && al.bellyCargo !== false;
+  let cargoCapT = 0, special = false;
   let weeklyFrequency = 0, condSum = 0, utilSum = 0, penaltySum = 0, n = 0, blockH = 0, weatherFees = 0;
   // Share of flights the weather cancels at one end: its own cancellations, or what reduced capacity can't handle.
   const endCancel = (ap: (typeof chain)[number], eff: WeatherEffect) => {
@@ -111,6 +129,8 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
     }
     roundTrips.set(ac.id, rt);
     for (const c of CABIN_CLASSES) seats[c] += rt * ac.cabin[c];
+    if (cargoRoute && t.kind === 'freighter') { cargoCapT += rt * (t.payloadT ?? 0); special ||= !!t.special; }
+    else if (bellyOn && t.kind !== 'freighter') cargoCapT += rt * bellyTOf(t) * (customShare ?? defaultHoldShare(t));
     condSum += ac.condition;
     utilSum += util;
     n += 1;
@@ -137,11 +157,13 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
     }
   }
   for (const cls of CABIN_CLASSES) quality[cls] = qualSeats[cls] > 0 ? quality[cls] / qualSeats[cls] : 50;
+  // A hold filled with cargo leaves bags behind.
+  if (bellyOn && customShare !== null && customShare > BAG_ROOM) for (const cls of CABIN_CLASSES) quality[cls] -= (customShare - BAG_ROOM) * 40;
   const allSeats = CABIN_CLASSES.reduce((s, c) => s + qualSeats[c], 0);
   const qualityMean = allSeats > 0 ? CABIN_CLASSES.reduce((s, c) => s + quality[c] * qualSeats[c], 0) / allSeats : 50;
   return {
     route, closed, roundTrips, seats, weeklyFrequency, quality, qualityMean, onTime, blockH, weatherFees: Math.round(weatherFees),
-    detourKm: flights.reduce((x, f) => x + f.detourKm, 0), blocked: blocked ?? rangeBlocked,
+    detourKm: flights.reduce((x, f) => x + f.detourKm, 0), blocked: blocked ?? rangeBlocked, cargoCapT, special,
   };
 }
 

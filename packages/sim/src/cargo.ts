@@ -21,9 +21,12 @@ const DOMESTIC = 0.8;
 /** General cargo reference rate, $/kg. */
 export const cargoRefRate = (km: number) => 0.8 + 0.00028 * km;
 
-/** Annual cargo tonnes: the real figure for the big cargo airports, else an estimate from size and wealth. */
+/** Airports outside the real top cargo list handle less than this. */
+const ESTIMATE_CAP_T = 300_000;
+
+/** Annual cargo tonnes: the real figure for the big cargo airports, else an estimate from size and wealth (capped). */
 export function airportCargoT(catalog: Catalog, a: Airport): number {
-  return catalog.cargo?.airportT[a.id] ?? 1500 * a.population ** 0.8 * a.wealth * a.sizeClass;
+  return catalog.cargo?.airportT[a.id] ?? Math.min(ESTIMATE_CAP_T, 12_000 * a.population ** 0.8 * a.wealth * a.sizeClass);
 }
 
 export const exportIndex = (catalog: Catalog, country: string) => catalog.cargo?.exportIndex[country] ?? 1;

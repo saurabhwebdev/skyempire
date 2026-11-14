@@ -195,7 +195,7 @@ export interface Route {
   belly?: BellySettings;
 }
 
-/** Belly cargo on a passenger route: the market default, or the player's own rate, cargo types and hold share (0.4–0.9). */
+/** Belly cargo on a passenger route: the market default, or the player's own rate, cargo types and hold share (0.2–0.9). */
 export type BellySettings = { mode: 'default' } | { mode: 'custom'; rate: number; accept: CargoType[]; holdShare: number };
 
 export interface SeasonalFare {

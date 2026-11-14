@@ -95,7 +95,7 @@ describe('flying a route with stops', () => {
     for (const p of Object.values(last.marketPax!)) expect(p.economy).toBeGreaterThan(0);
     const r = st.routes[id]!;
     const revenue = routeMarkets(r).reduce((sum, m) => sum + CABIN_CLASSES.reduce((x, c) => x + last.marketPax![m.key]![c] * marketFare(r, m.a, m.b, c, st.day), 0), 0);
-    expect(last.revenue).toBe(Math.round(revenue));
+    expect(last.revenue - (last.cargoRevenue ?? 0)).toBe(Math.round(revenue)); // plus any belly cargo
     expect(last.legLoad).toHaveLength(2);
   });
   it('never puts more passengers on a leg than it has seats, even when cheap fares flood it', () => {

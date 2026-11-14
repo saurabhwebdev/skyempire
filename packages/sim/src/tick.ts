@@ -7,6 +7,7 @@ import { recomputeSlots } from './commands/slots';
 import { applyCommand } from './commands/apply';
 import { refFare } from './demand';
 import { hoursByAircraft, pairKey, routeOps, simulateRoutes, type RouteOps } from './daySim';
+import { simulateCargo } from './cargoSim';
 import { routeDayCosts } from './economics';
 import { rollEvents } from './events';
 import { rollTensions } from './tensions';
@@ -89,7 +90,10 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
 
   // 6. Revenue & variable costs
   // Every market of every route competes with the other routes selling it (multi-stop routes sell several).
-  const { results: sold } = simulateRoutes([...byPair.values()].flat(), s, catalog);
+  const allOps = [...byPair.values()].flat();
+  const { results: sold } = simulateRoutes(allOps, s, catalog);
+  // Cargo: freighter routes, and belly holds on passenger routes.
+  const cargo = simulateCargo(allOps, s, catalog);
   for (const opsList of byPair.values()) {
     for (const ops of opsList) {
       const r = ops.route;
@@ -100,12 +104,19 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
         legs.set(acId, 2 * rt);
         hoursFlown.set(acId, (hoursFlown.get(acId) ?? 0) + 2 * rt * ops.blockH);
       }
-      const revenue = ops.closed ? 0 : res.revenue;
+      const cg = ops.closed ? undefined : cargo.get(r.id);
+      const revenue = ops.closed ? 0 : res.revenue + (cg?.revenue ?? 0);
       const c = routeDayCosts(r, s, catalog, legs, p, ops.closed, res.ticketRevenue);
-      c.fees += ops.weatherFees;
+      c.fees += ops.weatherFees + (cg?.handling ?? 0);
       const cost = c.fuel + c.crew + c.maintenance + c.fees + c.service;
       const paxTotal = CABIN_CLASSES.reduce((sum, k) => sum + p[k], 0);
-      r.last = { pax: p, loadFactor: res.loadFactor, revenue, cost, profit: revenue - cost };
+      const loadFactor = r.kind === 'cargo' ? (cg?.load ?? 0) : res.loadFactor;
+      r.last = { pax: p, loadFactor, revenue, cost, profit: revenue - cost };
+      if (cg || r.kind === 'cargo') {
+        r.last.cargoT = cg?.tonnes ?? 0;
+        r.last.cargoRevenue = cg?.revenue ?? 0;
+        if (r.kind === 'cargo') r.last.cargoLoad = cg?.load ?? 0;
+      }
       if (r.stops?.length) {
         r.last.marketPax = Object.fromEntries(res.marketPax);
         r.last.legLoad = res.legLoad;

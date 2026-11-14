@@ -1,4 +1,4 @@
-import { CURRENT_SCHEMA } from './migrate';
+import { COMBINATION_CARRIERS, CURRENT_SCHEMA } from './migrate';
 import { isReservedAirline } from '@skyempire/data';
 import type { Airline, AirlineData, Catalog, GameState, NewGameOptions } from '@skyempire/shared';
 import { PERSONALITIES } from './ai/personalities';
@@ -110,6 +110,9 @@ export function newGame(opts: NewGameOptions, catalog: Catalog): GameState {
       homeBaseId: data.hubId,
       baseIds: [data.hubId],
       reputation: p.startReputation,
+      // Low-cost carriers don't sell belly cargo (quick turnarounds, no cargo handling).
+      bellyCargo: data.personality !== 'budget' && data.personality !== 'expander',
+      kind: data.kind ?? (COMBINATION_CARRIERS.includes(data.iata) ? 'combination' : 'passenger'),
       // The biggest network and super-connector carriers start with the whole catalog open.
       tier: data.sizeRank <= 10 && (data.personality === 'legacy' || data.personality === 'gulf') ? 'global' : p.startTier,
       creditRating: 'A',

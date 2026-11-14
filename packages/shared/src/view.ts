@@ -46,6 +46,10 @@ export interface PreviewResult {
   expectedProfitPerDay?: Money;
   paybackDays?: number | null;
   suggestedFares?: Record<CabinClass, Money>;
+  /** Cargo carried per day (both ways), tonnes: freighters or belly. */
+  expectedCargoT?: number;
+  /** Cargo routes: the general rate ($/kg) that earns the most. */
+  suggestedCargoRate?: number;
   /** Multi-stop routes: suggested fares for each market other than end to end, keyed by pairKey. */
   suggestedLegFares?: Record<string, Record<CabinClass, Money>>;
   demandPerDay?: number;

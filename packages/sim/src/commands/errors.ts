@@ -15,6 +15,8 @@ export const ERR = {
   convertOwnedOnly: 'Only aircraft you own can be converted',
   convertOffRoutes: 'Take it off its routes first',
   dgAlready: 'You already hold a dangerous-goods licence',
+  freightersCargoOnly: 'Freighters fly cargo routes only',
+  cargoRoutesFreighters: 'Cargo routes need freighters',
   refitRunning: (days: number) => `This aircraft is already being refitted (${days} day${days === 1 ? '' : 's'} left)`,
   tooManyLayouts: 'You can keep up to 30 layouts — delete one first',
   unknownLayout: 'That layout doesn’t exist',

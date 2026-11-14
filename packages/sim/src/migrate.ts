@@ -28,7 +28,8 @@ export const migrations: Record<number, (s: Raw) => Raw> = {
   // v0.5 → v0.6: airline types and belly cargo. Real combination carriers keep flying freighters.
   4: (s) => {
     const airlines = Object.fromEntries(Object.entries(s.airlines as Record<string, Raw>).map(([id, al]) => [id, {
-      ...al, kind: !al.isPlayer && COMBINATION_CARRIERS.includes(String(al.code)) ? 'combination' : 'passenger', bellyCargo: true, dgLicence: false,
+      ...al, kind: !al.isPlayer && COMBINATION_CARRIERS.includes(String(al.code)) ? 'combination' : 'passenger',
+      bellyCargo: al.personality !== 'budget' && al.personality !== 'expander', dgLicence: false,
     }]));
     const routes = Object.fromEntries(Object.entries(s.routes as Record<string, Raw>).map(([id, r]) => [id, { ...r, kind: 'passenger', belly: { mode: 'default' } }]));
     return { ...s, schemaVersion: 5, airlines, routes };

@@ -5,6 +5,8 @@ const chainKey = (c: string[]) => { const f = c.join('>'), b = [...c].reverse().
 import { distanceKm } from '../geo';
 import { flightDistanceKm, pairKey, routeChain, routeLegs, routeMarkets } from '../routing';
 import { refFare } from '../demand';
+import { cargoRefRate } from '../cargo';
+import { CARGO_TYPES } from '@skyempire/shared';
 import { banMessage, isBanned } from '../tensions';
 import { nextId } from '../ids';
 import { aircraftHoursUsed, chainRoundTripHours, slotCapacity, slotsNeeded } from '../ops';
@@ -18,7 +20,17 @@ const fail = (reason: string): Fail => ({ ok: false, reason });
 /** Validate a set of assignments for from → stops → to. `excludeRouteId` = the route being edited. */
 export function validateAssignments(
   state: GameState, airlineId: string, from: string, to: string, assignments: Assignment[], catalog: Catalog, excludeRouteId?: string, stops: string[] = [],
+  kind: 'passenger' | 'cargo' = 'passenger',
 ): Fail | null {
+  const al = state.airlines[airlineId]!;
+  if (kind === 'cargo' && al.kind === 'passenger') return fail(ERR.passengerNoFreighters);
+  if (kind === 'passenger' && al.kind === 'cargo') return fail(ERR.cargoNoPassengers);
+  for (const asg of assignments) {
+    const t = catalog.aircraftTypes[state.aircraft[asg.aircraftId]?.typeId ?? ''];
+    if (!t) continue;
+    if (kind === 'passenger' && t.kind === 'freighter') return fail(ERR.freightersCargoOnly);
+    if (kind === 'cargo' && t.kind !== 'freighter') return fail(ERR.cargoRoutesFreighters);
+  }
   const chain = [from, ...stops, to];
   for (const id of chain) if (!catalog.airports[id]) return fail(ERR.unknownAirport(id));
   const legs = routeLegs({ from, to, stops });
@@ -87,7 +99,8 @@ export function applyRoutes(state: GameState, airlineId: string, cmd: Command, c
       // The same chain (either way round) can't be flown twice; a nonstop and a one-stop between the same ends can.
       const key = chainKey(chain);
       if (Object.values(state.routes).some((r) => r.airlineId === airlineId && chainKey(routeChain(r)) === key)) return fail(ERR.duplicateRoute);
-      const bad = validateAssignments(state, airlineId, cmd.from, cmd.to, cmd.assignments, catalog, undefined, stops);
+      const kind = cmd.kind ?? 'passenger';
+      const bad = validateAssignments(state, airlineId, cmd.from, cmd.to, cmd.assignments, catalog, undefined, stops, kind);
       if (bad) return bad;
       const id = nextId(state, 'rt');
       const legFares = fillLegFares(catalog, cmd.from, cmd.to, stops, cmd.legFares);
@@ -95,6 +108,10 @@ export function applyRoutes(state: GameState, airlineId: string, cmd: Command, c
         id, airlineId, from: cmd.from, to: cmd.to, fares: { ...cmd.fares }, assignments: cmd.assignments.map((a) => ({ ...a })),
         status: 'active', openedDay: state.day, last: null, profit30: [],
         ...(stops.length ? { stops: [...stops], legFares } : {}),
+        kind,
+        ...(kind === 'cargo'
+          ? { cargoRate: cmd.cargoRate ?? Math.round(cargoRefRate(distanceKm(catalog.airports[cmd.from]!, catalog.airports[cmd.to]!)) * 100) / 100, cargoAccept: [...(cmd.cargoAccept ?? CARGO_TYPES)] }
+          : { belly: cmd.belly ? structuredClone(cmd.belly) : { mode: 'default' as const } }),
       };
       recomputeSlots(state);
       return { ok: true };
@@ -103,7 +120,7 @@ export function applyRoutes(state: GameState, airlineId: string, cmd: Command, c
       const r = state.routes[cmd.routeId];
       if (!r || r.airlineId !== airlineId) return fail(ERR.unknownRoute);
       if (cmd.assignments && cmd.assignments.length > 0) {
-        const bad = validateAssignments(state, airlineId, r.from, r.to, cmd.assignments, catalog, r.id, r.stops ?? []);
+        const bad = validateAssignments(state, airlineId, r.from, r.to, cmd.assignments, catalog, r.id, r.stops ?? [], r.kind ?? 'passenger');
         if (bad) return bad;
       }
       if (cmd.seasonalFares) {
@@ -113,6 +130,10 @@ export function applyRoutes(state: GameState, airlineId: string, cmd: Command, c
         r.seasonalFares = cmd.seasonalFares.map((f) => ({ ...f }));
       }
       if (cmd.fares) r.fares = { ...cmd.fares };
+      if (r.kind === 'cargo') {
+        if (cmd.cargoRate !== undefined) r.cargoRate = cmd.cargoRate;
+        if (cmd.cargoAccept) r.cargoAccept = [...cmd.cargoAccept];
+      } else if (cmd.belly) r.belly = structuredClone(cmd.belly);
       if (cmd.legFares && r.stops?.length) r.legFares = fillLegFares(catalog, r.from, r.to, r.stops, { ...r.legFares, ...cmd.legFares });
       if (cmd.assignments) {
         r.assignments = cmd.assignments.map((a) => ({ ...a }));

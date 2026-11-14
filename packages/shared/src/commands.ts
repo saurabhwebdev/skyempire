@@ -25,7 +25,7 @@ const cargoType = z.enum(['general', 'express', 'mail', 'perishable', 'dangerous
 const cargoRate = z.number().positive().max(50);
 export const BellySchema = z.union([
   z.object({ mode: z.literal('default') }).strict(),
-  z.object({ mode: z.literal('custom'), rate: cargoRate, accept: z.array(cargoType).max(6), holdShare: z.number().min(0.4).max(0.9) }).strict(),
+  z.object({ mode: z.literal('custom'), rate: cargoRate, accept: z.array(cargoType).max(6), holdShare: z.number().min(0.2).max(0.9) }).strict(),
 ]);
 export const FaresSchema = z.object({ economy: positiveMoney, premium: positiveMoney, business: positiveMoney });
 export const SeasonalFareSchema = z

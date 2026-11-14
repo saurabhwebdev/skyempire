@@ -4,6 +4,8 @@ import { applyCommand } from './commands/apply';
 import { BALANCE } from './config/balance';
 import { hoursByAircraft, routeOps, simulateRoutes } from './daySim';
 import { refFare } from './demand';
+import { cargoRefRate } from './cargo';
+import { simulateCargo } from './cargoSim';
 import { routeDayCosts } from './economics';
 import { perPaxServiceCost } from './cabin';
 import { distanceKm } from './geo';
@@ -47,9 +49,12 @@ function evaluate(s: GameState, routeId: string, catalog: Catalog) {
     upfront += (ac.ownership === 'leased' ? t.leasePerMonth : ac.bookValue) * share;
   }
   const endKey = pairKey(route.from, route.to);
-  const profit = Math.round(res.revenue - (c.fuel + c.crew + c.maintenance + c.fees + c.service) - fixed);
+  const cg = simulateCargo(opsList, s, catalog).get(routeId);
+  const revenue = res.revenue + (cg?.revenue ?? 0);
+  const profit = Math.round(revenue - (c.fuel + c.crew + c.maintenance + c.fees + c.service) - (cg?.handling ?? 0) - fixed);
   const competitors = all.filter((r) => r.id !== routeId && routeMarkets(r).some((m) => m.key === endKey)).length;
-  return { profit, lf: res.loadFactor, demand: demand.get(endKey) ?? 0, competitors, upfront, pax: res.pax, marketPax: res.marketPax };
+  const lf = route.kind === 'cargo' ? (cg?.load ?? 0) : res.loadFactor;
+  return { profit, lf, demand: demand.get(endKey) ?? 0, competitors, upfront, pax: res.pax, marketPax: res.marketPax, cargoT: cg?.tonnes ?? 0, cargoMargin: (cg?.revenue ?? 0) - (cg?.handling ?? 0) };
 }
 
 /** Projected effect of a route command without changing `state` (used for UI hints and AI scoring). */
@@ -88,6 +93,20 @@ export function preview(state: GameState, airlineId: string, cmd: Command, catal
     suggested[cls] = best.fare;
   }
   route.fares = { ...suggested };
+  // Cargo routes: the general rate per kg that earns the most after handling.
+  let suggestedCargoRate: number | undefined;
+  if (route.kind === 'cargo') {
+    const chosen = route.cargoRate;
+    const ref = cargoRefRate(dist);
+    let best = { rate: ref, value: -Infinity };
+    for (const k of FARE_STEPS) {
+      route.cargoRate = Math.round(ref * k * 100) / 100;
+      const value = evaluate(s, routeId, catalog).cargoMargin;
+      if (value > best.value + 1e-6) best = { rate: route.cargoRate, value };
+    }
+    suggestedCargoRate = best.rate;
+    route.cargoRate = chosen;
+  }
   let suggestedLegFares: Record<string, Record<CabinClass, number>> | undefined;
   if (route.stops?.length) {
     suggestedLegFares = {};
@@ -124,6 +143,8 @@ export function preview(state: GameState, airlineId: string, cmd: Command, catal
     expectedProfitPerDay: e.profit,
     paybackDays: e.profit > 0 ? Math.ceil(e.upfront / e.profit) : null,
     suggestedFares: suggested,
+    ...(suggestedCargoRate !== undefined ? { suggestedCargoRate } : {}),
+    ...(e.cargoT > 0 || route.kind === 'cargo' ? { expectedCargoT: Math.round(e.cargoT * 10) / 10 } : {}),
     ...(suggestedLegFares ? { suggestedLegFares } : {}),
     demandPerDay: Math.round(e.demand),
     competitors: e.competitors,

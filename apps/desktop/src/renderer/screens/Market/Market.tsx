@@ -9,7 +9,7 @@ import { useGameStore, useUi } from '../../store';
 import { airportFilter, airportRank } from '../NewAirline/NewAirline';
 
 const AIRPORTS = Object.values(catalog.airports).sort((a, b) => b.population - a.population);
-export const PERSONALITY_LABEL = { budget: 'Low-cost', legacy: 'Network', gulf: 'Super-connector', regional: 'Regional', expander: 'Fast-growing low-cost' } as const;
+export const PERSONALITY_LABEL = { budget: 'Low-cost', legacy: 'Network', gulf: 'Super-connector', regional: 'Regional', expander: 'Fast-growing low-cost', integrator: 'Express cargo', freightCarrier: 'Cargo airline' } as const;
 
 function DemandLookup() {
   const [a, setA] = useState<Airport | null>(null);
