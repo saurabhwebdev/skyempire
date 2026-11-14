@@ -3,7 +3,7 @@ import { app, ipcMain, net, shell, type BrowserWindow } from 'electron';
 import electronUpdater from 'electron-updater';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { canSelfUpdate, isNewer, parseRelease, RELEASES_API, RELEASES_PAGE } from './updateLogic';
+import { canSelfUpdate, canStartDownload, isNewer, parseRelease, RELEASES_API, RELEASES_PAGE } from './updateLogic';
 
 const CHECK_EVERY_MS = 6 * 60 * 60 * 1000;
 
@@ -32,6 +32,8 @@ export function initUpdater(win: BrowserWindow): void {
   autoUpdater.on('error', (e) => {
     console.error('Updater error', e);
     if (state.status === 'downloading') set({ status: 'error', error: 'The download failed. Check your connection and try again.' });
+    // install() failed (e.g. the downloaded installer was removed): let the player download again.
+    else if (state.status === 'ready') set({ status: 'error', error: "The update couldn't start. Download it again." });
   });
 
   let checking: Promise<UpdateState> | null = null;
@@ -47,7 +49,8 @@ export function initUpdater(win: BrowserWindow): void {
         else set({ status: 'available', version: latest.version, notes: latest.notes, url: latest.url });
       } catch (e) {
         console.error('Update check failed', e);
-        if (state.status !== 'available') set({ status: 'error', error: "Couldn't reach GitHub. Check your connection." });
+        // A failed check is not a failed update: clear `version` so the banner stays hidden (Settings shows the message).
+        if (state.status !== 'available') set({ status: 'error', version: undefined, error: "Couldn't reach GitHub. Check your connection." });
       }
       return state;
     })().finally(() => { checking = null; });
@@ -57,7 +60,7 @@ export function initUpdater(win: BrowserWindow): void {
   ipcMain.handle(IPC.updateGet, () => state);
   ipcMain.handle(IPC.updateCheck, () => check());
   ipcMain.handle(IPC.updateDownload, async () => {
-    if (!state.canInstall || state.status !== 'available') return;
+    if (!canStartDownload(state)) return;
     set({ status: 'downloading', percent: 0, error: undefined });
     try {
       await autoUpdater.checkForUpdates();

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canSelfUpdate, changelogSection, isNewer, parseRelease } from './updateLogic';
+import { canSelfUpdate, canStartDownload, changelogSection, isNewer, parseRelease } from './updateLogic';
 
 describe('isNewer', () => {
   it('compares major, minor and patch numerically', () => {
@@ -50,5 +50,19 @@ describe('changelogSection', () => {
   it('does not match a version prefix', () => {
     expect(changelogSection('## 0.3.10\n- x', '0.3.1')).toBe('');
     expect(changelogSection(md, '9.9.9')).toBe('');
+  });
+});
+
+describe('canStartDownload', () => {
+  const s = { status: 'available', version: '0.4.0', current: '0.3.0', canInstall: true };
+  it('allows a first download and a retry after a failed one', () => {
+    expect(canStartDownload(s)).toBe(true);
+    expect(canStartDownload({ ...s, status: 'error' })).toBe(true);
+  });
+  it('refuses when up to date, already downloading, or not installable', () => {
+    expect(canStartDownload({ ...s, status: 'error', version: '0.3.0' })).toBe(false);
+    expect(canStartDownload({ ...s, status: 'error', version: undefined })).toBe(false);
+    expect(canStartDownload({ ...s, status: 'downloading' })).toBe(false);
+    expect(canStartDownload({ ...s, canInstall: false })).toBe(false);
   });
 });

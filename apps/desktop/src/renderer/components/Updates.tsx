@@ -123,7 +123,10 @@ export function WhatsNewAfterUpdate() {
     try {
       const seen = localStorage.getItem(SEEN_KEY);
       localStorage.setItem(SEEN_KEY, current);
-      if (seen && seen !== current && changelogSection(changelog, current)) setOpen(true);
+      if (!changelogSection(changelog, current) || seen === current) return;
+      if (seen) setOpen(true);
+      // v0.2 didn't record its version: an existing save means this is an upgrade, not a first install.
+      else void window.game.listSaves().then((saves) => { if (saves.length) setOpen(true); }).catch(() => {});
     } catch { /* storage unavailable */ }
   }, [current]);
   if (!current) return null;

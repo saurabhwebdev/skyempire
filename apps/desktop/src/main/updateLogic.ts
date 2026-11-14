@@ -52,3 +52,8 @@ export function changelogSection(md: string, version: string): string {
   const end = lines.findIndex((l, i) => i > start && /^##\s/.test(l));
   return lines.slice(start + 1, end < 0 ? undefined : end).join('\n').trim();
 }
+
+/** A download may start from a known newer release, including a retry after a failed one. */
+export function canStartDownload(s: { status: string; version?: string; current: string; canInstall: boolean }): boolean {
+  return s.canInstall && (s.status === 'available' || s.status === 'error') && !!s.version && isNewer(s.version, s.current);
+}

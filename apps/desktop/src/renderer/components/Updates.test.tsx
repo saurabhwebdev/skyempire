@@ -113,10 +113,25 @@ describe('settings update row', () => {
 describe('what’s new after an update', () => {
   beforeEach(() => { localStorage.clear(); useUpdates.setState({ state: null, dismissed: null }); });
   it('does not show on a first install', () => {
+    window.game = { listSaves: vi.fn(async () => []) } as unknown as typeof window.game;
     wrap(<WhatsNewAfterUpdate />);
     show({ current: '0.2.0', status: 'none' });
     expect(screen.queryByText(/Updated to SkyEmpire/)).toBeNull();
     expect(localStorage.getItem('se:lastVersion')).toBe('0.2.0');
+  });
+  it('treats an existing save without a recorded version as an upgrade from v0.2', async () => {
+    window.game = { listSaves: vi.fn(async () => [{ id: 's1' }]) } as unknown as typeof window.game;
+    wrap(<WhatsNewAfterUpdate />);
+    show({ current: '0.2.0', status: 'none' });
+    expect(await screen.findByText('Updated to SkyEmpire 0.2.0')).toBeInTheDocument();
+  });
+  it('stays quiet on a first install with no saves', async () => {
+    const listSaves = vi.fn(async () => []);
+    window.game = { listSaves } as unknown as typeof window.game;
+    wrap(<WhatsNewAfterUpdate />);
+    show({ current: '0.2.0', status: 'none' });
+    await waitFor(() => expect(listSaves).toHaveBeenCalled());
+    expect(screen.queryByText(/Updated to SkyEmpire/)).toBeNull();
   });
   it('shows once after the version changes', () => {
     localStorage.setItem('se:lastVersion', '0.1.0');

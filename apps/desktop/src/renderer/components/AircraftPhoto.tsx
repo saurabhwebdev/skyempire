@@ -9,11 +9,13 @@ export function AircraftPhoto({ typeId, className, credit = false, eager = false
   const p = photoOf(typeId);
   const [failed, setFailed] = useState(false);
   const name = catalog.aircraftTypes[typeId]?.name ?? typeId;
+  // A <figure> only when there's a caption: the plain photo sits inside buttons.
+  const Wrap = credit ? 'figure' : 'span';
   if (!p || failed) {
-    return <div className={cn('flex items-center justify-center bg-surface-2 p-4', className)}><AircraftSilhouette typeId={typeId} className="h-1/2 w-full text-muted" /></div>;
+    return <span className={cn('flex items-center justify-center bg-surface-2 p-4', className)}><AircraftSilhouette typeId={typeId} className="h-1/2 w-full text-muted" /></span>;
   }
   return (
-    <figure className="flex flex-col gap-1.5">
+    <Wrap className="flex flex-col gap-1.5">
       <img src={p.url} alt={`${name} in flight or on the ground`} loading={eager ? 'eager' : 'lazy'} decoding="async" width={960} height={640}
         onError={() => setFailed(true)} className={cn('w-full bg-surface-2 object-cover', className)} />
       {credit && (
@@ -23,6 +25,6 @@ export function AircraftPhoto({ typeId, className, credit = false, eager = false
           {' '}· Wikimedia Commons
         </figcaption>
       )}
-    </figure>
+    </Wrap>
   );
 }
