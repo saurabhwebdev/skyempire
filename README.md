@@ -2,6 +2,14 @@
 
 > Start your own airline. Grow it. Beat the incumbents.
 
+<p align="center">
+  <a href="https://github.com/saurabhwebdev/skyempire/blob/main/docs/media/skyempire-trailer.mp4">
+    <img src="docs/media/skyempire-trailer-poster.jpg" alt="Watch the SkyEmpire trailer (45 seconds)" width="720">
+  </a>
+  <br>
+  <sub>▶ <a href="https://github.com/saurabhwebdev/skyempire/blob/main/docs/media/skyempire-trailer.mp4">Watch the 45-second trailer</a> · Music: “Uplifting Corporate” by Soundrider/Dope (CC BY)</sub>
+</p>
+
 A free, open-source airline-management game for Windows. Found an airline with $50M and a dream, lease your first A320neo, build a network across ~1,000 real airports, and take on 19 real rival airlines — Emirates, IndiGo, Lufthansa, Ryanair, Delta and more — in a world with real demand, real aircraft and real costs.
 
 **Status:** v0.2 "Living World" — single-player; works offline.
