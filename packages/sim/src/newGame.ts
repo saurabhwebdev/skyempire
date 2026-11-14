@@ -32,18 +32,27 @@ function blankAirline(id: string, cash: number): Omit<Airline, 'name' | 'code' |
   };
 }
 
-/** The ceil(n/2) airlines nearest the player hub, then the biggest (lowest sizeRank) not yet picked. */
+/** Cargo airlines in every game (v0.6): the nearest of them first. */
+const CARGO_RIVALS = 3;
+
+/**
+ * Up to 3 cargo airlines (nearest first), then the ceil(rest/2) other airlines nearest the player hub,
+ * then the biggest (lowest sizeRank) not yet picked.
+ */
 export function pickAiAirlines(catalog: Catalog, hubId: string, n: number, rng: Rng): AirlineData[] {
   const hub = catalog.airports[hubId]!;
   const jitter = new Map(catalog.airlines.map((a) => [a.iata, rng.next()]));
-  const byDistance = [...catalog.airlines].sort(
+  const near = (list: AirlineData[]) => [...list].sort(
     (a, b) =>
       distanceKm(hub, catalog.airports[a.hubId]!) - distanceKm(hub, catalog.airports[b.hubId]!) ||
       jitter.get(a.iata)! - jitter.get(b.iata)!,
   );
-  const picked = byDistance.slice(0, Math.ceil(n / 2));
+  const cargo = near(catalog.airlines.filter((a) => a.kind === 'cargo')).slice(0, Math.min(CARGO_RIVALS, Math.floor(n / 4)));
+  const others = catalog.airlines.filter((a) => a.kind !== 'cargo');
+  const rest = n - cargo.length;
+  const picked = [...cargo, ...near(others).slice(0, Math.ceil(rest / 2))];
   const chosen = new Set(picked.map((a) => a.iata));
-  for (const a of [...catalog.airlines].sort((x, y) => x.sizeRank - y.sizeRank)) {
+  for (const a of [...others].sort((x, y) => x.sizeRank - y.sizeRank)) {
     if (picked.length >= n) break;
     if (!chosen.has(a.iata)) {
       picked.push(a);
@@ -121,10 +130,17 @@ export function newGame(opts: NewGameOptions, catalog: Catalog): GameState {
     };
     state.airlines[id] = al;
 
-    const allowed = data.fleetTypes.filter((t) => catalog.aircraftTypes[t] && !catalog.aircraftTypes[t]!.usedOnly && tierAllows(al.tier, catalog.aircraftTypes[t]!.tier));
-    const types = allowed.length ? allowed : ['A20N'];
-    for (let i = 0; i < BALANCE.aiStartingFleet[difficulty]; i++) {
-      const type = catalog.aircraftTypes[types[i % types.length]!]!;
+    // Cargo airlines start with freighters; everyone else with airliners (a combination carrier adds one freighter).
+    const ok = (t: string) => { const x = catalog.aircraftTypes[t]; return !!x && !x.usedOnly && !x.entryYear && tierAllows(al.tier, x.tier); };
+    const freighters = data.fleetTypes.filter((t) => ok(t) && catalog.aircraftTypes[t]!.kind === 'freighter');
+    const airliners = data.fleetTypes.filter((t) => ok(t) && catalog.aircraftTypes[t]!.kind !== 'freighter');
+    const base = al.kind === 'cargo' ? freighters : airliners;
+    const types = base.length ? base : al.kind === 'cargo' ? [] : ['A20N'];
+    const count = types.length ? BALANCE.aiStartingFleet[difficulty] : 0;
+    const start = Array.from({ length: count }, (_, i) => types[i % types.length]!);
+    if (al.kind === 'combination' && freighters.length && count > 1) start[count - 1] = freighters[0]!;
+    for (let i = 0; i < count; i++) {
+      const type = catalog.aircraftTypes[start[i]!]!;
       const ageDays = rng.int(0, 10 * 360);
       const condition = rng.int(85, 100);
       const acId = nextId(state, 'ac');

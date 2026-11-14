@@ -1,10 +1,13 @@
 import type { AircraftType, Catalog, Command, GameState, Route } from '@skyempire/shared';
-import { CABIN_CLASSES } from '@skyempire/shared';
+import { CABIN_CLASSES, CARGO_TYPES } from '@skyempire/shared';
 import { applyCommand } from '../commands/apply';
 import { BALANCE } from '../config/balance';
 import { hoursByAircraft, pairKey, revenueOf, routeOps, simulatePair } from '../daySim';
 import { refFare } from '../demand';
 import { routeDayCosts } from '../economics';
+import { airportCargoT, cargoRefRate } from '../cargo';
+import { simulateCargo } from '../cargoSim';
+import { routeMarkets } from '../routing';
 import { availableCredit, monthlyFixedCosts } from '../finance';
 import { tierAllows } from '../fleet';
 import { defaultConfig } from '../cabin';
@@ -57,9 +60,11 @@ export function estimateRoute(
 function pickType(state: GameState, airlineId: string, catalog: Catalog, p: Personality): AircraftType | null {
   const al = state.airlines[airlineId]!;
   const data = catalog.airlines.find((a) => `al_${a.iata}` === airlineId);
+  // Cargo airlines grow with freighters; passenger and combination airlines with airliners.
+  const wantFreighter = al.kind === 'cargo';
   const allowed = (data?.fleetTypes ?? ['A20N'])
     .map((id) => catalog.aircraftTypes[id])
-    .filter((t): t is AircraftType => !!t && tierAllows(al.tier, t.tier));
+    .filter((t): t is AircraftType => !!t && tierAllows(al.tier, t.tier) && !t.usedOnly && !t.entryYear && (t.kind === 'freighter') === wantFreighter);
   if (!allowed.length) return null;
   const preferred = allowed.filter((t) => p.preferredClasses.includes(t.class));
   const pool = preferred.length ? preferred : allowed;
@@ -95,6 +100,13 @@ export function runAi(state: GameState, airlineId: string, catalog: Catalog, rng
   for (const r of myRoutes()) {
     if (r.status !== 'active' || !r.last) continue;
     const dist = distanceKm(catalog.airports[r.from]!, catalog.airports[r.to]!);
+    if (r.kind === 'cargo') {
+      // Cargo: cheaper when freighters fly part-empty, dearer when full, within 0.6–1.5× the reference rate.
+      const ref = cargoRefRate(dist), load = r.last.cargoLoad ?? 0, now = r.cargoRate ?? ref;
+      const next = Math.round(Math.min(1.5 * ref, Math.max(0.6 * ref, load < 0.5 ? now * 0.95 : load > 0.9 ? now * 1.05 : now)) * 100) / 100;
+      if (next !== now) act({ type: 'updateRoute', routeId: r.id, cargoRate: next });
+      continue;
+    }
     const fares = { ...r.fares };
     let k = 1;
     if (r.last.loadFactor < 0.6) k = 1 - 0.05 - 0.1 * p.priceAggressiveness;
@@ -180,7 +192,7 @@ export function runAi(state: GameState, airlineId: string, catalog: Catalog, rng
     byPair.get(k)!.push(r);
   }
   let ranked: { from: string; to: string; dist: number; score: number }[] | null = null;
-  const taken = new Set(myRoutes().map((r) => pairKey(r.from, r.to)));
+  const taken = new Set(myRoutes().map((r) => (r.kind === 'cargo' ? `cargo:${pairKey(r.from, r.to)}` : pairKey(r.from, r.to))));
 
   for (let n = 0; n < maxNew; n++) {
     let ac = freeAircraft()[0];
@@ -197,6 +209,12 @@ export function runAi(state: GameState, airlineId: string, catalog: Catalog, rng
     }
     const t = catalog.aircraftTypes[ac.typeId]!;
     const freeHours = BALANCE.weeklyHours - (hours.get(ac.id) ?? 0);
+    if (t.kind === 'freighter') {
+      // Freighters fly cargo routes: the best-paying of the big cargo airports in range.
+      if (!openCargoRoute(state, airlineId, ac.id, freeHours, catalog, hours, p, act, taken)) break;
+      hours = hoursByAircraft(state, catalog);
+      continue;
+    }
 
     // Score candidates once per decision (with the first free aircraft as the yardstick).
     if (!ranked) {
@@ -254,4 +272,65 @@ export function aiShouldDrop(status: { detourKm?: number; blocked: string | null
   if (!status.blocked) return false;
   if (status.blocked.startsWith('Detour exceeds')) return outOfRange.length > 0 && outOfRange.every(Boolean);
   return true;
+}
+
+
+/** Expected daily profit of a hypothetical cargo route (freighter), without changing state. */
+export function estimateCargoRoute(
+  state: GameState, airlineId: string, from: string, to: string, aircraftId: string, rtpw: number, rate: number, catalog: Catalog, hours: Map<string, number>,
+): { profit: number } {
+  const cand: Route = {
+    id: '__candidate', airlineId, from, to, kind: 'cargo', cargoRate: rate, cargoAccept: [...CARGO_TYPES], fares: { economy: 1, premium: 1, business: 1 },
+    assignments: [{ aircraftId, roundTripsPerWeek: rtpw }], status: 'active', openedDay: state.day, last: null, profit30: [],
+  };
+  const key = pairKey(from, to);
+  const rivals = Object.values(state.routes).filter((r) => r.status === 'active' && routeMarkets(r).some((m) => m.key === key));
+  const opsList = [...rivals, cand].map((r) => routeOps(r, state, catalog, hours, true));
+  const ops = opsList[opsList.length - 1]!;
+  const cg = simulateCargo(opsList, state, catalog).get(cand.id);
+  const legs = new Map([...ops.roundTrips].map(([k, v]) => [k, 2 * v]));
+  const c = routeDayCosts(cand, state, catalog, legs, { economy: 0, premium: 0, business: 0 }, false, 0);
+  const ac = state.aircraft[aircraftId]!;
+  const t = catalog.aircraftTypes[ac.typeId]!;
+  const share = (rtpw * roundTripHours(distanceKm(catalog.airports[from]!, catalog.airports[to]!), t)) / BALANCE.weeklyHours;
+  const fixed = (((ac.ownership === 'leased' ? t.leasePerMonth : 0) + BALANCE.overheadPerAircraft) / 30) * share;
+  return { profit: (cg?.revenue ?? 0) - (cg?.handling ?? 0) - (c.fuel + c.crew + c.maintenance + c.fees) - fixed };
+}
+
+const CARGO_CANDIDATES = 40;
+
+/** Open the most profitable cargo route for a free freighter from one of the airline's bases. */
+function openCargoRoute(
+  state: GameState, airlineId: string, aircraftId: string, freeHours: number, catalog: Catalog, hours: Map<string, number>, p: Personality,
+  act: (cmd: Command) => boolean, taken: Set<string>,
+): boolean {
+  const al = state.airlines[airlineId]!;
+  const t = catalog.aircraftTypes[state.aircraft[aircraftId]!.typeId]!;
+  const hubs = Object.values(catalog.airports).sort((a, b) => airportCargoT(catalog, b) - airportCargoT(catalog, a)).slice(0, 120);
+  const ranked: { from: string; to: string; rtpw: number; rate: number; profit: number }[] = [];
+  for (const base of al.baseIds) {
+    const A = catalog.airports[base]!;
+    if (A.runwayM < t.minRunwayM) continue;
+    let n = 0;
+    for (const B of hubs) {
+      if (n >= CARGO_CANDIDATES) break;
+      if (B.id === A.id || taken.has(`cargo:${pairKey(A.id, B.id)}`) || B.runwayM < t.minRunwayM) continue;
+      const km = distanceKm(A, B);
+      if (km < MIN_KM || km > t.rangeKm) continue;
+      n++;
+      const rtpw = Math.min(14, Math.floor((0.7 * freeHours) / roundTripHours(km, t)), maxRoundTripsPerWeek(km, t));
+      if (rtpw < 1) continue;
+      const rate = Math.round(cargoRefRate(km) * (1.1 - 0.3 * p.priceAggressiveness) * 100) / 100;
+      const e = estimateCargoRoute(state, airlineId, A.id, B.id, aircraftId, rtpw, rate, catalog, hours);
+      if (e.profit > 0) ranked.push({ from: A.id, to: B.id, rtpw, rate, profit: e.profit });
+    }
+  }
+  ranked.sort((x, y) => y.profit - x.profit);
+  for (const best of ranked.slice(0, 3)) {
+    if (act({ type: 'openRoute', kind: 'cargo', from: best.from, to: best.to, fares: { economy: 1, premium: 1, business: 1 }, cargoRate: best.rate, assignments: [{ aircraftId, roundTripsPerWeek: best.rtpw }] })) {
+      taken.add(`cargo:${pairKey(best.from, best.to)}`);
+      return true;
+    }
+  }
+  return false;
 }

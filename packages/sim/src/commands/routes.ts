@@ -97,8 +97,9 @@ export function applyRoutes(state: GameState, airlineId: string, cmd: Command, c
       if (new Set(chain).size !== chain.length) return fail(ERR.repeatedStop);
       if (!al.baseIds.includes(cmd.from) && !al.baseIds.includes(cmd.to)) return fail(ERR.noBase);
       // The same chain (either way round) can't be flown twice; a nonstop and a one-stop between the same ends can.
-      const key = chainKey(chain);
-      if (Object.values(state.routes).some((r) => r.airlineId === airlineId && chainKey(routeChain(r)) === key)) return fail(ERR.duplicateRoute);
+      // A passenger and a cargo route may share the same airports.
+      const key = `${cmd.kind ?? 'passenger'}:${chainKey(chain)}`;
+      if (Object.values(state.routes).some((r) => r.airlineId === airlineId && `${r.kind ?? 'passenger'}:${chainKey(routeChain(r))}` === key)) return fail(ERR.duplicateRoute);
       const kind = cmd.kind ?? 'passenger';
       const bad = validateAssignments(state, airlineId, cmd.from, cmd.to, cmd.assignments, catalog, undefined, stops, kind);
       if (bad) return bad;
