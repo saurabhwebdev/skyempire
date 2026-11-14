@@ -9,6 +9,8 @@ export function recomputeSlots(state: GameState): void {
     const n = slotsNeeded(r.assignments.reduce((s, a) => s + a.roundTripsPerWeek, 0));
     used[r.from] = (used[r.from] ?? 0) + n;
     used[r.to] = (used[r.to] ?? 0) + n;
+    // A stop sees an arrival and a departure in each direction: twice the slots.
+    for (const st of r.stops ?? []) used[st] = (used[st] ?? 0) + 2 * n;
   }
   state.slotsUsed = used;
 }

@@ -1,4 +1,5 @@
-import type { AircraftType, Cabin, Catalog, GameState } from '@skyempire/shared';
+import type { AircraftType, Cabin, Catalog, GameState, Route } from '@skyempire/shared';
+import { routeLegs } from './routing';
 import { BALANCE } from './config/balance';
 import { distanceKm } from './geo';
 
@@ -34,6 +35,11 @@ export function routeDistance(state: Pick<GameState, 'routes'>, routeId: string,
 }
 
 /** Weekly hours an aircraft is already committed to across all active routes (optionally excluding one route). */
+/** Hours for one round trip over every leg of a route (from → stops → to and back). */
+export function chainRoundTripHours(catalog: Catalog, r: Pick<Route, 'from' | 'to' | 'stops'>, type: AircraftType): number {
+  return routeLegs(r).reduce((h, [x, y]) => h + roundTripHours(distanceKm(catalog.airports[x]!, catalog.airports[y]!), type), 0);
+}
+
 export function aircraftHoursUsed(aircraftId: string, state: GameState, catalog: Catalog, excludeRouteId?: string): number {
   const ac = state.aircraft[aircraftId];
   if (!ac) return 0;
@@ -43,7 +49,7 @@ export function aircraftHoursUsed(aircraftId: string, state: GameState, catalog:
     if (r.status !== 'active' || r.id === excludeRouteId) continue;
     for (const a of r.assignments) {
       if (a.aircraftId !== aircraftId) continue;
-      hours += a.roundTripsPerWeek * roundTripHours(distanceKm(catalog.airports[r.from]!, catalog.airports[r.to]!), type);
+      hours += a.roundTripsPerWeek * chainRoundTripHours(catalog, r, type);
     }
   }
   return hours;

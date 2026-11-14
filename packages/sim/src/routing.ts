@@ -1,4 +1,4 @@
-import type { AirspaceRegion, Catalog, GameState } from '@skyempire/shared';
+import type { AirspaceRegion, CabinClass, Catalog, GameState, Route } from '@skyempire/shared';
 import { distanceKm } from './geo';
 
 type Pt = [number, number]; // [lon, lat]
@@ -147,4 +147,36 @@ export function routeCrossesRegion(catalog: Catalog, from: string, to: string, r
   const A = catalog.airports[from], B = catalog.airports[to];
   if (!region || !A || !B) return false;
   return samples([A.lon, A.lat], [B.lon, B.lat]).some((p) => inRegion(p, region));
+}
+
+// ── Multi-stop routes (v0.5) ───────────────────────────────────────────────
+type Chainable = Pick<Route, 'from' | 'to' | 'stops'>;
+export const pairKey = (a: string, b: string) => (a < b ? `${a}-${b}` : `${b}-${a}`);
+
+/** Every airport the route visits, in order: from, stops…, to. */
+export const routeChain = (r: Chainable): string[] => [r.from, ...(r.stops ?? []), r.to];
+
+/** Consecutive airport pairs the aircraft flies. */
+export const routeLegs = (r: Chainable): [string, string][] => {
+  const c = routeChain(r);
+  return c.slice(1).map((b, i) => [c[i]!, b]);
+};
+
+export interface RouteMarket { a: string; b: string; key: string; stops: number; first: number; last: number }
+
+/** Every pair sold along the chain (first/last = leg indexes it spans), in chain order. */
+export function routeMarkets(r: Chainable): RouteMarket[] {
+  const c = routeChain(r);
+  const out: RouteMarket[] = [];
+  for (let i = 0; i < c.length - 1; i++)
+    for (let j = i + 1; j < c.length; j++) out.push({ a: c[i]!, b: c[j]!, key: pairKey(c[i]!, c[j]!), stops: j - i - 1, first: i, last: j - 1 });
+  return out;
+}
+
+/** Fare charged in one market on `day` (end to end = the route fare; others = legFares), after seasonal changes. */
+export function marketFare(r: Pick<Route, 'from' | 'to' | 'fares' | 'legFares' | 'seasonalFares'>, a: string, b: string, cls: CabinClass, day: number): number {
+  const key = pairKey(a, b);
+  const base = key === pairKey(r.from, r.to) ? r.fares[cls] : (r.legFares?.[key]?.[cls] ?? r.fares[cls]);
+  const sf = r.seasonalFares?.find((f) => day >= f.startDay && day <= f.endDay);
+  return sf ? Math.round(base * (1 + sf.pct / 100)) : base;
 }

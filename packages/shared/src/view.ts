@@ -46,6 +46,8 @@ export interface PreviewResult {
   expectedProfitPerDay?: Money;
   paybackDays?: number | null;
   suggestedFares?: Record<CabinClass, Money>;
+  /** Multi-stop routes: suggested fares for each market other than end to end, keyed by pairKey. */
+  suggestedLegFares?: Record<string, Record<CabinClass, Money>>;
   demandPerDay?: number;
   competitors?: number;
   distanceKm?: number;

@@ -1,7 +1,7 @@
 import type { CabinProduct, GameState, Ife, Meal } from '@skyempire/shared';
 import { standardProduct } from './cabin';
 
-export const CURRENT_SCHEMA = 3;
+export const CURRENT_SCHEMA = 4;
 
 type Raw = Record<string, unknown>;
 
@@ -20,6 +20,8 @@ export const migrations: Record<number, (s: Raw) => Raw> = {
     }));
     return { ...s, schemaVersion: 3, airlines: next, aircraft };
   },
+  // v0.4 → v0.5: multi-stop routes. Every new field is optional, so only the version changes.
+  3: (s) => ({ ...s, schemaVersion: 4 }),
 };
 
 /** The v0.3 service levels 1–5 as products. Seats keep the standard fit, so every cabin still fits. */

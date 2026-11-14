@@ -128,6 +128,10 @@ export interface Assignment {
 export interface RouteDayStats {
   pax: Cabin;
   loadFactor: number;
+  /** Multi-stop routes: passengers per market (pairKey), both directions. */
+  marketPax?: Record<string, Cabin>;
+  /** Multi-stop routes: load factor of each leg, in chain order. */
+  legLoad?: number[];
   revenue: Money;
   cost: Money;
   profit: Money;
@@ -250,7 +254,7 @@ export interface World {
 }
 
 export interface GameState {
-  schemaVersion: 3;
+  schemaVersion: 4;
   seed: number;
   rngState: number;
   day: number;

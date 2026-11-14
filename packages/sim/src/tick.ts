@@ -6,7 +6,7 @@ import { dateOf, isMonthStart } from './calendar';
 import { recomputeSlots } from './commands/slots';
 import { applyCommand } from './commands/apply';
 import { refFare } from './demand';
-import { hoursByAircraft, pairKey, revenueOf, routeOps, simulatePair, totalSeats, type RouteOps } from './daySim';
+import { hoursByAircraft, pairKey, routeOps, simulateRoutes, type RouteOps } from './daySim';
 import { routeDayCosts } from './economics';
 import { rollEvents } from './events';
 import { rollTensions } from './tensions';
@@ -88,23 +88,28 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
   };
 
   // 6. Revenue & variable costs
+  // Every market of every route competes with the other routes selling it (multi-stop routes sell several).
+  const { results: sold } = simulateRoutes([...byPair.values()].flat(), s, catalog);
   for (const opsList of byPair.values()) {
-    const { pax } = simulatePair(opsList, s, catalog);
     for (const ops of opsList) {
       const r = ops.route;
-      const p = pax.get(r.id)!;
+      const res = sold.get(r.id)!;
+      const p = res.pax;
       const legs = new Map<string, number>();
       for (const [acId, rt] of ops.roundTrips) {
         legs.set(acId, 2 * rt);
         hoursFlown.set(acId, (hoursFlown.get(acId) ?? 0) + 2 * rt * ops.blockH);
       }
-      const c = routeDayCosts(r, s, catalog, legs, p, ops.closed);
+      const revenue = ops.closed ? 0 : res.revenue;
+      const c = routeDayCosts(r, s, catalog, legs, p, ops.closed, res.ticketRevenue);
       c.fees += ops.weatherFees;
-      const revenue = ops.closed ? 0 : revenueOf(r, p, s.day);
       const cost = c.fuel + c.crew + c.maintenance + c.fees + c.service;
-      const seats = totalSeats(ops);
       const paxTotal = CABIN_CLASSES.reduce((sum, k) => sum + p[k], 0);
-      r.last = { pax: p, loadFactor: seats > 0 ? paxTotal / seats : 0, revenue, cost, profit: revenue - cost };
+      r.last = { pax: p, loadFactor: res.loadFactor, revenue, cost, profit: revenue - cost };
+      if (r.stops?.length) {
+        r.last.marketPax = Object.fromEntries(res.marketPax);
+        r.last.legLoad = res.legLoad;
+      }
       r.profit30 = [...r.profit30, revenue - cost].slice(-30);
       const d = daily.get(r.airlineId)!;
       d.revenue += revenue;

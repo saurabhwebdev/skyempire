@@ -21,6 +21,8 @@ export const ERR = {
   runwayTooShort: (airport: string, name: string) => `Runway at ${airport} is too short for the ${name}`,
   noBase: 'Routes must start or end at one of your bases',
   duplicateRoute: 'You already fly this route',
+  tooManyStops: 'A route can have at most 2 stops',
+  repeatedStop: 'A route can visit each airport only once',
   noSlots: (airport: string) => `No free slots at ${airport}`,
   noHours: (name: string, free: number) => `Not enough free hours on this ${name} — ${Math.max(0, Math.floor(free))} h/week left`,
   duplicateAssignment: 'Each aircraft can appear only once on a route',

@@ -40,7 +40,9 @@ export const CommandSchema = z.discriminatedUnion('type', [
       type: z.literal('openRoute'),
       from: code,
       to: code,
+      stops: z.array(code).max(2).optional(),
       fares: FaresSchema,
+      legFares: z.record(z.string().max(9), FaresSchema).optional(),
       assignments: z.array(AssignmentSchema).min(1),
     })
     .refine((c) => c.from !== c.to, { message: 'A route needs two different airports' }),
@@ -48,6 +50,7 @@ export const CommandSchema = z.discriminatedUnion('type', [
     type: z.literal('updateRoute'),
     routeId: id,
     fares: FaresSchema.optional(),
+    legFares: z.record(z.string().max(9), FaresSchema).optional(),
     assignments: z.array(AssignmentSchema).optional(),
     seasonalFares: z.array(SeasonalFareSchema).max(4).optional(),
   }),
@@ -69,8 +72,8 @@ export type Command =
   | { type: 'setCabin'; aircraftId: string; config: CabinConfig }
   | { type: 'saveCabinTemplate'; name: string; typeId: string; config: CabinConfig }
   | { type: 'deleteCabinTemplate'; templateId: string }
-  | { type: 'openRoute'; from: string; to: string; fares: Fares; assignments: Assignment[] }
-  | { type: 'updateRoute'; routeId: string; fares?: Fares; assignments?: Assignment[]; seasonalFares?: SeasonalFare[] }
+  | { type: 'openRoute'; from: string; to: string; stops?: string[]; fares: Fares; legFares?: Record<string, Fares>; assignments: Assignment[] }
+  | { type: 'updateRoute'; routeId: string; fares?: Fares; legFares?: Record<string, Fares>; assignments?: Assignment[]; seasonalFares?: SeasonalFare[] }
   | { type: 'closeRoute'; routeId: string }
   | { type: 'preCancel'; routeId: string; day: number }
   | { type: 'openBase'; airportId: string }

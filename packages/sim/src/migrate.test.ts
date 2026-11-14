@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import v1 from './__fixtures__/v1-save.json';
-import { migrate } from './migrate';
+import { CURRENT_SCHEMA, migrate } from './migrate';
 import { catalog } from './testing';
 import { tick } from './tick';
 import { checkConfig } from './cabin';
@@ -9,7 +9,7 @@ import type { GameState } from '@skyempire/shared';
 describe('save migration', () => {
   it('migrates a v1 save', () => {
     let s = migrate(structuredClone(v1));
-    expect(s.schemaVersion).toBe(3);
+    expect(s.schemaVersion).toBe(CURRENT_SCHEMA);
     expect(s.world).toEqual({ startYear: 2026, liveWeather: {}, tensions: [], preCancelled: {} });
     for (let i = 0; i < 5; i++) s = tick(s, [], catalog).state;
     expect(s.day).toBe(45);
