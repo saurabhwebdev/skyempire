@@ -13,7 +13,7 @@ export function MapToggles() {
   };
   const btn = (on: boolean) =>
     cn('flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-[12px] transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-accent',
-      on ? 'border-accent/50 bg-accent/15 text-text' : 'border-border bg-surface-2/90 text-muted hover:text-text');
+      on ? 'border-accent/60 bg-surface-3 text-text shadow-overlay' : 'border-border bg-surface-2 text-muted shadow-overlay hover:text-text');
   return (
     <div className="absolute top-3 left-3 z-10 flex gap-2" role="group" aria-label="Map layers">
       <button type="button" className={btn(showRivals)} aria-pressed={showRivals} onClick={() => useUi.getState().setShowRivals(!showRivals)}>
