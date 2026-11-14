@@ -3,6 +3,7 @@ import { cn, Modal } from '@skyempire/ui';
 import { useEffect, useState } from 'react';
 import { Switch } from '../../components/Switch';
 import { LogoPackSection } from './LogoPackSection';
+import { UpdateSection, useUpdates } from '../../components/Updates';
 import { useGameStore } from '../../store';
 
 export function applySettingsToDocument(s: Settings) {
@@ -12,6 +13,7 @@ export function applySettingsToDocument(s: Settings) {
 
 export function SettingsDialog({ open, onOpenChange }: { open: boolean; onOpenChange(o: boolean): void }) {
   const settings = useGameStore((s) => s.settings);
+  const version = useUpdates((s) => s.state?.current);
   const update = async (patch: Partial<Settings>) => {
     const optimistic = { ...settings, ...patch };
     useGameStore.getState().setSettings(optimistic);
@@ -37,8 +39,9 @@ export function SettingsDialog({ open, onOpenChange }: { open: boolean; onOpenCh
           </div>
         </div>
         <LogoPackSection />
+        <UpdateSection />
         <div className="py-3 text-[13px] text-muted">
-          <p className="font-semibold text-text">About SkyEmpire 0.2</p>
+          <p className="font-semibold text-text">About SkyEmpire{version ? ` ${version}` : ''}</p>
           <p>SkyEmpire is not affiliated with any airline or aircraft manufacturer. Names are used for identification only.</p>
           <p className="mt-1">Data: OurAirports, GeoNames, World Bank, Natural Earth, Wikidata, OpenFlights. See CREDITS.md.</p>
         </div>

@@ -47,6 +47,21 @@ export interface TickPush {
   summary: TickSummary | null;
 }
 
+/** In-app updates (v0.3). `canInstall` is false for the .zip build and dev runs: those get a download link instead. */
+export interface UpdateState {
+  status: 'idle' | 'checking' | 'none' | 'available' | 'downloading' | 'ready' | 'error';
+  current: string;
+  version?: string;
+  /** Release notes (Markdown) for `version`. */
+  notes?: string;
+  /** 0–100 while downloading. */
+  percent?: number;
+  canInstall: boolean;
+  /** Release page, for manual download. */
+  url: string;
+  error?: string;
+}
+
 export interface GameApi {
   newGame(opts: NewGameOptions): Promise<ClientView>;
   loadSave(saveId: string): Promise<ClientView>;
@@ -68,10 +83,17 @@ export interface GameApi {
     onProgress(cb: (done: number, total: number) => void): () => void;
     setPlayerLogo(data: Uint8Array): Promise<void>;
   };
-  onUpdateReady(cb: (version: string) => void): () => void;
+  updates: {
+    get(): Promise<UpdateState>;
+    check(): Promise<UpdateState>;
+    download(): Promise<void>;
+    /** Quits, installs and relaunches. Save the game first. */
+    install(): void;
+    openPage(): void;
+    onState(cb: (s: UpdateState) => void): () => void;
+  };
   /** Messages from the main process (save failures, recovered saves, simulation errors). */
   onNotice(cb: (n: { title: string; body?: string; tone: 'info' | 'warning' | 'danger' }) => void): () => void;
-  installUpdate(): void;
   getSettings(): Promise<Settings>;
   setSettings(s: Partial<Settings>): Promise<Settings>;
 }
@@ -99,4 +121,10 @@ export const IPC = {
   logoCancel: 'logos:cancel',
   logoProgress: 'logos:progress',
   logoPlayer: 'logos:player',
+  updateGet: 'update:get',
+  updateCheck: 'update:check',
+  updateDownload: 'update:download',
+  updateInstall: 'update:install',
+  updateOpenPage: 'update:openPage',
+  updateState: 'update:state',
 } as const;

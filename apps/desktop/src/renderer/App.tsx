@@ -1,6 +1,7 @@
 import { Toaster, TooltipProvider } from '@skyempire/ui';
 import { useEffect } from 'react';
-import { useGameBridge, useNotices, useUpdateNotice } from './hooks/useGame';
+import { useGameBridge, useNotices } from './hooks/useGame';
+import { UpdateBanner, useUpdateBridge, WhatsNewAfterUpdate } from './components/Updates';
 import { BottomTray } from './shell/BottomTray';
 import { GameMenu, ShortcutSheet } from './shell/GameMenu';
 import { Inspector } from './shell/Inspector';
@@ -100,7 +101,7 @@ function GameScreen() {
 
 function Root() {
   useGameBridge();
-  useUpdateNotice();
+  useUpdateBridge();
   useNotices();
   useShortcuts();
   const screen = useUi((s) => s.screen);
@@ -110,6 +111,8 @@ function Root() {
     <>
       {screen === 'game' ? <GameScreen /> : screen === 'newAirline' ? <NewAirline /> : screen === 'gameOver' ? <GameOver /> : <Title />}
       <SettingsHost />
+      <UpdateBanner />
+      <WhatsNewAfterUpdate />
     </>
   );
 }
