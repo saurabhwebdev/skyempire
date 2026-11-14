@@ -1,4 +1,5 @@
 import type { SeasonalFare, Assignment, Catalog, Command, CommandResult, GameState } from '@skyempire/shared';
+import { distanceKm } from '../geo';
 import { flightDistanceKm } from '../routing';
 import { banMessage, isBanned } from '../tensions';
 import { nextId } from '../ids';
@@ -17,11 +18,17 @@ export function validateAssignments(
   const a = catalog.airports[from], b = catalog.airports[to];
   if (!a) return fail(ERR.unknownAirport(from));
   if (!b) return fail(ERR.unknownAirport(to));
-  const banned = isBanned(state, a.country, b.country);
-  if (banned) return fail(banMessage(catalog, banned));
+  // Tensions block new or bigger schedules only: a grounded route can still change fares or shed aircraft.
+  const existing = excludeRouteId ? state.routes[excludeRouteId] : undefined;
+  const shrinks = !!existing && assignments.every((x) => (existing.assignments.find((y) => y.aircraftId === x.aircraftId)?.roundTripsPerWeek ?? 0) >= x.roundTripsPerWeek);
   const flight = flightDistanceKm(state, catalog, a.id, b.id);
-  if (flight.blocked) return fail(flight.blocked);
-  const dist = flight.km;
+  if (!shrinks) {
+    const banned = isBanned(state, a.country, b.country);
+    if (banned) return fail(banMessage(catalog, banned));
+    if (flight.blocked) return fail(flight.blocked);
+  }
+  // Weekly hour budgets use the great-circle planning distance; range uses the distance actually flown.
+  const dist = distanceKm(a, b);
   const seen = new Set<string>();
   for (const asg of assignments) {
     if (seen.has(asg.aircraftId)) return fail(ERR.duplicateAssignment);
@@ -29,7 +36,7 @@ export function validateAssignments(
     const ac = state.aircraft[asg.aircraftId];
     if (!ac || ac.ownerId !== airlineId) return fail(ERR.unknownAircraft);
     const t = catalog.aircraftTypes[ac.typeId]!;
-    if (t.rangeKm < dist) return fail(ERR.rangeTooShort(t.name, t.rangeKm));
+    if (t.rangeKm < dist || (!shrinks && t.rangeKm < flight.km)) return fail(ERR.rangeTooShort(t.name, t.rangeKm));
     for (const ap of [a, b]) if (ap.runwayM < t.minRunwayM) return fail(ERR.runwayTooShort(ap.id, t.name));
     const used = aircraftHoursUsed(ac.id, state, catalog, excludeRouteId);
     const need = asg.roundTripsPerWeek * roundTripHours(dist, t);

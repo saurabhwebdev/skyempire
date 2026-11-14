@@ -40,6 +40,32 @@ describe('route bans', () => {
   });
 });
 
+describe('editing affected routes', () => {
+  it('a banned route can still change fares or drop aircraft, but not grow', () => {
+    const { s, r } = withRoute();
+    s.day = 3;
+    s.world.tensions.push(ban('DE', 'ES'));
+    expect(applyCommand(s, s.playerId, { type: 'updateRoute', routeId: r.id, fares: { economy: 99, premium: 199, business: 399 }, assignments: r.assignments }, catalog)).toEqual({ ok: true });
+    expect(applyCommand(s, s.playerId, { type: 'updateRoute', routeId: r.id, assignments: [{ aircraftId: r.assignments[0]!.aircraftId, roundTripsPerWeek: 7 }] }, catalog)).toEqual({ ok: true });
+    expect(applyCommand(s, s.playerId, { type: 'updateRoute', routeId: r.id, assignments: [{ aircraftId: r.assignments[0]!.aircraftId, roundTripsPerWeek: 10 }] }, catalog))
+      .toEqual({ ok: false, reason: 'Flights banned between Germany and Spain' });
+  });
+  it('a closure does not break an unchanged, fully used schedule (hours use planning distance)', async () => {
+    const { maxRoundTripsPerWeek } = await import('./ops');
+    const { distanceKm } = await import('./geo');
+    const s = playerGame('FRA', 0);
+    s.airlines[s.playerId]!.tier = 'national';
+    applyCommand(s, s.playerId, lease('B789'), catalog);
+    const ac = playerAircraft(s)[0]!.id;
+    const rt = maxRoundTripsPerWeek(distanceKm(airport('FRA'), airport('PEK')), catalog.aircraftTypes.B789!);
+    expect(applyCommand(s, s.playerId, { type: 'openRoute', from: 'FRA', to: 'PEK', fares, assignments: [{ aircraftId: ac, roundTripsPerWeek: rt }] }, catalog)).toEqual({ ok: true });
+    const r = Object.values(s.routes)[0]!;
+    s.day = 50;
+    s.world.tensions.push({ id: 'c', kind: 'airspaceClosure', regionId: 'central-asia', magnitude: 1, warnDay: 0, startDay: 40, endDay: 400 }, { id: 'c2', kind: 'airspaceClosure', regionId: 'western-russia', magnitude: 1, warnDay: 0, startDay: 40, endDay: 400 });
+    expect(applyCommand(s, s.playerId, { type: 'updateRoute', routeId: r.id, fares: { economy: 500, premium: 900, business: 2000 }, assignments: r.assignments }, catalog)).toEqual({ ok: true });
+  });
+});
+
 describe('advisories and thaws', () => {
   it('a travel advisory cuts demand to that country only', () => {
     const s = playerGame('FRA', 0);
@@ -91,6 +117,13 @@ describe('rolling tensions', () => {
 });
 
 describe('AI and tensions', () => {
+  it('an AI airline keeps a route when only some of its aircraft are out of range', async () => {
+    const { aiShouldDrop } = await import('./ai/decide');
+    expect(aiShouldDrop({ detourKm: 900, blocked: 'Detour exceeds Airbus A320neo range' }, [true, false])).toBe(false);
+    expect(aiShouldDrop({ detourKm: 900, blocked: 'Detour exceeds Airbus A320neo range' }, [true, true])).toBe(true);
+    expect(aiShouldDrop({ detourKm: 0, blocked: 'Flights banned between Germany and Spain' }, [false])).toBe(true);
+    expect(aiShouldDrop({ detourKm: 0, blocked: null }, [false])).toBe(false);
+  });
   it('an AI airline closes routes grounded by a ban', async () => {
     const { runAi } = await import('./ai/decide');
     const { tick } = await import('./tick');

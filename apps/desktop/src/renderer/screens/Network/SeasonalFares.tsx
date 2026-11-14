@@ -13,7 +13,8 @@ export function SeasonalFares({ route }: { route: Route }) {
   const view = useGameStore((s) => s.view)!;
   const toast = useToast();
   const fromId = useId(), toId = useId();
-  const periods = route.seasonalFares ?? [];
+  // Periods that have ended no longer count toward the limit and are dropped on the next save.
+  const periods = (route.seasonalFares ?? []).filter((p) => p.endDay >= view.day);
   const [from, setFrom] = useState(() => dateOf(view.day + 1, view.startYear).iso);
   const [to, setTo] = useState(() => dateOf(view.day + 7, view.startYear).iso);
   const [pct, setPct] = useState(10);

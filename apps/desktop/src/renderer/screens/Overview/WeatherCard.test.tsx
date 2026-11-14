@@ -15,16 +15,29 @@ const route: Route = {
 const wrap = () => render(<TooltipProvider><Toaster><WeatherCard /></Toaster></TooltipProvider>);
 
 describe('WeatherCard', () => {
-  it('lists bad weather in the next 3 days with a Cancel ahead action', async () => {
-    const command = vi.fn().mockResolvedValue({ ok: true });
-    window.game = { command } as unknown as typeof window.game;
+  it('lists bad weather in the next 3 days with its impact', () => {
     useGameStore.setState({ view: fakeView({}, { day: 10, routes: [route], weather: { today: {}, forecast: { LHR: ['snow', 'clear', 'rain'], CDG: ['clear', 'clear', 'clear'] } } }) });
     wrap();
     expect(screen.getByText('Snow')).toBeInTheDocument();
     expect(screen.getByText('Tomorrow · ~10% of flights cancelled')).toBeInTheDocument();
     expect(screen.queryByText('Rain')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Cancel ahead' })).not.toBeInTheDocument();
+  });
+  it('offers to cancel ahead of a cyclone, after confirming', async () => {
+    const command = vi.fn().mockResolvedValue({ ok: true });
+    window.game = { command } as unknown as typeof window.game;
+    useGameStore.setState({ view: fakeView({}, { day: 10, routes: [route], weather: { today: {}, forecast: { CDG: ['clear', 'cyclone', 'clear'] } } }) });
+    wrap();
     await userEvent.click(screen.getByRole('button', { name: 'Cancel ahead' }));
-    expect(command).toHaveBeenCalledWith({ type: 'preCancel', routeId: 'r1', day: 11 });
+    expect(command).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel 1 route' }));
+    expect(command).toHaveBeenCalledWith({ type: 'preCancel', routeId: 'r1', day: 12 });
+  });
+  it('shows when flights are already cancelled ahead', () => {
+    useGameStore.setState({ view: fakeView({}, { day: 10, routes: [route], preCancelled: { r1: [12] }, weather: { today: {}, forecast: { CDG: ['clear', 'cyclone', 'clear'] } } }) });
+    wrap();
+    expect(screen.getByText('Cancelled ahead')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Cancel ahead' })).not.toBeInTheDocument();
   });
   it('says so when skies are clear', () => {
     useGameStore.setState({ view: fakeView({}, { routes: [route], weather: { today: {}, forecast: { LHR: ['clear', 'rain', 'wind'] } } }) });

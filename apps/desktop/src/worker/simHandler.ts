@@ -12,7 +12,7 @@ export type SimRequest =
   | { kind: 'view' }
   | { kind: 'snapshot' }
   | { kind: 'weatherPoints' }
-  | { kind: 'setLiveWeather'; data: Record<number, Record<string, WeatherCondition>> };
+  | { kind: 'setLiveWeather'; token: string; data: Record<number, Record<string, WeatherCondition>> };
 
 export interface SimResponses {
   newGame: ClientView;
@@ -23,13 +23,16 @@ export interface SimResponses {
   routeDemand: PreviewResult;
   view: ClientView;
   snapshot: GameState;
-  weatherPoints: { day: number; points: { id: string; lat: number; lon: number }[] };
-  setLiveWeather: { ok: true };
+  weatherPoints: { day: number; token: string; points: { id: string; lat: number; lon: number }[] };
+  setLiveWeather: { ok: boolean };
 }
 
 export interface SimHandler {
   handle<R extends SimRequest>(req: R): SimResponses[R['kind']];
 }
+
+/** Identifies a career (seed, calendar and player airline) so late async inputs can't land in a different one. */
+const careerToken = (s: GameState) => `${s.seed}:${s.world.startYear}:${s.airlines[s.playerId]?.name ?? ''}`;
 
 /** Pure game host: owns the GameState and the player's queued commands. */
 export function createSimHandler(catalog: Catalog): SimHandler {
@@ -82,12 +85,14 @@ export function createSimHandler(catalog: Catalog): SimHandler {
       const ids = new Set<string>(s.airlines[s.playerId]!.baseIds);
       for (const r of Object.values(s.routes)) if (r.status === 'active') ids.add(r.from).add(r.to);
       const points = [...ids].map((id) => catalog.airports[id]).filter((a) => !!a).map((a) => ({ id: a!.id, lat: a!.lat, lon: a!.lon }));
-      return { day: s.day, points };
+      return { day: s.day, token: careerToken(s), points };
     },
     setLiveWeather: (r) => {
       const s = need();
+      // The fetch takes seconds: drop it if another career was loaded meanwhile, and never rewrite days already simulated.
+      if (r.token !== careerToken(s)) return { ok: false };
       const live = s.world.liveWeather;
-      for (const [day, byAirport] of Object.entries(r.data)) live[Number(day)] = { ...live[Number(day)], ...byAirport };
+      for (const [day, byAirport] of Object.entries(r.data)) if (Number(day) > s.day) live[Number(day)] = { ...live[Number(day)], ...byAirport };
       for (const day of Object.keys(live)) if (Number(day) < s.day) delete live[Number(day)];
       return { ok: true };
     },

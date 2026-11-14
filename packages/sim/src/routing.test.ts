@@ -39,6 +39,11 @@ describe('flight distance and detours', () => {
     const r = detour([0, 0], [20, 0], [wall]);
     expect(r).toBeNull();
   });
+  it('knows which routes cross a region (great circle, antimeridian-safe)', async () => {
+    const { routeCrossesRegion } = await import('./routing');
+    expect(routeCrossesRegion(catalog, 'SYD', 'LAX', 'horn-of-africa')).toBe(false);
+    expect(routeCrossesRegion(catalog, 'LHR', 'DEL', 'south-central-asia')).toBe(true);
+  });
   it('caches results', () => {
     const s = closing('northern-gulf');
     expect(flightDistanceKm(s, catalog, 'LHR', 'DEL')).toBe(flightDistanceKm(s, catalog, 'LHR', 'DEL'));

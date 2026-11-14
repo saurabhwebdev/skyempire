@@ -39,6 +39,16 @@ describe('SeasonalFares', () => {
       seasonalFares: [{ startDay: 353, endDay: 369, pct: 20 }, { startDay: 396, endDay: 405, pct: 15 }],
     });
   });
+  it('drops periods that have ended when saving', async () => {
+    const command = vi.fn().mockResolvedValue({ ok: true });
+    window.game = { command } as unknown as typeof window.game;
+    useGameStore.setState({ view: fakeView({}, { day: 380 }) });
+    wrap();
+    fireEvent.change(screen.getByLabelText('From'), { target: { value: '2027-02-01' } });
+    fireEvent.change(screen.getByLabelText('To'), { target: { value: '2027-02-10' } });
+    await userEvent.click(screen.getByRole('button', { name: 'Add seasonal fare' }));
+    expect(command).toHaveBeenCalledWith({ type: 'updateRoute', routeId: 'r1', seasonalFares: [{ startDay: 396, endDay: 405, pct: 10 }] });
+  });
   it('removes a period', async () => {
     const command = vi.fn().mockResolvedValue({ ok: true });
     window.game = { command } as unknown as typeof window.game;

@@ -1,7 +1,7 @@
 import type { ActiveTension, Airport, Catalog, GameState, Notification, Route, TensionKind } from '@skyempire/shared';
 import { nextId } from './ids';
 import type { Rng } from './rng';
-import { flightDistanceKm, inRegion } from './routing';
+import { flightDistanceKm, routeCrossesRegion } from './routing';
 
 /** Generic geopolitical events (v0.2 design §3): never names parties or causes. Daily chances. */
 export const TENSIONS = {
@@ -58,15 +58,7 @@ function touches(_state: GameState, catalog: Catalog, t: ActiveTension, r: Route
   const a = catalog.airports[r.from]!, b = catalog.airports[r.to]!;
   if (t.kind === 'routeBan' || t.kind === 'thawBonus') return samePair(t, a.country, b.country);
   if (t.kind === 'advisory') return a.country === t.country || b.country === t.country;
-  const region = catalog.airspace.find((x) => x.id === t.regionId);
-  if (!region) return false;
-  // Rough: does the straight lon/lat segment pass through the region's box? (Only used to pick note levels and targets.)
-  const steps = 24;
-  for (let i = 0; i <= steps; i++) {
-    const f = i / steps;
-    if (inRegion([a.lon + (b.lon - a.lon) * f, a.lat + (b.lat - a.lat) * f], region)) return true;
-  }
-  return false;
+  return !!t.regionId && routeCrossesRegion(catalog, r.from, r.to, t.regionId);
 }
 
 function note(state: GameState, level: Notification['level'], title: string, body: string): Notification {
@@ -103,7 +95,7 @@ export function rollTensions(state: GameState, catalog: Catalog, rng: Rng): Noti
     w.tensions = w.tensions.filter((x) => x !== t); // lifted now: no separate "resume" note tomorrow
     w.tensions.push({ id: nextId(state, 'tn'), kind: 'thawBonus', countries: t.countries, magnitude: TENSIONS.thawBonus, warnDay: state.day, startDay: state.day + 1, endDay: state.day + TENSIONS.thawBonusDays });
     out.push(note(state, affectsPlayer(state, catalog, t) ? 'major' : 'info', `Flights resume early between ${countryName(catalog, t.countries![0])} and ${countryName(catalog, t.countries![1])}`,
-      'Relations have improved. Expect a rebound in travel between them for about three months.'));
+      'Restrictions have been lifted. Expect a rebound in travel between them for about three months.'));
   }
 
   const routes = Object.values(state.routes).filter((r) => r.status === 'active');

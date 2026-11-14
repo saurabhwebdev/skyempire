@@ -105,6 +105,8 @@ export interface ClientView {
   tensions: TensionView[];
   /** Player route id → detour and why it can't fly (if so). */
   routeStatus: Record<string, { detourKm: number; blocked: string | null }>;
+  /** Player route id → game days its flights were cancelled ahead. */
+  preCancelled: Record<string, number[]>;
   weather: {
     /** Airports served by anyone with weather other than clear today. */
     today: Record<string, WeatherCondition>;

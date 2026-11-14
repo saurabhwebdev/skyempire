@@ -39,7 +39,18 @@ describe('airspace regions', () => {
   it('splits Russia into a western and an eastern region at 60°E', () => {
     const w = regions.find((r) => r.id === 'western-russia')!, e = regions.find((r) => r.id === 'siberia')!;
     expect(Math.max(...w.rings.flat().map((p) => p[0]))).toBeLessThanOrEqual(60.001);
-    expect(Math.min(...e.rings.flat().map((p) => p[0]))).toBeGreaterThanOrEqual(59.999);
+    for (const ring of e.rings) {
+      const lons = ring.map((p) => p[0]);
+      expect(Math.min(...lons) >= 59.999 || Math.max(...lons) <= -160).toBe(true); // Chukotka lies past 180°
+    }
+  });
+  it('puts known places in the right region', () => {
+    const at = (id: string, p: [number, number]) => regions.find((r) => r.id === id)!.rings.some((ring) => inRing(p, ring));
+    expect(at('balkans', [20.46, 44.8])).toBe(true); // Belgrade
+    expect(at('balkans', [44.06, 9.56])).toBe(false); // Hargeisa is not in the Balkans
+    expect(at('siberia', [-173.2, 64.4])).toBe(true); // Chukotka east of 180°
+    expect(at('western-russia', [-173.2, 64.4])).toBe(false);
+    expect(at('western-russia', [37.6, 55.75])).toBe(true); // Moscow
   });
   it('stays small', () => expect(statSync(join(import.meta.dirname, 'airspace.json')).size).toBeLessThan(400_000));
 });

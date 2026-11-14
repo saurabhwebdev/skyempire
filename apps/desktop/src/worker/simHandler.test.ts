@@ -55,12 +55,24 @@ describe('live weather input', () => {
     h.handle({ kind: 'newGame', opts: { seed: 1, regionId: 'world', difficulty: 'normal', homeBaseId: 'LHR', aiCount: 2, airline: { name: 'Weather Test Air', code: 'W1T', colors: { primary: '#123456', secondary: '#ffffff' }, logoShape: 'circle' } } });
     const pts = h.handle({ kind: 'weatherPoints' });
     expect(pts.points.some((p) => p.id === 'LHR')).toBe(true);
-    h.handle({ kind: 'setLiveWeather', data: { 1: { LHR: 'snow' }, 2: { LHR: 'fog' } } });
+    h.handle({ kind: 'setLiveWeather', token: pts.token, data: { 1: { LHR: 'snow' }, 2: { LHR: 'fog' } } });
     h.handle({ kind: 'tick' });
     h.handle({ kind: 'tick' });
     const s = h.handle({ kind: 'snapshot' });
-    h.handle({ kind: 'setLiveWeather', data: { 5: { LHR: 'rain' } } });
+    h.handle({ kind: 'setLiveWeather', token: pts.token, data: { 5: { LHR: 'rain' } } });
     expect(Object.keys(h.handle({ kind: 'snapshot' }).world.liveWeather)).toEqual(['2', '5']);
     expect(s.world.liveWeather[2]).toEqual({ LHR: 'fog' });
+  });
+});
+
+describe('live weather safety', () => {
+  it('ignores forecasts meant for another career and days already simulated', () => {
+    const h = createSimHandler(loadCatalog('world'));
+    h.handle({ kind: 'newGame', opts: { seed: 1, regionId: 'world', difficulty: 'normal', homeBaseId: 'LHR', aiCount: 0, airline: { name: 'Token Air', code: 'T1K', colors: { primary: '#123456', secondary: '#ffffff' }, logoShape: 'circle' } } });
+    const { token } = h.handle({ kind: 'weatherPoints' });
+    h.handle({ kind: 'tick' });
+    h.handle({ kind: 'setLiveWeather', token: 'someone-else', data: { 5: { LHR: 'snow' } } });
+    h.handle({ kind: 'setLiveWeather', token, data: { 1: { LHR: 'fog' }, 3: { LHR: 'rain' } } });
+    expect(h.handle({ kind: 'snapshot' }).world.liveWeather).toEqual({ 3: { LHR: 'rain' } });
   });
 });

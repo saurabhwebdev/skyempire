@@ -64,7 +64,9 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
   const wa = average ? 'clear' : weatherAt(state, catalog, a.id, state.day);
   const wb = average ? 'clear' : weatherAt(state, catalog, b.id, state.day);
   const preCancelled = !average && (state.world.preCancelled[route.id]?.includes(state.day) ?? false);
-  const closed = isAirportClosed(state, a.id) || isAirportClosed(state, b.id) || wa === 'cyclone' || wb === 'cyclone';
+  const struck = isAirportClosed(state, a.id) || isAirportClosed(state, b.id);
+  const cyclone = wa === 'cyclone' || wb === 'cyclone';
+  const closed = struck || cyclone;
   const al = state.airlines[route.airlineId]!;
   const roundTrips = new Map<string, number>();
   const seats = emptyCabin();
@@ -84,14 +86,15 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
     const t = catalog.aircraftTypes[ac.typeId]!;
     blockH = blockHours(dist, t.cruiseKmh);
     const outOfRange = t.rangeKm < dist;
-    const flying = !closed && !blocked && !outOfRange && ac.status === 'active';
+    // Flights a cyclone would cancel still count as scheduled (stranded passengers cost money); strikes ground everything.
+    const flying = !struck && !blocked && !outOfRange && ac.status === 'active';
     if (outOfRange && !blocked && !rangeBlocked) rangeBlocked = `Detour exceeds ${t.name} range`;
     const scheduled = flying ? (average ? asg.roundTripsPerWeek / 7 : flightsToday(asg.roundTripsPerWeek, state.day)) : 0;
     const acSeats = CABIN_CLASSES.reduce((s, c) => s + ac.cabin[c], 0);
     const util = (hours.get(ac.id) ?? 0) / BALANCE.weeklyHours;
     let rt = scheduled;
-    if (preCancelled) {
-      weatherFees += WEATHER.preCancelCostPerSeat * 2 * scheduled * acSeats;
+    if (preCancelled || cyclone) {
+      weatherFees += (preCancelled ? WEATHER.preCancelCostPerSeat : WEATHER.cancelCostPerSeat) * 2 * scheduled * acSeats;
       rt = 0;
     } else if (scheduled > 0) {
       const ea = weatherEffect(wa, a, t.class), eb = weatherEffect(wb, b, t.class);

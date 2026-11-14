@@ -33,7 +33,10 @@ export function RouteInspector({ id }: { id: string }) {
         <p className="text-muted">{a.city} – {b.city} · {Math.round(distanceKm(a, b)).toLocaleString('en-US')} km</p>
         {r.status === 'suspended' && <p className="mt-2 rounded-md bg-warning/10 p-2 text-[13px] text-warning">Suspended — assign an aircraft to fly it again.</p>}
         {view.routeStatus[r.id]?.blocked && (
-          <p className="mt-2 rounded-md bg-danger/10 p-2 text-[13px] text-danger">{view.routeStatus[r.id]!.blocked}. This route is grounded until it lifts; its slots are kept.</p>
+          <p className="mt-2 rounded-md bg-danger/10 p-2 text-[13px] text-danger">
+            {view.routeStatus[r.id]!.blocked}.{' '}
+            {view.routeStatus[r.id]!.blocked!.startsWith('Detour exceeds') ? 'That aircraft is grounded here — swap in a longer-range one.' : 'This route is grounded until it lifts; its slots are kept.'}
+          </p>
         )}
         {!view.routeStatus[r.id]?.blocked && (view.routeStatus[r.id]?.detourKm ?? 0) > 0 && (
           <p className="mt-2 rounded-md bg-warning/10 p-2 text-[13px] text-warning">Flying a {view.routeStatus[r.id]!.detourKm.toLocaleString('en-US')} km detour around closed airspace — more fuel and crew time.</p>

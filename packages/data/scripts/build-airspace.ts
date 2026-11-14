@@ -11,11 +11,12 @@ type Pt = [number, number];
 const ROOT = join(import.meta.dirname, '..');
 
 /** Region id → display name, countries, optional longitude clip. Names are geographic only. */
-const REGIONS: { id: string; name: string; countries: string[]; lon?: [number, number] }[] = [
+/** `lon` clips rings to a longitude band; `westOf` also adds whole rings lying west of that longitude (e.g. Chukotka past 180°). */
+const REGIONS: { id: string; name: string; countries: string[]; lon?: [number, number]; westOf?: number; names?: string[] }[] = [
   { id: 'eastern-europe', name: 'Eastern Europe', countries: ['UA', 'BY', 'MD'] },
   { id: 'baltic', name: 'Baltic', countries: ['EE', 'LV', 'LT'] },
-  { id: 'western-russia', name: 'Western Russia', countries: ['RU'], lon: [-180, 60] },
-  { id: 'siberia', name: 'Siberia', countries: ['RU'], lon: [60, 180] },
+  { id: 'western-russia', name: 'Western Russia', countries: ['RU'], lon: [0, 60] },
+  { id: 'siberia', name: 'Siberia', countries: ['RU'], lon: [60, 180], westOf: -160 },
   { id: 'caucasus', name: 'Caucasus', countries: ['GE', 'AM', 'AZ'] },
   { id: 'central-asia', name: 'Central Asia', countries: ['KZ', 'UZ', 'TM', 'KG', 'TJ'] },
   { id: 'south-central-asia', name: 'South-Central Asia', countries: ['AF', 'PK'] },
@@ -45,7 +46,7 @@ const REGIONS: { id: string; name: string; countries: string[]; lon?: [number, n
   { id: 'malay-peninsula', name: 'Malay Peninsula', countries: ['MY', 'SG', 'BN'] },
   { id: 'indonesian-archipelago', name: 'Indonesian Archipelago', countries: ['ID', 'TL'] },
   { id: 'philippine-archipelago', name: 'Philippine Archipelago', countries: ['PH'] },
-  { id: 'balkans', name: 'Balkans', countries: ['RS', 'BA', 'ME', 'MK', 'AL', 'HR', '-99'] },
+  { id: 'balkans', name: 'Balkans', countries: ['RS', 'BA', 'ME', 'MK', 'AL', 'HR', 'XK'], names: ['Kosovo'] },
   { id: 'anatolia', name: 'Anatolia', countries: ['TR'] },
   { id: 'andes', name: 'Andes', countries: ['CO', 'EC', 'PE', 'BO'] },
   { id: 'northern-south-america', name: 'Northern South America', countries: ['VE', 'GY', 'SR'] },
@@ -117,11 +118,14 @@ const round = (p: Pt): Pt => [Math.round(p[0] * 100) / 100, Math.round(p[1] * 10
 const out = REGIONS.map((def) => {
   let rings: Pt[][] = [];
   for (const f of basemap.features) {
-    if (!def.countries.includes(f.properties.iso)) continue;
+    // Natural Earth codes a few places as -99 (Kosovo, Somaliland, N. Cyprus…): those are matched by name.
+    if (!def.countries.includes(f.properties.iso) && !def.names?.includes(f.properties.name)) continue;
     for (let ring of outerRings(f)) {
       const lons = ring.map((p) => p[0]);
       if (Math.max(...lons) - Math.min(...lons) > 180) continue; // crosses the antimeridian
-      if (def.lon) ring = clip(clip(ring, def.lon[0], false), def.lon[1], true);
+      if (def.westOf !== undefined && Math.max(...lons) <= def.westOf) {
+        // keep the whole ring (it lies past the antimeridian, e.g. Chukotka)
+      } else if (def.lon) ring = clip(clip(ring, def.lon[0], false), def.lon[1], true);
       if (ring.length < 3) continue;
       const s = simplify([...ring, ring[0]!], 0.5).slice(0, -1).map(round);
       if (s.length >= 3 && area(s) >= 1) rings.push(s);
@@ -137,7 +141,7 @@ const out = REGIONS.map((def) => {
       return round([p[0] + (0.75 * dx) / len, Math.max(-89, Math.min(89, p[1] + (0.75 * dy) / len))]);
     })
     .filter((n) => !rings.some((r) => inRing(n, r)));
-  return { id: def.id, name: def.name, countries: def.countries.filter((c) => c !== '-99'), rings, nodes };
+  return { id: def.id, name: def.name, countries: def.countries, rings, nodes };
 });
 
 writeFileSync(join(ROOT, 'src', 'airspace.json'), JSON.stringify(out) + '\n');

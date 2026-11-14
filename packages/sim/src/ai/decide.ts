@@ -11,6 +11,7 @@ import { distanceKm } from '../geo';
 import { maxRoundTripsPerWeek, roundTripHours } from '../ops';
 import type { Rng } from '../rng';
 import { upcomingPeaks } from '../holidays';
+import { flightDistanceKm } from '../routing';
 import { routeTensionStatus } from '../tensions';
 import { PERSONALITIES, type Personality } from './personalities';
 
@@ -128,7 +129,13 @@ export function runAi(state: GameState, airlineId: string, catalog: Catalog, rng
   }
 
   // 2b. Drop routes grounded by tensions (bans, closed airspace, detours beyond range): free the aircraft for elsewhere.
-  for (const r of myRoutes()) if (routeTensionStatus(state, catalog, r).blocked) act({ type: 'closeRoute', routeId: r.id });
+  for (const r of myRoutes()) {
+    const status = routeTensionStatus(state, catalog, r);
+    if (!status.blocked) continue;
+    const km = flightDistanceKm(state, catalog, r.from, r.to).km;
+    const outOfRange = r.assignments.map((x) => { const ac = state.aircraft[x.aircraftId]; return !ac || catalog.aircraftTypes[ac.typeId]!.rangeKm < km; });
+    if (aiShouldDrop(status, outOfRange)) act({ type: 'closeRoute', routeId: r.id });
+  }
 
   // 3. Liquidity
   const monthly = monthlyFixedCosts(state, airlineId, catalog);
@@ -239,4 +246,11 @@ export function runAi(state: GameState, airlineId: string, catalog: Catalog, rng
     if (!opened) break;
   }
   return done;
+}
+
+/** Close a route hit by tensions when it is banned or has no way around — or when none of its aircraft can make the detour. */
+export function aiShouldDrop(status: { detourKm?: number; blocked: string | null }, outOfRange: boolean[]): boolean {
+  if (!status.blocked) return false;
+  if (status.blocked.startsWith('Detour exceeds')) return outOfRange.length > 0 && outOfRange.every(Boolean);
+  return true;
 }

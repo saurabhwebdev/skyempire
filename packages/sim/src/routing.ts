@@ -140,3 +140,11 @@ export function flightDistanceKm(state: GameState, catalog: Catalog, from: strin
   cache.set(key, res);
   return res;
 }
+
+/** Does the great circle between two airports pass through a region (endpoints excluded)? */
+export function routeCrossesRegion(catalog: Catalog, from: string, to: string, regionId: string): boolean {
+  const region = catalog.airspace.find((r) => r.id === regionId);
+  const A = catalog.airports[from], B = catalog.airports[to];
+  if (!region || !A || !B) return false;
+  return samples([A.lon, A.lat], [B.lon, B.lat]).some((p) => inRegion(p, region));
+}

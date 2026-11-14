@@ -65,6 +65,7 @@ export function buildClientView(state: GameState, playerId: string, catalog: Cat
     weather: { today, forecast },
     tensions,
     routeStatus,
+    preCancelled: Object.fromEntries(Object.entries(state.world.preCancelled).filter(([id]) => state.routes[id]?.airlineId === playerId)),
     upcomingPeaks: upcomingPeaks([...markets], state.day, state.day + 60, state.world.startYear, catalog),
     gameOver: state.gameOver,
     finance: (() => {

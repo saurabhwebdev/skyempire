@@ -84,6 +84,15 @@ describe('weather effects', () => {
 });
 
 describe('cancel ahead', () => {
+  it('a cyclone closure strands passengers ($20/seat) unless flights were cancelled ahead ($5/seat)', () => {
+    const { s, r } = withRoute();
+    s.day = 3;
+    s.world.liveWeather[3] = { MAD: 'cyclone' };
+    const onDay = routeOps(r, s, catalog, hoursByAircraft(s, catalog), false);
+    expect(onDay.weatherFees).toBe(20 * 2 * 2 * 194);
+    s.world.preCancelled[r.id] = [3];
+    expect(routeOps(r, s, catalog, hoursByAircraft(s, catalog), false).weatherFees).toBe(5 * 2 * 2 * 194);
+  });
   it('cancelling 2 days ahead grounds the route that day for $5 a seat', () => {
     const { s, r } = withRoute();
     expect(applyCommand(s, s.playerId, { type: 'preCancel', routeId: r.id, day: s.day + 2 }, catalog)).toEqual({ ok: true });

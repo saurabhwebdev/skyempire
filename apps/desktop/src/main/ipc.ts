@@ -36,9 +36,9 @@ export function registerIpc(win: BrowserWindow, host: SimHost, store: SaveStore,
     if (!settings.liveWeather || weatherBusy || !saveId) return;
     weatherBusy = true;
     try {
-      const { day, points } = await host.request({ kind: 'weatherPoints' });
+      const { day, points, token } = await host.request({ kind: 'weatherPoints' });
       const data = await liveWeather.refresh(points, day);
-      if (data) await host.request({ kind: 'setLiveWeather', data });
+      if (data && saveId) await host.request({ kind: 'setLiveWeather', token, data });
     } catch (e) {
       console.warn('Live weather skipped', e);
     } finally {
