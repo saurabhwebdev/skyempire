@@ -133,21 +133,25 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
       d.costs.fees += c.fees;
       d.costs.service += c.service;
       const dist = distanceKm(catalog.airports[r.from]!, catalog.airports[r.to]!);
-      add(fareRatio, r.airlineId, r.fares.economy / refFare(dist, 'economy'));
+      if (r.kind !== 'cargo') add(fareRatio, r.airlineId, r.fares.economy / refFare(dist, 'economy'));
       add(onTimeAcc, r.airlineId, ops.onTime);
-      add(qualityAcc, r.airlineId, ops.qualityMean);
+      if (r.kind !== 'cargo') add(qualityAcc, r.airlineId, ops.qualityMean);
     }
   }
 
   // 7. Aircraft, reputation, cash
   const incidents = new Map<string, number>();
   for (const ac of Object.values(s.aircraft)) {
+    if (ac.deliveryDay !== undefined && ac.deliveryDay > s.day) continue; // on order: doesn't exist yet
     const flown = hoursFlown.get(ac.id) ?? 0;
     const inRefit = ac.refitDaysLeft > 0;
     const { checkCost, check } = advanceAircraft(ac, flown);
-    if (inRefit && ac.refitDaysLeft === 0 && ac.ownerId === s.playerId)
-      notes.push({ id: nextId(s, 'n'), day: s.day, level: 'info', category: 'airline', title: `${catalog.aircraftTypes[ac.typeId]!.name} refit done`,
-        body: 'Back in service with its new cabin.', link: { kind: 'aircraft', id: ac.id } });
+    if (inRefit && ac.refitDaysLeft === 0 && ac.ownerId === s.playerId) {
+      const t = catalog.aircraftTypes[ac.typeId]!;
+      notes.push({ id: nextId(s, 'n'), day: s.day, level: 'info', category: 'airline',
+        title: t.kind === 'freighter' ? `${t.name} conversion done` : `${t.name} refit done`,
+        body: t.kind === 'freighter' ? 'Back in service as a freighter.' : 'Back in service with its new cabin.', link: { kind: 'aircraft', id: ac.id } });
+    }
     const d = daily.get(ac.ownerId);
     if (d) d.costs.maintenance += checkCost;
     if (check && ac.ownerId === s.playerId) {

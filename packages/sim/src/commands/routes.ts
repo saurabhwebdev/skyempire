@@ -1,3 +1,4 @@
+import { formatDate } from '../calendar';
 import type { SeasonalFare, Assignment, Catalog, Command, CommandResult, GameState } from '@skyempire/shared';
 type Fares = Record<'economy' | 'premium' | 'business', number>;
 /** Same airports in the same order, read either way. */
@@ -52,6 +53,7 @@ export function validateAssignments(
     seen.add(asg.aircraftId);
     const ac = state.aircraft[asg.aircraftId];
     if (!ac || ac.ownerId !== airlineId) return fail(ERR.unknownAircraft);
+    if (ac.deliveryDay !== undefined && ac.deliveryDay > state.day) return fail(ERR.notDelivered(formatDate(ac.deliveryDay, state.world.startYear)));
     const t = catalog.aircraftTypes[ac.typeId]!;
     for (const [i, [x, y]] of legs.entries()) {
       const dist = distanceKm(catalog.airports[x]!, catalog.airports[y]!);

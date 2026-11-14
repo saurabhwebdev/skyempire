@@ -18,6 +18,12 @@ const FLOW_K = 0.00085;
 const DIST_EXP = 0.3;
 const DOMESTIC = 0.8;
 
+/** Below this distance some cargo goes by truck instead. */
+const ROAD_KM = 1000;
+
+/** Share of a cargo flow that travels by road: most of it under ~500 km, none from 1,000 km. */
+export const roadShare = (km: number) => (km >= ROAD_KM ? 0 : (1 - km / ROAD_KM) ** 0.7);
+
 /** General cargo reference rate, $/kg. */
 export const cargoRefRate = (km: number) => 0.8 + 0.00028 * km;
 
@@ -30,6 +36,38 @@ export function airportCargoT(catalog: Catalog, a: Airport): number {
 }
 
 export const exportIndex = (catalog: Catalog, country: string) => catalog.cargo?.exportIndex[country] ?? 1;
+
+/** Trucks bring cargo to long-haul hubs from airports this close ("road feeder services"). */
+const FEEDER_KM = 600;
+/** Share of a nearby airport's cargo a hub can draw on for long-haul flights. */
+const FEEDER_SHARE = 0.4;
+/** Flows at least this long use the hub's whole trucking catchment. */
+const LONG_HAUL_KM = 2500;
+const catchments = new WeakMap<Catalog, Map<string, number>>();
+
+/**
+ * An airport's own cargo plus what trucks bring it for long-haul flights: each airport sends a share of its cargo
+ * to the hubs within trucking distance, mostly to the biggest (pull ∝ tonnes^1.5). Worked out once per catalogue.
+ */
+export function cargoCatchmentT(catalog: Catalog, a: Airport): number {
+  let m = catchments.get(catalog);
+  if (!m) {
+    m = new Map();
+    const all = Object.values(catalog.airports);
+    const own = new Map(all.map((x) => [x.id, airportCargoT(catalog, x)]));
+    for (const x of all) m.set(x.id, own.get(x.id)!);
+    for (const b of all) {
+      const near = all.filter((x) => x.id !== b.id && Math.abs(x.lat - b.lat) <= 6 && distanceKm(x, b) <= FEEDER_KM);
+      const pull = near.map((x) => own.get(x.id)! ** 1.5);
+      const total = pull.reduce((p, q) => p + q, 0);
+      if (total <= 0) continue;
+      const sent = FEEDER_SHARE * own.get(b.id)!;
+      near.forEach((x, i) => m!.set(x.id, m!.get(x.id)! + (sent * pull[i]!) / total));
+    }
+    catchments.set(catalog, m);
+  }
+  return m.get(a.id) ?? airportCargoT(catalog, a);
+}
 
 /** Day of year (0 = Jan 1) of Lunar New Year, from the holiday tables. */
 function lunarNewYearDoy(catalog: Catalog, year: number): number | null {
@@ -52,10 +90,12 @@ export function cargoSeason(dayOfYear: number, originCountry: string, type: Carg
 /** Tonnes a day from A to B (all types), before rates. Flows are one-sided: exporters send more than they get back. */
 export function cargoFlow(a: Airport, b: Airport, dayOfYear: number, economyIndex: number, catalog: Catalog, year: number): number {
   const km = Math.max(distanceKm(a, b), 50);
-  const mass = Math.sqrt(airportCargoT(catalog, a) * airportCargoT(catalog, b));
+  // Long-haul flights draw on cargo trucked in from nearby airports; short ones only on their own.
+  const size = (x: Airport) => (km >= LONG_HAUL_KM ? cargoCatchmentT(catalog, x) : airportCargoT(catalog, x));
+  const mass = Math.sqrt(size(a) * size(b));
   const trade = exportIndex(catalog, a.country) / Math.sqrt(exportIndex(catalog, b.country));
   const domestic = a.country === b.country ? DOMESTIC : 1;
-  return (FLOW_K * mass * trade * domestic * cargoSeason(dayOfYear, a.country, 'general', year, catalog) * economyIndex) / km ** DIST_EXP;
+  return ((1 - roadShare(km)) * FLOW_K * mass * trade * domestic * cargoSeason(dayOfYear, a.country, 'general', year, catalog) * economyIndex) / km ** DIST_EXP;
 }
 
 /** A flow split by cargo type; countries known for flowers, fish and fruit send more perishables. */

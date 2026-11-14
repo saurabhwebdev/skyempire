@@ -67,8 +67,8 @@ export function bellyTOf(t: AircraftType): number {
 }
 /** Share of the hold sold for cargo on the default setting: narrowbody holds are mostly bags. */
 export const defaultHoldShare = (t: AircraftType) => (t.class === 'widebody' || t.class === 'longNarrowbody' ? 0.6 : 0.35);
-/** Above this hold share, bags start being left behind. */
-const BAG_ROOM = 0.75;
+/** Above the default share + this, bags start being left behind (narrowbody 50%, widebody 75%). */
+const BAG_MARGIN = 0.15;
 
 /** What a route operates today. `average` = typical day (rtpw / 7) for previews. */
 export function routeOps(route: Route, state: GameState, catalog: Catalog, hours: Map<string, number>, average: boolean): RouteOps {
@@ -158,7 +158,11 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
   }
   for (const cls of CABIN_CLASSES) quality[cls] = qualSeats[cls] > 0 ? quality[cls] / qualSeats[cls] : 50;
   // A hold filled with cargo leaves bags behind.
-  if (bellyOn && customShare !== null && customShare > BAG_ROOM) for (const cls of CABIN_CLASSES) quality[cls] -= (customShare - BAG_ROOM) * 40;
+  const bagRoom = Math.min(...route.assignments.map((a) => {
+    const t = catalog.aircraftTypes[state.aircraft[a.aircraftId]?.typeId ?? ''];
+    return t ? defaultHoldShare(t) + BAG_MARGIN : 1;
+  }), 1);
+  if (bellyOn && customShare !== null && customShare > bagRoom) for (const cls of CABIN_CLASSES) quality[cls] -= (customShare - bagRoom) * 40;
   const allSeats = CABIN_CLASSES.reduce((s, c) => s + qualSeats[c], 0);
   const qualityMean = allSeats > 0 ? CABIN_CLASSES.reduce((s, c) => s + quality[c] * qualSeats[c], 0) / allSeats : 50;
   return {

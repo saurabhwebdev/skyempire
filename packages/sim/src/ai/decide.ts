@@ -1,4 +1,4 @@
-import type { AircraftType, Catalog, Command, GameState, Route } from '@skyempire/shared';
+import type { AircraftType, Airport, Catalog, Command, GameState, Route } from '@skyempire/shared';
 import { CABIN_CLASSES, CARGO_TYPES } from '@skyempire/shared';
 import { applyCommand } from '../commands/apply';
 import { BALANCE } from '../config/balance';
@@ -298,6 +298,16 @@ export function estimateCargoRoute(
 }
 
 const CARGO_CANDIDATES = 40;
+const rankedHubs = new WeakMap<Catalog, Airport[]>();
+/** The 120 busiest cargo airports (ranked once per catalogue). */
+function topCargoAirports(catalog: Catalog): Airport[] {
+  let list = rankedHubs.get(catalog);
+  if (!list) {
+    list = Object.values(catalog.airports).sort((a, b) => airportCargoT(catalog, b) - airportCargoT(catalog, a)).slice(0, 120);
+    rankedHubs.set(catalog, list);
+  }
+  return list;
+}
 
 /** Open the most profitable cargo route for a free freighter from one of the airline's bases. */
 function openCargoRoute(
@@ -306,7 +316,7 @@ function openCargoRoute(
 ): boolean {
   const al = state.airlines[airlineId]!;
   const t = catalog.aircraftTypes[state.aircraft[aircraftId]!.typeId]!;
-  const hubs = Object.values(catalog.airports).sort((a, b) => airportCargoT(catalog, b) - airportCargoT(catalog, a)).slice(0, 120);
+  const hubs = topCargoAirports(catalog);
   const ranked: { from: string; to: string; rtpw: number; rate: number; profit: number }[] = [];
   for (const base of al.baseIds) {
     const A = catalog.airports[base]!;

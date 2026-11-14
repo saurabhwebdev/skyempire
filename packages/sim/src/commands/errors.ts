@@ -15,6 +15,8 @@ export const ERR = {
   convertOwnedOnly: 'Only aircraft you own can be converted',
   convertOffRoutes: 'Take it off its routes first',
   dgAlready: 'You already hold a dangerous-goods licence',
+  leaseFutureType: 'Lease it now: you can buy one once it’s delivered',
+  notDelivered: (date: string) => `This aircraft arrives on ${date}`,
   freightersCargoOnly: 'Freighters fly cargo routes only',
   cargoRoutesFreighters: 'Cargo routes need freighters',
   refitRunning: (days: number) => `This aircraft is already being refitted (${days} day${days === 1 ? '' : 's'} left)`,

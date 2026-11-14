@@ -27,6 +27,9 @@
 - **Cargo on every screen.** The route editor gets a Passengers / Cargo switch, a rate per kg and the cargo types. Cargo routes are amber on the map. The Overview shows tonnes moved, and Finance shows cargo revenue.
 - **Cargo-only careers** grow by tonnes moved and have their own goals and tutorial.
 - **Four big cargo hubs added:** Memphis, Louisville, Cincinnati and Anchorage.
+- **Trucks matter.**
+  - Short cargo hops lose most of their freight to road transport.
+  - Long-haul hubs collect cargo trucked in from nearby airports, the way Luxembourg and Leipzig really work.
 
 ## 0.5.0 — "Connections"
 

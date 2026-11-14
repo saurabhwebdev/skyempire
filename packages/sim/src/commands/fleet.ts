@@ -55,7 +55,10 @@ export function applyFleet(state: GameState, airlineId: string, cmd: Command, ca
       if (!tierAllows(al.tier, t.tier)) return fail(ERR.tierLocked(t.tier));
       const cabin = cabinFor(t, cmd.config);
       if ('ok' in cabin) return cabin;
-      const cost = (cmd.type === 'leaseAircraft' ? t.leasePerMonth : t.priceUsd) + (t.kind === 'freighter' ? 0 : upgradeCost(cabin));
+      // A type not delivered yet is ordered by lease: nothing is paid until it arrives.
+      const onOrder = !!t.entryYear && t.entryYear > dateOf(state.day, state.world.startYear).year;
+      if (onOrder && cmd.type === 'buyAircraft') return fail(ERR.leaseFutureType);
+      const cost = onOrder ? 0 : (cmd.type === 'leaseAircraft' ? t.leasePerMonth : t.priceUsd) + (t.kind === 'freighter' ? 0 : upgradeCost(cabin));
       if (al.cash < cost) return fail(ERR.notEnoughCash(cost - al.cash));
       al.cash -= cost;
       const ac = addAircraft(state, airlineId, t.id, cabin, cmd.type === 'leaseAircraft' ? 'leased' : 'owned', 0, 100, cmd.type === 'buyAircraft' ? t.priceUsd : 0);
@@ -70,12 +73,14 @@ export function applyFleet(state: GameState, airlineId: string, cmd: Command, ca
       if (!listing) return fail(ERR.unknownListing);
       const t = catalog.aircraftTypes[listing.typeId]!;
       if (!tierAllows(al.tier, t.tier)) return fail(ERR.tierLocked(t.tier));
+      if (t.entryYear && t.entryYear > dateOf(state.day, state.world.startYear).year) return fail(ERR.unknownListing);
       if (cmd.convertTo) {
         // Bought and sent straight to conversion: it arrives as a freighter.
         const target = catalog.aircraftTypes[cmd.convertTo];
         if (!target?.conversion?.from.includes(t.id)) return fail(ERR.notConvertible);
         const wrong = kindAllows(al, target);
         if (wrong) return wrong;
+        if (!tierAllows(al.tier, target.tier)) return fail(ERR.tierLocked(target.tier));
         const cost = listing.price + target.conversion.costUsd;
         if (al.cash < cost) return fail(ERR.notEnoughCash(cost - al.cash));
         al.cash -= cost;
@@ -134,6 +139,7 @@ export function applyFleet(state: GameState, airlineId: string, cmd: Command, ca
       if (!target?.conversion?.from.includes(ac.typeId)) return fail(ERR.notConvertible);
       const wrong = kindAllows(al, target);
       if (wrong) return wrong;
+      if (!tierAllows(al.tier, target.tier)) return fail(ERR.tierLocked(target.tier));
       if (ac.ownership !== 'owned') return fail(ERR.convertOwnedOnly);
       if (Object.values(state.routes).some((r) => r.assignments.some((x) => x.aircraftId === ac.id))) return fail(ERR.convertOffRoutes);
       if (ac.refitDaysLeft > 0) return fail(ERR.refitRunning(ac.refitDaysLeft));

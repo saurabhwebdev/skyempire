@@ -60,6 +60,11 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
   const [cargoAccept, setCargoAccept] = useState<CargoType[]>(() => existing?.cargoAccept ?? [...CARGO_TYPES]);
   const [belly, setBelly] = useState<BellySettings>(() => existing?.belly ?? { mode: 'default' });
   const [bellyOpen, setBellyOpen] = useState(false);
+  // Bags start being left behind above the default hold share + 15% (narrowbody 50%, widebody 75%).
+  const bagRoom = Math.min(1, ...assignments.map((a) => {
+    const t = catalog.aircraftTypes[view.aircraft.find((x) => x.id === a.aircraftId)?.typeId ?? ''];
+    return t && (t.class === 'widebody' || t.class === 'longNarrowbody') ? 0.75 : 0.5;
+  }));
   const dist = to && catalog.airports[from] && catalog.airports[to] ? distanceKm(catalog.airports[from]!, catalog.airports[to]!) : 0;
   const legKm = to ? routeLegs(chain).map(([x, y]) => (catalog.airports[x] && catalog.airports[y] ? distanceKm(catalog.airports[x]!, catalog.airports[y]!) : 0)) : [];
   const flownKm = legKm.reduce((a, b) => a + b, 0);
@@ -385,7 +390,7 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
                     <NumberInput label="Rate per kg (general cargo)" prefix="$" value={belly.rate} min={0.1} max={50} step={0.05} onChange={(v) => setBelly({ ...belly, rate: Math.round(v * 100) / 100 })} />
                     {typeBoxes(belly.accept, (accept) => setBelly({ ...belly, accept }), false)}
                     <Slider label="Hold space for cargo" value={Math.round(belly.holdShare * 100)} min={20} max={90} step={5} onChange={(v) => setBelly({ ...belly, holdShare: v / 100 })} format={(v) => `${v}%`} />
-                    {belly.holdShare > 0.75 && <p className="text-[13px] text-warning">Not enough room for every bag: some get left behind, and passengers notice.</p>}
+                    {belly.holdShare > bagRoom && <p className="text-[13px] text-warning">Not enough room for every bag: some get left behind, and passengers notice.</p>}
                   </>
                 )}
               </div>

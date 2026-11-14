@@ -1,3 +1,4 @@
+import { dateOf } from './calendar';
 import { COMBINATION_CARRIERS, CURRENT_SCHEMA } from './migrate';
 import { isReservedAirline } from '@skyempire/data';
 import type { Airline, AirlineData, Catalog, GameState, NewGameOptions } from '@skyempire/shared';
@@ -169,7 +170,9 @@ export function newGame(opts: NewGameOptions, catalog: Catalog): GameState {
 }
 
 export function refreshUsedListings(state: GameState, catalog: Catalog, rng: Rng): void {
-  const types = Object.values(catalog.aircraftTypes);
+  // Types not delivered yet (A350F before 2027…) can't be second-hand.
+  const year = dateOf(state.day, state.world.startYear).year;
+  const types = Object.values(catalog.aircraftTypes).filter((t) => !t.entryYear || t.entryYear <= year);
   state.market.usedListings = Array.from({ length: 12 }, () => {
     const type = rng.pick(types);
     const ageDays = rng.int(3, 20) * 360;

@@ -86,7 +86,7 @@ export function AircraftMarket() {
     const freighter = t.kind === 'freighter';
     const fuelPerSeatHour = freighter ? t.fuelKgPerH / (t.payloadT ?? 1) : t.fuelKgPerH / t.maxSeats;
     const coming = !!t.entryYear && t.entryYear > year;
-    const convertTo = extra && airlineKind === 'cargo' && !freighter ? conversionOf(t.id) : undefined;
+    const convertTo = extra && airlineKind !== 'passenger' && !freighter ? conversionOf(t.id) : undefined;
     return (
       <article key={extra?.listing.id ?? t.id} className={cn('flex flex-col gap-3 overflow-hidden rounded-lg border bg-surface-1 p-4', compare.includes(t.id) ? 'border-accent' : 'border-border')}>
         <button type="button" aria-label={`About the ${t.name}`} onClick={() => setDetails(t.id)}
@@ -124,11 +124,12 @@ export function AircraftMarket() {
           </div>
         ) : (
           <div className="mt-auto flex flex-wrap gap-2">
-            {extra && convertTo ? (
-              <Button size="sm" variant="primary" onClick={() => setPending({ kind: 'convert', type: t, listing: extra.listing, target: convertTo })}>
+            {extra && convertTo && (
+              <Button size="sm" variant={airlineKind === 'cargo' ? 'primary' : 'secondary'} onClick={() => setPending({ kind: 'convert', type: t, listing: extra.listing, target: convertTo })}>
                 Buy & convert to {convertTo.name} · {formatMoney(extra.listing.price + convertTo.conversion!.costUsd)}
               </Button>
-            ) : extra ? (
+            )}
+            {extra && convertTo && airlineKind === 'cargo' ? null : extra ? (
               <Button size="sm" variant="primary" onClick={() => setPending({ kind: 'used', type: t, listing: extra.listing })}>Buy for {formatMoney(extra.listing.price)}</Button>
             ) : t.conversion ? (
               <p className="text-[13px] text-muted">Convert a {t.conversion.from.map((id) => catalog.aircraftTypes[id]?.name ?? id).join(' or ')} you own, or buy one under Used.</p>

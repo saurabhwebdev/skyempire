@@ -146,3 +146,21 @@ Agreed with the user on 2026-11-14 (the cargo plan, extended twice): every freig
 - **Belly holds:** `bellyT` is the total hold. The default cargo share is 60% on widebodies and 35% on narrowbodies (mostly bags). Low-cost rivals don't sell belly cargo.
 - **Photos:** 6 freighters have no freely licensed photo (A320P2F, A350F, 777-8F, Dash 8-400 conversion, E190F, E195F) and show their silhouette.
 - **Unlisted airports:** cargo estimates are capped at 300,000 t a year.
+
+## Changes after the final review (2026-11-14)
+- **Types not delivered yet** (A350F, 777-8F) are ordered by lease only:
+  - nothing is paid, nothing ages and no overhead is charged until delivery;
+  - they can't be assigned to routes before then;
+  - they never appear on the used market.
+- **Conversions** check the target freighter's tier.
+- **Bag room** is the default share + 15%: 50% on narrowbodies, 75% on widebodies.
+- **Road freight:**
+  - Under 1,000 km, part of the cargo goes by truck (most of it under 500 km).
+  - Long-haul flights (2,500 km or more) draw on cargo trucked in from airports within 600 km. Each airport sends 40% of its cargo to its nearby hubs, weighted towards the biggest.
+  - Without this, freighters earned most on 150 km hops.
+- **Reputation:** cargo routes no longer count towards passenger fare fairness or quality.
+- **Deferred:**
+  - special cargo is decided per route, not per aircraft;
+  - cargo lost to leg caps or closures isn't handed to other carriers;
+  - the AI can't grow fleets of used-only freighter types;
+  - arrow-key navigation in radio groups.
