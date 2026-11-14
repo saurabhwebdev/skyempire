@@ -146,6 +146,10 @@ export interface Route {
   profit30: Money[];
   /** Fare changes for date ranges (game days, inclusive), e.g. +20% over a festival. */
   seasonalFares?: SeasonalFare[];
+  /** Up to 2 intermediate stops (v0.5): the aircraft flies from → stops → to and back. */
+  stops?: string[];
+  /** Fares for the markets other than from–to on a multi-stop route, keyed by pairKey (e.g. "DXB-LHR"). */
+  legFares?: Record<string, Record<CabinClass, Money>>;
 }
 
 export interface SeasonalFare {
