@@ -52,13 +52,16 @@ export function tensionDemandFactor(state: GameState, o: Airport, d: Airport): n
 
 /** Does the player have a route this tension touches? */
 function affectsPlayer(state: GameState, catalog: Catalog, t: ActiveTension): boolean {
-  return Object.values(state.routes).some((r) => r.airlineId === state.playerId && touches(state, catalog, t, r));
+  return Object.values(state.routes).some((r) => r.airlineId === state.playerId && tensionTouchesRoute(catalog, t, r));
 }
-function touches(_state: GameState, catalog: Catalog, t: ActiveTension, r: Route): boolean {
-  const a = catalog.airports[r.from]!, b = catalog.airports[r.to]!;
-  if (t.kind === 'routeBan' || t.kind === 'thawBonus') return samePair(t, a.country, b.country);
-  if (t.kind === 'advisory') return a.country === t.country || b.country === t.country;
-  return !!t.regionId && routeCrossesRegion(catalog, r.from, r.to, t.regionId);
+/** Does a tension touch any leg (or airport) of a route, stops included? */
+export function tensionTouchesRoute(catalog: Catalog, t: ActiveTension, r: Pick<Route, 'from' | 'to' | 'stops'>): boolean {
+  return routeLegs(r).some(([x, y]) => {
+    const a = catalog.airports[x]!, b = catalog.airports[y]!;
+    if (t.kind === 'routeBan' || t.kind === 'thawBonus') return samePair(t, a.country, b.country);
+    if (t.kind === 'advisory') return a.country === t.country || b.country === t.country;
+    return !!t.regionId && routeCrossesRegion(catalog, x, y, t.regionId);
+  });
 }
 
 function note(state: GameState, level: Notification['level'], title: string, body: string): Notification {
@@ -111,7 +114,7 @@ export function rollTensions(state: GameState, catalog: Catalog, rng: Rng): Noti
   if (rng.chance(TENSIONS.closurePerDay) && catalog.airspace.length) {
     const open = catalog.airspace.filter((r) => !w.tensions.some((t) => t.kind === 'airspaceClosure' && t.regionId === r.id));
     const sample = rng.chance(0.7) ? routes.slice(0, 40) : [];
-    const crossed = open.filter((r) => sample.some((x) => touches(state, catalog, { id: '', kind: 'airspaceClosure', regionId: r.id, magnitude: 1, warnDay: 0, startDay: 0, endDay: 0 }, x)));
+    const crossed = open.filter((r) => sample.some((x) => tensionTouchesRoute(catalog, { id: '', kind: 'airspaceClosure', regionId: r.id, magnitude: 1, warnDay: 0, startDay: 0, endDay: 0 }, x)));
     const pool = crossed.length ? crossed : open;
     if (pool.length) {
       const region = rng.pick(pool);

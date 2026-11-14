@@ -148,6 +148,10 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
 export interface PairResult {
   /** Passengers per route per class, both directions combined. */
   pax: Map<string, Cabin>;
+  /** The same per direction: [A→B, B→A], where A–B are the first entry's market ends. */
+  dirPax?: Map<string, [Cabin, Cabin]>;
+  /** The market's A end (direction 0 starts here). */
+  from?: string;
   /** Unconstrained daily demand both directions (before price effects). */
   demand: number;
 }
@@ -171,12 +175,13 @@ export function simulatePair(ops: RouteOps[], state: GameState, catalog: Catalog
 export function simulateMarket(entries: MarketEntry[], state: GameState, catalog: Catalog): PairResult {
   const ops = entries.map((e) => e.ops);
   const pax = new Map<string, Cabin>(ops.map((o) => [o.route.id, emptyCabin()]));
+  const dirPax = new Map<string, [Cabin, Cabin]>(ops.map((o) => [o.route.id, [emptyCabin(), emptyCabin()]]));
   if (entries.length === 0) return { pax, demand: 0 };
   const A = catalog.airports[entries[0]!.m.a]!, B = catalog.airports[entries[0]!.m.b]!;
   const dist = distanceKm(A, B);
   const doy = dateOf(state.day, state.world.startYear).dayOfYear;
   let demandTotal = 0;
-  for (const [o, d] of [[A, B], [B, A]] as const) {
+  for (const [dir, [o, d]] of ([[A, B], [B, A]] as const).entries()) {
     const base = baseDemand(o, d, doy, state.market.economyIndex) * tensionDemandFactor(state, o, d);
     demandTotal += base;
     const split = classSplit(o, d);
@@ -205,15 +210,19 @@ export function simulateMarket(entries: MarketEntry[], state: GameState, catalog
       const seatSum = withSeats.reduce((s, x) => s + x.seats, 0);
       const avgFare = (withSeats.reduce((s, x) => s + x.fare * x.seats, 0) + ref * BALANCE.backgroundFareFactor * Math.max(0, BALANCE.backgroundShare * classBase - seatSum)) / Math.max(seatSum, BALANCE.backgroundShare * classBase);
       const demand = elasticDemand(classBase, avgFare, ref, cls);
-      for (const [routeId, n] of allocate(demand, offers, ref, cls)) if (routeId !== '__others') pax.get(routeId)![cls] += n;
+      for (const [routeId, n] of allocate(demand, offers, ref, cls)) {
+        if (routeId === '__others') continue;
+        pax.get(routeId)![cls] += n;
+        dirPax.get(routeId)![dir]![cls] += n;
+      }
     }
   }
-  return { pax, demand: demandTotal };
+  return { pax, dirPax, from: A.id, demand: demandTotal };
 }
 
 /** What a route sold today: passengers per market, revenue and how full each leg was. */
 /** `revenue` is rounded to dollars; `ticketRevenue` is exact (it feeds the distribution fee). */
-export interface RouteResult { pax: Cabin; marketPax: Map<string, Cabin>; revenue: number; ticketRevenue: number; legLoad: number[]; loadFactor: number }
+export interface RouteResult { pax: Cabin; marketPax: Map<string, Cabin>; revenue: number; ticketRevenue: number; legLoad: number[]; loadFactor: number; legPaxByDirection: [Cabin, Cabin][] }
 
 /**
  * Passengers for a set of routes: every market of every route is allocated against all routes selling that market,
@@ -225,28 +234,39 @@ export function simulateRoutes(opsList: RouteOps[], state: GameState, catalog: C
     if (!byMarket.has(m.key)) byMarket.set(m.key, []);
     byMarket.get(m.key)!.push({ ops, m });
   }
-  const marketPax = new Map<string, Map<string, Cabin>>(opsList.map((o) => [o.route.id, new Map()]));
+  // Per route and market: passengers [forward, back], forward = the route's own chain order.
+  const marketDir = new Map<string, Map<string, [Cabin, Cabin]>>(opsList.map((o) => [o.route.id, new Map()]));
   const demand = new Map<string, number>();
   for (const [key, entries] of byMarket) {
     const res = simulateMarket(entries, state, catalog);
     demand.set(key, res.demand);
-    for (const [routeId, p] of res.pax) marketPax.get(routeId)!.set(key, p);
+    for (const { ops, m } of entries) {
+      const [ab, ba] = res.dirPax!.get(ops.route.id)!;
+      marketDir.get(ops.route.id)!.set(key, m.a === res.from ? [ab, ba] : [ba, ab]);
+    }
   }
   const results = new Map<string, RouteResult>();
   for (const ops of opsList) {
     const r = ops.route;
     const markets = routeMarkets(r);
-    const mp = marketPax.get(r.id)!;
+    const md = marketDir.get(r.id)!;
     const legCount = markets.reduce((n, m) => Math.max(n, m.last + 1), 0);
-    if (legCount > 1) {
-      // A leg can't carry more than its seats (both directions): scale the markets that share an overfull leg.
-      for (let pass = 0; pass < 2; pass++) for (let leg = 0; leg < legCount; leg++) for (const c of CABIN_CLASSES) {
-        const on = markets.filter((m) => m.first <= leg && leg <= m.last);
-        const load = on.reduce((x, m) => x + (mp.get(m.key)?.[c] ?? 0), 0);
-        const cap = 2 * ops.seats[c];
-        if (load > cap + 1e-9) for (const m of on) mp.get(m.key)![c] *= cap / load;
-      }
+    // A leg can't carry more than its seats in either direction: scale the markets sharing an overfull leg.
+    // Scaling only lowers loads, so one pass settles every leg.
+    if (legCount > 1) for (let leg = 0; leg < legCount; leg++) for (const d of [0, 1] as const) for (const c of CABIN_CLASSES) {
+      const on = markets.filter((m) => m.first <= leg && leg <= m.last);
+      const load = on.reduce((x, m) => x + (md.get(m.key)?.[d][c] ?? 0), 0);
+      if (load > ops.seats[c] + 1e-9) for (const m of on) md.get(m.key)![d][c] *= ops.seats[c] / load;
     }
+    const mp = new Map<string, Cabin>([...md].map(([k, [f, b]]) => [k, { economy: f.economy + b.economy, premium: f.premium + b.premium, business: f.business + b.business }]));
+    const legPaxByDirection = Array.from({ length: legCount }, (_, leg) => {
+      const on = markets.filter((m) => m.first <= leg && leg <= m.last);
+      return ([0, 1] as const).map((d) => {
+        const c = emptyCabin();
+        for (const m of on) for (const k of CABIN_CLASSES) c[k] += md.get(m.key)?.[d][k] ?? 0;
+        return c;
+      }) as [Cabin, Cabin];
+    });
     const pax = emptyCabin();
     let revenue = 0;
     for (const m of markets) {
@@ -259,7 +279,7 @@ export function simulateRoutes(opsList: RouteOps[], state: GameState, catalog: C
       return seats2 > 0 ? onLeg / seats2 : 0;
     });
     const loadFactor = legLoad.length ? legLoad.reduce((a, b) => a + b, 0) / legLoad.length : 0;
-    results.set(r.id, { pax, marketPax: mp, revenue: Math.round(revenue), ticketRevenue: revenue, legLoad, loadFactor });
+    results.set(r.id, { pax, marketPax: mp, revenue: Math.round(revenue), ticketRevenue: revenue, legLoad, loadFactor, legPaxByDirection });
   }
   return { results, demand };
 }

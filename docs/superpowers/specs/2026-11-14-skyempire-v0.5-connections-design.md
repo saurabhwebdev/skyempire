@@ -59,3 +59,9 @@ Requested by the user on 2026-11-14, before cargo (cargo moves to v0.6). The dec
 
 ## Out of scope
 - AI multi-stop routes, connecting itineraries across different routes, and cargo (v0.6).
+
+## Notes after the final review (2026-11-14)
+- **Leg capacity** is enforced per direction (outbound and return separately), not on the two-way total.
+- **Tension warnings** count every leg of a stop route.
+- **"Use free hours"** refreshes can't overwrite newer ones. If the best route can't open, it tries the next. A failed lookup can't leave it stuck.
+- **Deferred:** rival AI still groups routes by their end airports, so it doesn't count the player's stop routes as competitors on intermediate pairs.

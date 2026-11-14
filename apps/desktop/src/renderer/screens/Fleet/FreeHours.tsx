@@ -2,7 +2,7 @@ import type { Aircraft, Command, RouteSuggestion } from '@skyempire/shared';
 import { formatMoney } from '@skyempire/shared';
 import { Button, EmptyState, Modal, Skeleton, useToast } from '@skyempire/ui';
 import { CheckCircle2 } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { aircraftLabel, hoursUsed, WEEKLY_HOURS } from '../../lib/fleet';
 import { useGameStore } from '../../store';
 
@@ -26,33 +26,46 @@ export function FreeHoursDialog({ open, onOpenChange }: { open: boolean; onOpenC
   const [done, setDone] = useState<string | null>(null);
   const ids = free.map((a) => a.id).join(',');
 
+  // Each refresh gets a token; a slower, older one never overwrites a newer one.
+  const latest = useRef(0);
   const load = useCallback(async () => {
+    const token = ++latest.current;
     const out: Record<string, RouteSuggestion[]> = {};
-    for (const id of ids ? ids.split(',') : []) out[id] = await window.game.suggestRoutes(id);
-    setSuggestions(out);
+    for (const id of ids ? ids.split(',') : []) {
+      try { out[id] = await window.game.suggestRoutes(id); } catch { out[id] = []; }
+    }
+    if (token === latest.current) setSuggestions(out);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ids, view.routes.length]);
-  useEffect(() => { if (open) { setSuggestions({}); void load(); } }, [open, load]);
-  useEffect(() => { if (open) setDone(null); }, [open]);
+  useEffect(() => { if (open && busy !== 'all') void load(); }, [open, load]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (open) { setSuggestions({}); setDone(null); } }, [open]);
 
   const openOne = async (acId: string, s: RouteSuggestion) => {
-    setBusy(`${acId}:${s.to}`);
-    const r = await window.game.command(openCmd(acId, s));
-    setBusy(null);
-    if (r.ok) toast({ title: `Route ${s.from}–${s.to} opened`, tone: 'success' }); else toast({ title: r.reason, tone: 'danger' });
+    setBusy(`${acId}:${s.from}-${s.to}`);
+    try {
+      const r = await window.game.command(openCmd(acId, s));
+      if (r.ok) toast({ title: `Route ${s.from}–${s.to} opened`, tone: 'success' }); else toast({ title: r.reason, tone: 'danger' });
+    } finally {
+      setBusy(null);
+    }
   };
   const openAll = async () => {
     setBusy('all');
     let n = 0;
-    for (const a of free) {
-      const [best] = await window.game.suggestRoutes(a.id); // fresh: earlier openings change what's left
-      if (!best) continue;
-      const r = await window.game.command(openCmd(a.id, best));
-      if (r.ok) n++;
+    try {
+      for (const a of free) {
+        let list: RouteSuggestion[] = [];
+        try { list = await window.game.suggestRoutes(a.id); } catch { continue; } // fresh: earlier openings change what's left
+        for (const s of list) {
+          const r = await window.game.command(openCmd(a.id, s));
+          if (r.ok) { n++; break; } // else try this aircraft's next suggestion
+        }
+      }
+    } finally {
+      setBusy(null);
+      setDone(`Opened ${n} route${n === 1 ? '' : 's'}`);
+      void load();
     }
-    setBusy(null);
-    setDone(`Opened ${n} route${n === 1 ? '' : 's'}`);
-    void load();
   };
 
   return (
@@ -81,12 +94,12 @@ export function FreeHoursDialog({ open, onOpenChange }: { open: boolean; onOpenC
                 ) : (
                   <ul className="flex flex-col gap-1.5">
                     {list.map((s) => (
-                      <li key={s.to} className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-md bg-surface-2 px-3 py-2 text-[13px]">
+                      <li key={`${s.from}-${s.to}`} className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-md bg-surface-2 px-3 py-2 text-[13px]">
                         <span className="font-mono">{s.from} → {s.to}</span>
                         <span className="num text-muted">{s.distanceKm.toLocaleString('en-US')} km · {s.roundTripsPerWeek}/wk · {Math.round(s.expectedLoadFactor * 100)}% full</span>
                         <span className="num text-success">+{formatMoney(Math.round(s.expectedProfitPerDay))}/day</span>
                         <Button size="sm" className="ml-auto" aria-label={`Open ${s.from} → ${s.to} with ${aircraftLabel(a)}`}
-                          loading={busy === `${a.id}:${s.to}`} disabled={busy !== null} onClick={() => openOne(a.id, s)}>Open</Button>
+                          loading={busy === `${a.id}:${s.from}-${s.to}`} disabled={busy !== null} onClick={() => openOne(a.id, s)}>Open</Button>
                       </li>
                     ))}
                   </ul>

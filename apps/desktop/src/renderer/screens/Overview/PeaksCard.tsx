@@ -17,12 +17,18 @@ function RaiseFares({ peak, onDone }: { peak: UpcomingPeakView; onDone(): void }
   if (routes.length === 0) return <p className="mt-2 text-[13px] text-muted">None of your routes fly there yet.</p>;
   const apply = async () => {
     setBusy(true);
-    const { commands, skipped } = peakFareCommands(routes, peak, pct, view.day);
-    let added = 0;
-    for (const c of commands) {
-      const r = await window.game.command(c);
-      if (r.ok) added++;
-      else toast({ title: r.reason, tone: 'danger' });
+    let added = 0, skipped = 0;
+    // One route at a time, reading today's date each time: a day can pass while the game runs.
+    for (const route of routes) {
+      const now = useGameStore.getState().view ?? view;
+      const fresh = now.routes.find((x) => x.id === route.id) ?? route;
+      const { commands, skipped: s } = peakFareCommands([fresh], peak, pct, now.day);
+      skipped += s;
+      for (const c of commands) {
+        const r = await window.game.command(c);
+        if (r.ok) added++;
+        else toast({ title: r.reason, tone: 'danger' });
+      }
     }
     setBusy(false);
     setResult(`Added to ${added} route${added === 1 ? '' : 's'}${skipped ? ` · skipped ${skipped} (already set)` : ''}`);

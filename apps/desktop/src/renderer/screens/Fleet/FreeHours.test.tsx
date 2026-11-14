@@ -49,6 +49,32 @@ describe('use free hours', () => {
     expect(await screen.findByText('Opened 2 routes')).toBeInTheDocument();
   });
 
+  it('tries the next suggestion when the best one can no longer open', async () => {
+    const user = userEvent.setup();
+    const command = vi.fn(async (c: Command) => (c.type === 'openRoute' && c.to === 'MAD' ? { ok: false, reason: 'No free slots at MAD' } : { ok: true }));
+    window.game = { command, suggestRoutes: vi.fn(async () => [sug('MAD', 12_000), sug('FCO', 9_000)]) } as unknown as typeof window.game;
+    useGameStore.setState({ view: fakeView({}, { aircraft: [ac('a1')] }) });
+    wrap(<FleetTray />);
+    await user.click(screen.getByRole('button', { name: /Use free hours/ }));
+    await screen.findAllByText('LHR → MAD');
+    await user.click(screen.getByRole('button', { name: 'Open best for all' }));
+    expect(await screen.findByText('Opened 1 route')).toBeInTheDocument();
+    expect(command.mock.calls.map(([c]) => (c as { to: string }).to)).toEqual(['MAD', 'FCO']);
+  });
+
+  it('a failed lookup does not leave the panel stuck', async () => {
+    const user = userEvent.setup();
+    const suggestRoutes = vi.fn().mockResolvedValueOnce([sug('MAD', 12_000)]).mockRejectedValueOnce(new Error('worker busy')).mockResolvedValue([]);
+    window.game = { command: vi.fn(), suggestRoutes } as unknown as typeof window.game;
+    useGameStore.setState({ view: fakeView({}, { aircraft: [ac('a1')] }) });
+    wrap(<FleetTray />);
+    await user.click(screen.getByRole('button', { name: /Use free hours/ }));
+    await screen.findAllByText('LHR → MAD');
+    await user.click(screen.getByRole('button', { name: 'Open best for all' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Open best for all' })).toBeEnabled());
+    expect(screen.getByRole('button', { name: 'Open best for all' })).not.toHaveAttribute('aria-busy', 'true');
+  });
+
   it('says so when every aircraft is busy', async () => {
     const user = userEvent.setup();
     window.game = { suggestRoutes: vi.fn() } as unknown as typeof window.game;

@@ -1,9 +1,9 @@
-import type { CabinClass, Command, GameState } from '@skyempire/shared';
+import type { ActiveTension, CabinClass, Command, GameState } from '@skyempire/shared';
 import { CABIN_CLASSES } from '@skyempire/shared';
 import { describe, expect, it } from 'vitest';
 import { applyCommand } from './commands/apply';
-import { hoursByAircraft, routeOps, simulateMarket, simulatePair } from './daySim';
-import { routeTensionStatus } from './tensions';
+import { hoursByAircraft, routeOps, simulateMarket, simulatePair, simulateRoutes } from './daySim';
+import { routeTensionStatus, tensionTouchesRoute } from './tensions';
 import { refFare } from './demand';
 import { distanceKm } from './geo';
 import { migrate, CURRENT_SCHEMA } from './migrate';
@@ -40,7 +40,7 @@ describe('route chain helpers', () => {
     expect(marketFare(route, 'LHR', 'SIN', 'economy', 0)).toBe(900);
     expect(marketFare(route, 'DXB', 'LHR', 'economy', 0)).toBe(500);
     expect(marketFare(route, 'LHR', 'DXB', 'economy', 5)).toBe(550);
-    expect(marketFare(route, 'DXB', 'SIN', 'economy', 0)).toBeGreaterThan(0); // no fare set: falls back to a distance share
+    expect(marketFare(route, 'DXB', 'SIN', 'economy', 0)).toBe(900); // no fare set: falls back to the end-to-end fare (opening fills them all)
   });
 });
 
@@ -110,6 +110,18 @@ describe('flying a route with stops', () => {
     }
     expect(fullest).toBeGreaterThan(0.95);
   });
+  it('caps each leg in each direction, even when demand is lopsided', () => {
+    // Outbound demand can beat the seats while the return is lighter: the total alone would hide it.
+    const { s, ac } = game();
+    const f = (a: string, b: string) => Object.fromEntries(CABIN_CLASSES.map((c) => [c, Math.round(refFare(km(a, b), c) * 1.2)])) as Record<CabinClass, number>;
+    s.world.tensions.push({ id: 'adv', kind: 'advisory', country: 'AE', magnitude: 0.5, warnDay: 0, startDay: 0, endDay: 500 } as never);
+    expect(applyCommand(s, s.playerId, { type: 'openRoute', from: 'LHR', to: 'DXB', stops: ['IST'], fares: f('LHR', 'DXB'), legFares: { 'IST-LHR': f('LHR', 'IST'), 'DXB-IST': f('IST', 'DXB') }, assignments: [{ aircraftId: ac, roundTripsPerWeek: 6 }] }, catalog)).toEqual({ ok: true });
+    const r = Object.values(s.routes)[0]!;
+    const ops = routeOps(r, s, catalog, hoursByAircraft(s, catalog), true);
+    const res = simulateRoutes([ops], s, catalog).results.get(r.id)!;
+    for (const [leg, dirs] of res.legPaxByDirection.entries())
+      for (const d of dirs) for (const c of CABIN_CLASSES) expect(d[c], `leg ${leg} ${c}`).toBeLessThanOrEqual(ops.seats[c] + 1e-9);
+  });
   it('a strike at the stop grounds the whole route', () => {
     const { s, id } = flying();
     s.events.push({ id: 'x', kind: 'strike', startDay: 1, endDay: 3, airportId: 'DXB', magnitude: 1 });
@@ -134,6 +146,14 @@ describe('flying a route with stops', () => {
     const asNonstop = simulateMarket([{ ops, m: { ...through, stops: 0 } }], s, catalog).pax.get(id)!;
     expect(viaPair.economy).toBeCloseTo(asOneStop.economy);
     expect(asNonstop.economy).not.toBeCloseTo(asOneStop.economy);
+  });
+  it('tension warnings count the legs through a stop', () => {
+    const { s, id } = flying();
+    const r = s.routes[id]!;
+    const ban: ActiveTension = { id: 'b', kind: 'routeBan', countries: ['AE', 'SG'], magnitude: 1, warnDay: 0, startDay: 5, endDay: 50 };
+    expect(tensionTouchesRoute(catalog, ban, r)).toBe(true);
+    expect(tensionTouchesRoute(catalog, { ...ban, countries: ['GB', 'SG'] }, r)).toBe(false); // nobody flies LHR–SIN nonstop here
+    expect(tensionTouchesRoute(catalog, { id: 'a', kind: 'advisory', country: 'AE', magnitude: 0.3, warnDay: 0, startDay: 5, endDay: 50 }, r)).toBe(true);
   });
   it('costs cover every leg', () => {
     const weekCost = (st: GameState, id: string) => { let x = st, sum = 0; for (let i = 0; i < 7; i++) { x = tick(x, [], catalog).state; sum += x.routes[id]!.last!.cost; } return sum; };

@@ -160,7 +160,14 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
   );
   const fareInput = (label: string, value: number, onChange: (v: number) => void) => (
     <input aria-label={label} inputMode="numeric" value={String(value)}
-      onChange={(e) => { const v = Number(e.target.value.replace(/[^0-9]/g, '')); if (Number.isFinite(v)) { setFaresTouched(true); onChange(Math.min(50000, Math.max(1, v))); } }}
+      onChange={(e) => {
+        // An empty box keeps the old fare (so typing over it doesn't snap to $1).
+        const digits = e.target.value.replace(/[^0-9]/g, '');
+        if (!digits) return;
+        setFaresTouched(true);
+        onChange(Math.min(50000, Math.max(1, Number(digits))));
+      }}
+      onFocus={(e) => e.target.select()}
       className="num h-8 w-full rounded-md border border-border bg-surface-1 px-2 text-right text-[13px] outline-none focus:border-accent" />
   );
 
