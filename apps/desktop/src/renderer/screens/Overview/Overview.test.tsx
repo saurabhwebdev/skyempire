@@ -27,6 +27,10 @@ describe('deriveAlerts', () => {
     expect(alerts.map((a) => a.id)).toContain('low-cash');
     expect(alerts.find((a) => a.id === 'low-cash')!.action.label).toBe('Take a loan');
   });
+  it('flags routes grounded by a ban or closed airspace', () => {
+    const alerts = deriveAlerts(fakeView({ cash: 40_000_000 }, { aircraft: [ac], routes: [route], routeStatus: { r1: { detourKm: 0, blocked: 'Flights banned between United Kingdom and France' } } }));
+    expect(alerts.find((a) => a.id === 'grounded-r1')).toMatchObject({ level: 'danger', text: 'LHR–CDG is grounded: Flights banned between United Kingdom and France.', action: { label: 'Review route' } });
+  });
   it('flags losing routes, idle aircraft and suspended routes', () => {
     const idle = { ...ac, id: 'ac2' };
     const losing = { ...route, profit30: Array(30).fill(-4000) };

@@ -20,6 +20,9 @@ export function deriveAlerts(view: ClientView): Alert[] {
   if (view.player.cash < bills)
     out.push({ id: 'low-cash', level: 'danger', text: `Cash is low — next month's bills are about ${formatMoney(bills)}.`, action: { label: 'Take a loan', run: go('finance') } });
   for (const r of view.routes) {
+    const blocked = view.routeStatus[r.id]?.blocked;
+    if (blocked)
+      out.push({ id: `grounded-${r.id}`, level: 'danger', text: `${r.from}–${r.to} is grounded: ${blocked}.`, action: { label: 'Review route', run: go('network', { kind: 'route', id: r.id }) } });
     const sum = r.profit30.reduce((a, b) => a + b, 0);
     if (r.status === 'active' && r.profit30.length >= 7 && sum < 0)
       out.push({ id: `loss-${r.id}`, level: 'warning', text: `${r.from}–${r.to} lost ${formatMoney(-sum)} in the last ${r.profit30.length} days.`, action: { label: 'Review route', run: go('network', { kind: 'route', id: r.id }) } });
