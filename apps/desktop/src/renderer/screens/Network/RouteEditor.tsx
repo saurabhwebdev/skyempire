@@ -65,6 +65,19 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
     [fares, dist],
   );
 
+  const maxFor = (acId: string) => {
+    const ac = view.aircraft.find((a) => a.id === acId);
+    const t = ac && catalog.aircraftTypes[ac.typeId];
+    if (!t || !dist) return 1;
+    const perTrip = legKm.reduce((h, km) => h + roundTripHours(km, t), 0);
+    return Math.max(1, Math.floor((WEEKLY_HOURS - (used.get(acId) ?? 0) - otherHours(acId)) / perTrip));
+  };
+  // Hours used by this editor's other rows (same aircraft can't be listed twice, so 0) — kept for clarity.
+  const otherHours = (_acId: string) => 0;
+  // What's sent: each aircraft's flights capped at what its free hours allow (the slider shows the same cap).
+  const sendAssignments = assignments.map((a) => ({ ...a, roundTripsPerWeek: Math.min(a.roundTripsPerWeek, maxFor(a.aircraftId)) }));
+  const sendKey = sendAssignments.map((a) => `${a.aircraftId}:${a.roundTripsPerWeek}`).join(',');
+
   // Fares for the other markets of a stop route: the player's, else the reference fare for that distance.
   const effectiveLegFares: Record<string, Fares> = useMemo(() => {
     const out: Record<string, Fares> = {};
@@ -80,11 +93,11 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
   const cmd: Command | null = useMemo(() => {
     if (!to || !stopsReady) return null;
     const leg = chosenStops.length ? { legFares: effectiveLegFares } : {};
-    if (existing) return { type: 'updateRoute', routeId: existing.id, fares: effectiveFares, assignments, ...leg };
-    if (!assignments.length) return null;
-    return { type: 'openRoute', from, to, ...(chosenStops.length ? { stops: chosenStops } : {}), fares: effectiveFares, assignments, ...leg };
+    if (existing) return { type: 'updateRoute', routeId: existing.id, fares: effectiveFares, assignments: sendAssignments, ...leg };
+    if (!sendAssignments.length) return null;
+    return { type: 'openRoute', from, to, ...(chosenStops.length ? { stops: chosenStops } : {}), fares: effectiveFares, assignments: sendAssignments, ...leg };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [to, from, effectiveFares, effectiveLegFares, assignments, existing, chosenStops.join(','), stopsReady]);
+  }, [to, from, effectiveFares, effectiveLegFares, sendKey, existing, chosenStops.join(','), stopsReady]);
 
   useEffect(() => {
     if (!cmd) return;
@@ -122,15 +135,6 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
     close();
   };
 
-  const maxFor = (acId: string) => {
-    const ac = view.aircraft.find((a) => a.id === acId);
-    const t = ac && catalog.aircraftTypes[ac.typeId];
-    if (!t || !dist) return 1;
-    const perTrip = legKm.reduce((h, km) => h + roundTripHours(km, t), 0);
-    return Math.max(1, Math.floor((WEEKLY_HOURS - (used.get(acId) ?? 0) - otherHours(acId)) / perTrip));
-  };
-  // Hours used by this editor's other rows (same aircraft can't be listed twice, so 0) — kept for clarity.
-  const otherHours = (_acId: string) => 0;
   const longestLeg = Math.max(0, ...legKm);
   const candidates = view.aircraft.filter((a) => !rangeOnly || (catalog.aircraftTypes[a.typeId]?.rangeKm ?? 0) >= longestLeg);
   const stopPicker = (i: number) => (
@@ -263,7 +267,7 @@ function RouteEditorPanel({ editor }: { editor: NonNullable<ReturnType<typeof us
                 const set = (c: CabinClass) => (v: number) => end ? setFares({ ...effectiveFares, [c]: v }) : setLegFares({ ...effectiveLegFares, [m.key]: { ...f, [c]: v } });
                 return (
                   <tr key={m.key}>
-                    <th scope="row" className="py-1 pr-2 text-left font-mono font-normal">{m.a} → {m.b}</th>
+                    <th scope="row" className="whitespace-nowrap py-1 pr-2 text-left font-mono text-[12px] font-normal">{m.a} → {m.b}</th>
                     {(['economy', 'premium', 'business'] as const).map((c) => <td key={c} className="py-1 pr-1">{fareInput(`${m.a} → ${m.b} ${c} fare`, f[c], set(c))}</td>)}
                   </tr>
                 );

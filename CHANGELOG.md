@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.0 — "Connections"
+
+- **Routes with stops.** A route can now have up to 2 stops, e.g. London → Dubai → Singapore.
+  - One aircraft flies the whole way and back.
+  - You sell every pair along the route: London–Dubai, Dubai–Singapore and London–Singapore through.
+  - Each pair has its own fares, with suggestions.
+  - Short-range aircraft can now reach far-away cities, and thin routes fill better.
+  - Every leg must be within range. Stops use twice the airport slots, and a strike, a ban or closed airspace on any leg grounds the whole route.
+  - The route panel shows passengers for each pair and how full each leg is.
+- **Use free hours.** On the Fleet page, **Use free hours** lists every aircraft flying less than 70% of its week, with the best new routes from your bases (expected load and profit).
+  - Open one in a click, or press **Open best for all**.
+- **Raise fares for a travel peak.** In **Travel peaks ahead** on the Overview, **Raise fares** adds a seasonal fare over the peak dates to every route that flies there, in one go. Routes that already have one for those dates are skipped.
+- **Side menu:** the tooltip shows the section name with its keyboard shortcut as a key, e.g. "Fleet [3]".
+- **Fix:** a new route could ask for more flights than the aircraft had hours for. On long routes this made "Open route" fail with "Not enough free hours".
+
 ## 0.4.0 — "Cabin"
 
 - **Cabin designer.** Design every aircraft's cabin, with up to three classes: Economy, Premium Economy and Business. For each class you choose:

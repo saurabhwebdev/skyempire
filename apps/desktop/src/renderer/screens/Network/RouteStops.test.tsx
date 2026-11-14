@@ -47,6 +47,18 @@ describe('routes with stops', () => {
     expect(await screen.findByText('Route LHR → DXB → SIN opened')).toBeInTheDocument();
   });
 
+  it('never asks for more flights than the aircraft has hours for', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const preview = vi.fn().mockResolvedValue({ ok: true });
+    window.game = { preview, command: vi.fn() } as unknown as typeof window.game;
+    wrap(<RouteEditor />);
+    await user.click(screen.getByRole('button', { name: 'Add a stop' }));
+    await user.type(screen.getByRole('combobox', { name: 'Stop 1' }), 'DXB');
+    await user.keyboard('{Enter}');
+    await act(() => vi.advanceTimersByTimeAsync(200));
+    const sent = preview.mock.calls.at(-1)![0] as { assignments: { roundTripsPerWeek: number }[] };
+    expect(sent.assignments[0]!.roundTripsPerWeek).toBe(3); // 126 h ÷ ~32 h per LHR–DXB–SIN round trip
+  });
   it('allows at most 2 stops and lets you remove one', async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     window.game = { preview: vi.fn().mockResolvedValue({ ok: true }), command: vi.fn() } as unknown as typeof window.game;

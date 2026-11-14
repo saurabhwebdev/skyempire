@@ -1,0 +1,38 @@
+// Dev helper (v0.5): a route with a stop, the free-hours panel and the side menu.
+import { _electron as electron } from '@playwright/test';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+const [dir] = process.argv.slice(2);
+const app = await electron.launch({ args: [join(import.meta.dirname, '..', 'out', 'main', 'index.js')], env: { ...process.env, SKYEMPIRE_USER_DATA: mkdtempSync(join(tmpdir(), 'se-shot-')) } });
+const win = await app.firstWindow();
+await win.setViewportSize({ width: 1440, height: 900 });
+await win.getByRole('button', { name: 'New career' }).click();
+await win.getByLabel('Airline name').fill('Stopover Air');
+await win.getByRole('button', { name: 'Choose a hub' }).click();
+await win.getByLabel('Search airports').fill('LHR');
+await win.keyboard.press('Enter');
+await win.getByRole('button', { name: 'Choose difficulty' }).click();
+await win.getByRole('button', { name: 'Found airline' }).click();
+await win.getByRole('button', { name: 'Skip tutorial' }).click();
+await win.evaluate(async () => {
+  const p = { economy: { seat: 'standard', ife: 'none', meal: 'snack', amenityKit: false, lounge: false }, premium: { seat: 'recliner', ife: 'none', meal: 'hot', amenityKit: false, lounge: false }, business: { seat: 'angled', ife: 'none', meal: 'dining', amenityKit: false, lounge: false } };
+  for (let i = 0; i < 3; i++) await window.game.command({ type: 'leaseAircraft', typeId: 'A20N', config: { seats: { economy: 194, premium: 0, business: 0 }, product: p, dense: false } });
+});
+await win.keyboard.press('2');
+await win.keyboard.press('n');
+await win.getByRole('combobox', { name: 'To', exact: true }).fill('SIN');
+await win.keyboard.press('Enter');
+await win.getByRole('button', { name: 'Add a stop' }).click();
+await win.getByRole('combobox', { name: 'Stop 1' }).fill('DXB');
+await win.keyboard.press('Enter');
+await win.waitForTimeout(1500);
+await win.screenshot({ path: join(dir, 'editor-stop.png') });
+await win.getByRole('button', { name: 'Open route' }).click();
+await win.waitForTimeout(800);
+await win.screenshot({ path: join(dir, 'map-stop.png') });
+await win.keyboard.press('3');
+await win.getByRole('button', { name: /Use free hours/ }).click();
+await win.waitForTimeout(4000);
+await win.screenshot({ path: join(dir, 'free-hours.png') });
+await app.close();
