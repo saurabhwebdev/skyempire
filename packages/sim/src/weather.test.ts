@@ -108,3 +108,15 @@ describe('cancel ahead', () => {
     expect(st.world.preCancelled[r.id] ?? []).toEqual([]);
   });
 });
+
+describe('weather in the client view', () => {
+  it('forecasts 3 days for each player airport', async () => {
+    const { buildClientView } = await import('./view');
+    const { s } = withRoute();
+    const v = buildClientView(s, s.playerId, catalog);
+    expect(Object.keys(v.weather.forecast).sort()).toEqual(['FRA', 'MAD']);
+    expect(v.weather.forecast.FRA).toHaveLength(3);
+    s.world.liveWeather[s.day] = { MAD: 'thunderstorm' };
+    expect(buildClientView(s, s.playerId, catalog).weather.today.MAD).toBe('thunderstorm');
+  });
+});

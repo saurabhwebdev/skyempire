@@ -23,6 +23,8 @@ export interface Settings {
   volume: number;
   tutorialDone: boolean;
   colorBlindRivals: boolean;
+  /** Show weather on the map. */
+  mapWeather: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -34,6 +36,7 @@ export const DEFAULT_SETTINGS: Settings = {
   volume: 0.6,
   tutorialDone: false,
   colorBlindRivals: false,
+  mapWeather: true,
 };
 
 export interface TickPush {

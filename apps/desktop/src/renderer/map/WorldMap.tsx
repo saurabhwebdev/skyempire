@@ -10,6 +10,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useGameStore, useUi } from '../store';
 import { MAP } from './colors';
 import { buildLayers } from './layers';
+import { MapToggles } from './MapToggles';
 
 setWorkerUrl(maplibreWorkerUrl);
 
@@ -99,7 +100,7 @@ export function WorldMap() {
     () =>
       view
         ? buildLayers({
-            airports: AIRPORTS, view, selection, showRivals, reduceMotion, colorBlind: settings.colorBlindRivals, zoom, fresh,
+            airports: AIRPORTS, view, selection, showRivals, showWeather: settings.mapWeather, reduceMotion, colorBlind: settings.colorBlindRivals, zoom, fresh,
             onClick: (i) => {
               const ed = useUi.getState().routeEditor;
               // While creating a route, clicking an airport fills From (if it's a base and empty) or To.
@@ -112,7 +113,7 @@ export function WorldMap() {
             onHover: setHover,
           })
         : [],
-    [view, selection, showRivals, reduceMotion, settings.colorBlindRivals, zoom, fresh, select],
+    [view, selection, showRivals, settings.mapWeather, reduceMotion, settings.colorBlindRivals, zoom, fresh, select],
   );
   useEffect(() => overlay.current?.setProps({ layers }), [layers]);
 
@@ -143,6 +144,7 @@ export function WorldMap() {
     <div className="absolute inset-0">
       {/* MapLibre forces position: relative on its container, so size it with h-full inside this absolute wrapper. */}
       <div ref={container} className="h-full w-full" aria-label="World map" role="application" />
+      <MapToggles />
       {hover && (
         <div
           role="tooltip"

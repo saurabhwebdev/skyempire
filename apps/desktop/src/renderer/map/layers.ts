@@ -2,13 +2,14 @@ import type { Airport, ClientView } from '@skyempire/shared';
 import type { Layer } from '@deck.gl/core';
 import { ArcLayer, ScatterplotLayer, TextLayer } from '@deck.gl/layers';
 import type { Selection } from '../store';
-import { ACCENT, AIRPORT, AIRPORT_ACTIVE, hexToRgba, RIVAL_PALETTE, type RGBA } from './colors';
+import { ACCENT, AIRPORT, AIRPORT_ACTIVE, hexToRgba, RIVAL_PALETTE, WEATHER_COLORS, type RGBA } from './colors';
 
 export interface MapInput {
   airports: Airport[];
   view: ClientView;
   selection: Selection;
   showRivals: boolean;
+  showWeather: boolean;
   reduceMotion: boolean;
   colorBlind: boolean;
   zoom: number;
@@ -41,6 +42,21 @@ export function buildLayers(m: MapInput): Layer[] {
     m.view.rivals.map((r, i) => [r.id, m.colorBlind ? RIVAL_PALETTE[i % RIVAL_PALETTE.length]! : hexToRgba(r.color)]),
   );
   const layers: Layer[] = [];
+
+  if (m.showWeather) {
+    const points: { id: string; cond: string; a: Airport }[] = [];
+    for (const [id, cond] of Object.entries(m.view.weather.today)) {
+      const a = byId.get(id);
+      if (a && cond in WEATHER_COLORS) points.push({ id, cond, a });
+    }
+    if (points.length)
+      layers.push(
+        new ScatterplotLayer<(typeof points)[number]>({
+          id: 'weather', data: points, getPosition: (d) => [d.a.lon, d.a.lat], getFillColor: (d) => WEATHER_COLORS[d.cond]!,
+          getRadius: (d) => (d.cond === 'cyclone' ? 120_000 : 40_000), radiusUnits: 'meters', radiusMinPixels: 8, stroked: false,
+        }),
+      );
+  }
 
   if (m.showRivals) {
     const arcs: Arc[] = [];

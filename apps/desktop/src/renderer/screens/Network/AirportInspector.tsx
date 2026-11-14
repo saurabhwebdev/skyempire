@@ -3,6 +3,7 @@ import { baseSetupCost } from '@skyempire/sim';
 import { Button, Modal, useToast } from '@skyempire/ui';
 import { useState } from 'react';
 import { catalog } from '../../lib/catalog';
+import { dayLabel, WEATHER_ICON, WEATHER_LABEL } from '../../lib/weather';
 import { useGameStore, useUi } from '../../store';
 
 export function AirportInspector({ id }: { id: string }) {
@@ -34,6 +35,23 @@ export function AirportInspector({ id }: { id: string }) {
         <dt className="text-muted">Fees</dt><dd className="num text-right">${a.landingFeePerTonne}/t · ${a.paxFee}/pax</dd>
         <dt className="text-muted">Rivals here</dt><dd className="text-right">{rivalNames.length ? rivalNames.slice(0, 4).join(', ') + (rivalNames.length > 4 ? ` +${rivalNames.length - 4}` : '') : 'None'}</dd>
       </dl>
+      {view.weather.forecast[id] && (
+        <section aria-label="Forecast">
+          <h3 className="label-caps mb-2">Next 3 days</h3>
+          <ul className="grid grid-cols-3 gap-2">
+            {view.weather.forecast[id]!.map((cond, i) => {
+              const Icon = WEATHER_ICON[cond];
+              return (
+                <li key={i} className="flex flex-col items-center gap-1 rounded-md bg-surface-2 p-2 text-center">
+                  <Icon className="size-5 text-muted" aria-hidden />
+                  <span className="text-[12px]">{WEATHER_LABEL[cond]}</span>
+                  <span className="text-[11px] text-faint">{dayLabel(i + 1)}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
       <div className="flex flex-col gap-2">
         {isBase ? (
           <Button variant="primary" onClick={() => useUi.getState().openRouteEditor({ from: id })}>New route from here</Button>

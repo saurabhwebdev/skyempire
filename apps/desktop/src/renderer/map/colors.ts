@@ -13,3 +13,13 @@ export function hexToRgba(hex: string, alpha = 255): RGBA {
   const n = Number.parseInt(hex.replace('#', ''), 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255, alpha];
 }
+
+/** Weather overlay: soft halos, one hue per condition (dark-map tuned; labels carry meaning too). */
+export const WEATHER_COLORS: Record<string, RGBA> = {
+  wind: [120, 190, 200, 70],
+  rain: [80, 140, 230, 80],
+  thunderstorm: [175, 110, 230, 110],
+  snow: [225, 235, 250, 110],
+  fog: [160, 165, 175, 100],
+  cyclone: [235, 90, 80, 140],
+};

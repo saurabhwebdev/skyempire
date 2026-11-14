@@ -16,6 +16,7 @@ const input = (o: Partial<MapInput> = {}): MapInput => ({
   ),
   selection: null,
   showRivals: true,
+  showWeather: false,
   reduceMotion: false,
   colorBlind: false,
   zoom: 5,
@@ -28,6 +29,16 @@ describe('buildLayers', () => {
     expect(ids()).toEqual(['rival-routes', 'player-routes', 'airports', 'labels']));
   it('hides rival routes when toggled off', () => expect(ids({ showRivals: false })).not.toContain('rival-routes'));
   it('hides labels when zoomed out', () => expect(ids({ zoom: 3 })).not.toContain('labels'));
+  it('omits the weather layer when toggled off', () => {
+    const view = { ...input().view, weather: { today: { LHR: 'snow' as const, JFK: 'thunderstorm' as const }, forecast: {} } };
+    expect(ids({ view, showWeather: false })).not.toContain('weather');
+    expect(ids({ view, showWeather: true })[0]).toBe('weather');
+  });
+  it('draws one weather point per airport with weather', () => {
+    const view = { ...input().view, weather: { today: { LHR: 'snow' as const, JFK: 'fog' as const }, forecast: {} } };
+    const layer = buildLayers(input({ view, showWeather: true })).find((l) => l.id === 'weather')!;
+    expect((layer.props.data as { id: string }[]).map((d) => d.id).sort()).toEqual(['JFK', 'LHR']);
+  });
   it('flags player bases', () => {
     const layer = buildLayers(input()).find((l) => l.id === 'airports')!;
     const data = layer.props.data as { id: string; isBase: boolean }[];

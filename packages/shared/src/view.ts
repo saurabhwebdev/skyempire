@@ -1,4 +1,4 @@
-import type { ActiveEvent, Aircraft, Airline, CabinClass, GameState, Money, PersonalityId, Route } from './types';
+import type { ActiveEvent, Aircraft, Airline, CabinClass, GameState, Money, PersonalityId, Route, WeatherCondition } from './types';
 
 export interface Notification {
   id: string;
@@ -87,4 +87,10 @@ export interface ClientView {
   finance: { companyValue: Money; availableCredit: Money; monthlyFixed: Money };
   /** Festivals in the player's markets over the next 60 days. */
   upcomingPeaks: UpcomingPeakView[];
+  weather: {
+    /** Airports served by anyone with weather other than clear today. */
+    today: Record<string, WeatherCondition>;
+    /** The player's airports: conditions for the next 3 days. */
+    forecast: Record<string, WeatherCondition[]>;
+  };
 }
