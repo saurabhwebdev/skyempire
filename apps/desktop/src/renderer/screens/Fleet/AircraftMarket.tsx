@@ -1,6 +1,6 @@
-import type { AircraftType, Cabin, UsedListing } from '@skyempire/shared';
+import type { AircraftType, CabinConfig, UsedListing } from '@skyempire/shared';
 import { formatMoney } from '@skyempire/shared';
-import { tierAllows } from '@skyempire/sim';
+import { defaultConfig, tierAllows } from '@skyempire/sim';
 import { Button, cn, NumberInput, useToast } from '@skyempire/ui';
 import { Lock, X } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -9,7 +9,7 @@ import { AircraftPhoto } from '../../components/AircraftPhoto';
 import { catalog } from '../../lib/catalog';
 import { useGameStore, useUi } from '../../store';
 import { AircraftDetails } from './AircraftDetails';
-import { CabinEditor } from './CabinEditor';
+import { CabinDesigner } from './CabinDesigner';
 
 const TYPES = Object.values(catalog.aircraftTypes).sort((a, b) => a.priceUsd - b.priceUsd);
 const TIER = { startup: 'Startup', regional: 'Regional', national: 'National', global: 'Global' } as const;
@@ -36,11 +36,11 @@ export function AircraftMarket() {
     return t && t.rangeKm >= minRange && t.maxSeats >= minSeats;
   });
 
-  const confirm = async (cabin: Cabin) => {
+  const confirm = async (config: CabinConfig) => {
     if (!pending) return;
     const cmd = pending.kind === 'used'
-      ? ({ type: 'buyUsedAircraft', listingId: pending.listing.id, cabin } as const)
-      : ({ type: pending.kind === 'lease' ? 'leaseAircraft' : 'buyAircraft', typeId: pending.type.id, cabin } as const);
+      ? ({ type: 'buyUsedAircraft', listingId: pending.listing.id, config } as const)
+      : ({ type: pending.kind === 'lease' ? 'leaseAircraft' : 'buyAircraft', typeId: pending.type.id, config } as const);
     const r = await window.game.command(cmd);
     if (!r.ok) { toast({ title: r.reason, tone: 'danger' }); return; }
     toast({ title: `${pending.type.name} added to your fleet`, tone: 'success' });
@@ -145,9 +145,9 @@ export function AircraftMarket() {
       )}
       {details && <AircraftDetails typeId={details} open onOpenChange={(o) => !o && setDetails(null)} />}
       {pending && (
-        <CabinEditor open onOpenChange={(o) => !o && setPending(null)} typeId={pending.type.id}
-          initial={{ economy: pending.type.maxSeats, premium: 0, business: 0 }}
-          confirmLabel={pending.kind === 'lease' ? `Lease for ${formatMoney(pending.type.leasePerMonth)}/mo` : `Buy for ${formatMoney(pending.kind === 'used' ? pending.listing.price : pending.type.priceUsd)}`}
+        <CabinDesigner open onOpenChange={(o) => !o && setPending(null)} typeId={pending.type.id}
+          initial={defaultConfig(pending.type, null)}
+          mode={{ kind: 'new', confirmLabel: pending.kind === 'lease' ? `Lease for ${formatMoney(pending.type.leasePerMonth)}/mo` : `Buy for ${formatMoney(pending.kind === 'used' ? pending.listing.price : pending.type.priceUsd)}` }}
           onConfirm={confirm} />
       )}
     </motion.section>

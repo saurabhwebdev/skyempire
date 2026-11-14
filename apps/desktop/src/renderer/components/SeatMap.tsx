@@ -1,19 +1,30 @@
-import type { Cabin } from '@skyempire/shared';
-import { rowShape } from '../lib/aircraftMedia';
+import type { CabinConfig } from '@skyempire/shared';
+import { catalog } from '../lib/catalog';
+import { economyAbreast, rowShape } from '../lib/aircraftMedia';
 
-const SEAT = { business: { w: 1.5, pitch: 2.3, color: 'var(--color-warning)' }, premium: { w: 1.1, pitch: 1.35, color: 'var(--color-success)' }, economy: { w: 0.9, pitch: 1, color: 'var(--color-accent)' } } as const;
+const COLOR = { business: 'var(--color-warning)', premium: 'var(--color-success)', economy: 'var(--color-accent)' } as const;
+/** Seat width (across) and row pitch (along), in drawing units; bigger seats take more floor. */
+const SEAT_W = { business: 1.5, premium: 1.1, economy: 0.9 } as const;
+const PITCH: Record<string, number> = {
+  'economy:slimline': 0.9, 'economy:standard': 1, 'economy:extraLegroom': 1.15,
+  'premium:recliner': 1.35, 'premium:legRest': 1.5,
+  'business:recliner': 1.7, 'business:angled': 2.1, 'business:flat': 2.4, 'business:suite': 2.7,
+};
+const LABEL = { business: 'Business', premium: 'Premium', economy: 'Economy' } as const;
 const AISLE = 0.8;
 const MAX_ROWS_DRAWN = 90;
 
 /**
  * Top-down cabin map, nose on the left: one rounded square per seat, aisles between groups.
- * Generic layout (typical seats per row), not a specific airline's seat map.
+ * Rows follow the seat types (e.g. 1-2-1 lie-flat business). Generic layout, not a specific airline's seat map.
  */
-export function SeatMap({ cabin, abreast, className }: { cabin: Cabin; abreast: number; className?: string }) {
-  const shape = rowShape(abreast);
+export function SeatMap({ config, typeId, className }: { config: CabinConfig; typeId: string; className?: string }) {
+  const t = catalog.aircraftTypes[typeId]!;
+  const cabin = config.seats;
+  const shape = rowShape(t.abreast ?? 6, config.product, economyAbreast(t, config.dense));
   const cabins = (['business', 'premium', 'economy'] as const).filter((k) => cabin[k] > 0);
   // Cross-section width is set by the economy row; other cabins spread across the same width.
-  const yWidth = shape.economy.reduce((a, b) => a + b, 0) * SEAT.economy.w + (shape.economy.length - 1) * AISLE;
+  const yWidth = shape.economy.reduce((a, b) => a + b, 0) * SEAT_W.economy + (shape.economy.length - 1) * AISLE;
   const H = yWidth + 1.6;
   let x = 3.2; // after the nose
   const seats: { x: number; y: number; w: number; h: number; color: string }[] = [];
@@ -24,21 +35,21 @@ export function SeatMap({ cabin, abreast, className }: { cabin: Cabin; abreast: 
     const perRow = groups.reduce((a, b) => a + b, 0);
     const rows = Math.ceil(cabin[k] / perRow);
     rowsTotal += rows;
-    const s = SEAT[k];
-    const seatW = Math.min(s.w, (yWidth - (groups.length - 1) * AISLE) / perRow);
+    const pitch = PITCH[`${k}:${config.product[k].seat}`] ?? 1;
+    const seatW = Math.min(SEAT_W[k], (yWidth - (groups.length - 1) * AISLE) / perRow);
     const aisle = (yWidth - perRow * seatW) / Math.max(1, groups.length - 1);
     let left = cabin[k];
     for (let r = 0; r < Math.min(rows, MAX_ROWS_DRAWN); r++) {
       let y = 0.8, inRow = Math.min(perRow, left);
       for (const g of groups) {
         for (let i = 0; i < g; i++) {
-          if (inRow-- > 0) seats.push({ x, y, w: s.pitch * 0.72, h: seatW * 0.86, color: s.color });
+          if (inRow-- > 0) seats.push({ x, y, w: pitch * 0.72, h: seatW * 0.86, color: COLOR[k] });
           y += seatW;
         }
         y += aisle;
       }
       left -= perRow;
-      x += s.pitch;
+      x += pitch;
     }
     dividers.push(x + 0.2);
     x += 0.6;
@@ -59,8 +70,8 @@ export function SeatMap({ cabin, abreast, className }: { cabin: Cabin; abreast: 
       <figcaption className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-muted">
         {cabins.map((k) => (
           <span key={k} className="inline-flex items-center gap-1.5">
-            <span aria-hidden className="size-2.5 rounded-sm" style={{ background: SEAT[k].color }} />
-            <span className="num">{cabin[k]}</span> {k === 'business' ? 'Business' : k === 'premium' ? 'Premium' : 'Economy'} · {shape[k].join('-')}
+            <span aria-hidden className="size-2.5 rounded-sm" style={{ background: COLOR[k] }} />
+            <span className="num">{cabin[k]}</span> {LABEL[k]} · {shape[k].join('-')}
           </span>
         ))}
         {total > 0 && <span className="num ml-auto">{rowsTotal} rows</span>}

@@ -1,3 +1,4 @@
+import { standardProduct } from '@skyempire/sim';
 import { loadCatalog } from '@skyempire/data';
 import type { NewGameOptions } from '@skyempire/shared';
 import { describe, expect, it } from 'vitest';
@@ -20,14 +21,14 @@ describe('sim worker handler', () => {
     const h = createSimHandler(catalog);
     h.handle({ kind: 'newGame', opts });
     const before = h.handle({ kind: 'snapshot' });
-    const r = h.handle({ kind: 'command', cmd: { type: 'leaseAircraft', typeId: 'B77W', cabin: { economy: 400, premium: 0, business: 0 } } });
+    const r = h.handle({ kind: 'command', cmd: { type: 'leaseAircraft', typeId: 'B77W', config: { seats: { economy: 400, premium: 0, business: 0 }, product: standardProduct(), dense: false } } });
     expect(r.result.ok).toBe(false);
     expect(h.handle({ kind: 'snapshot' })).toEqual(before);
   });
   it('applies commands immediately, even while the clock runs', () => {
     const h = createSimHandler(catalog);
     h.handle({ kind: 'newGame', opts });
-    const cmd = { type: 'leaseAircraft' as const, typeId: 'A20N', cabin: { economy: 194, premium: 0, business: 0 } };
+    const cmd = { type: 'leaseAircraft' as const, typeId: 'A20N', config: { seats: { economy: 194, premium: 0, business: 0 }, product: standardProduct(), dense: false } };
     expect(h.handle({ kind: 'command', cmd }).view!.aircraft).toHaveLength(1);
     expect(h.handle({ kind: 'command', cmd }).view!.aircraft).toHaveLength(2);
     expect(h.handle({ kind: 'tick' }).view.aircraft).toHaveLength(2);

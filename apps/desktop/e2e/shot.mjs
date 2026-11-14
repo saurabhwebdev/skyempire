@@ -11,7 +11,7 @@ win.on('pageerror', (e) => console.log('[pageerror]', e.message.slice(0, 300)));
 await win.setViewportSize({ width: 1440, height: 900 });
 await win.evaluate(async (days) => {
   await window.game.newGame({ seed: 4, regionId: 'world', difficulty: 'normal', homeBaseId: 'LHR', airline: { name: 'Albion Skyways', code: 'ALB', colors: { primary: '#2f6fed', secondary: '#ffffff' }, logoShape: 'wing' } });
-  await window.game.command({ type: 'leaseAircraft', typeId: 'A20N', cabin: { economy: 194, premium: 0, business: 0 } });
+  await window.game.command({ type: 'leaseAircraft', typeId: 'A20N', config: { seats: { economy: 194, premium: 0, business: 0 }, product: { economy: { seat: 'standard', ife: 'none', meal: 'snack', amenityKit: false, lounge: false }, premium: { seat: 'recliner', ife: 'none', meal: 'hot', amenityKit: false, lounge: false }, business: { seat: 'angled', ife: 'none', meal: 'dining', amenityKit: false, lounge: false } }, dense: false } });
   await new Promise((r) => { const off = window.game.onTick((p) => { if (p.view.day >= days) { off(); window.game.setSpeed(0); r(); } }); window.game.setSpeed(8); });
 }, Number(days));
 await win.reload();

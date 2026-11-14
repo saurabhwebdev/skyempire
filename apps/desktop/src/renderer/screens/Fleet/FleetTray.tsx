@@ -7,6 +7,7 @@ import { aircraftLabel, hoursUsed, WEEKLY_HOURS } from '../../lib/fleet';
 import { useGameStore, useUi } from '../../store';
 
 export function aircraftStatus(ac: Aircraft, used: number): { text: string; idle: boolean } {
+  if (ac.refitDaysLeft > 0) return { text: `Refit · ${ac.refitDaysLeft}d`, idle: false };
   if (ac.status === 'maintenance') return { text: `Maintenance · ${ac.maintenanceDaysLeft}d`, idle: false };
   if (used <= 0) return { text: 'Idle', idle: true };
   return { text: 'Flying', idle: false };

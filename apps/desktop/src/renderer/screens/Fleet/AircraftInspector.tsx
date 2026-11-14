@@ -1,4 +1,4 @@
-import { formatMoney, type Cabin } from '@skyempire/shared';
+import { formatMoney, type CabinConfig } from '@skyempire/shared';
 import { aircraftMarketValue } from '@skyempire/sim';
 import { Button, Meter, Modal, useToast } from '@skyempire/ui';
 import { useState } from 'react';
@@ -7,7 +7,13 @@ import { catalog } from '../../lib/catalog';
 import { aircraftLabel, hoursUsed, WEEKLY_HOURS } from '../../lib/fleet';
 import { useGameStore, useUi } from '../../store';
 import { AircraftDetails } from './AircraftDetails';
-import { CabinEditor } from './CabinEditor';
+import { CabinDesigner } from './CabinDesigner';
+import { aircraftStatus } from './FleetTray';
+
+const SEAT_NAME: Record<string, string> = {
+  slimline: 'slimline', standard: 'standard', extraLegroom: 'extra legroom', recliner: 'recliner', legRest: 'leg rest',
+  angled: 'angled lie-flat', flat: 'full-flat', suite: 'suites',
+};
 
 export function AircraftInspector({ id }: { id: string }) {
   const view = useGameStore((s) => s.view)!;
@@ -30,10 +36,13 @@ export function AircraftInspector({ id }: { id: string }) {
       useUi.getState().select(null);
     } else toast({ title: r.reason, tone: 'danger' });
   };
-  const setCabin = async (cabin: Cabin) => {
-    const r = await window.game.command({ type: 'setCabin', aircraftId: id, cabin });
+  const current: CabinConfig = { seats: ac.cabin, product: ac.product, dense: ac.dense };
+  const setCabin = async (config: CabinConfig) => {
+    const r = await window.game.command({ type: 'setCabin', aircraftId: id, config });
     if (r.ok) { setCabinOpen(false); toast({ title: 'Cabin updated', tone: 'success' }); } else toast({ title: r.reason, tone: 'danger' });
   };
+  const product = (['business', 'premium', 'economy'] as const).filter((c) => ac.cabin[c] > 0)
+    .map((c) => `${c === 'business' ? 'J' : c === 'premium' ? 'W' : 'Y'}: ${SEAT_NAME[ac.product[c].seat] ?? ac.product[c].seat}`).join(' · ');
   return (
     <div className="flex flex-col gap-5">
       <header>
@@ -52,10 +61,11 @@ export function AircraftInspector({ id }: { id: string }) {
       <dl className="grid grid-cols-2 gap-y-2 text-[13px]">
         <dt className="text-muted">Age</dt><dd className="num text-right">{(ac.ageDays / 360).toFixed(1)} years</dd>
         <dt className="text-muted">Seats</dt><dd className="num text-right">{ac.cabin.business}J · {ac.cabin.premium}W · {ac.cabin.economy}Y</dd>
+        <dt className="text-muted">Cabin</dt><dd className="text-right">{product}{ac.dense ? ' · dense' : ''}</dd>
         <dt className="text-muted">Range</dt><dd className="num text-right">{t.rangeKm.toLocaleString('en-US')} km</dd>
         <dt className="text-muted">{leased ? 'Lease' : 'Market value'}</dt><dd className="num text-right">{leased ? `${formatMoney(t.leasePerMonth)}/mo` : formatMoney(value)}</dd>
         <dt className="text-muted">Flight hours</dt><dd className="num text-right">{Math.round(ac.flightHours).toLocaleString('en-US')}</dd>
-        <dt className="text-muted">Status</dt><dd className="text-right">{ac.status === 'maintenance' ? `Maintenance (${ac.maintenanceDaysLeft}d)` : routes.length ? 'Flying' : 'Idle'}</dd>
+        <dt className="text-muted">Status</dt><dd className="text-right">{aircraftStatus(ac, routes.length ? used : 0).text}</dd>
       </dl>
       <div>
         <span className="label-caps">Routes</span>
@@ -66,12 +76,12 @@ export function AircraftInspector({ id }: { id: string }) {
         </ul>
       </div>
       <div className="flex flex-col gap-2">
-        <Button variant="primary" onClick={() => setCabinOpen(true)}>Edit cabin</Button>
+        <Button variant="primary" onClick={() => setCabinOpen(true)} disabled={ac.refitDaysLeft > 0}>{ac.refitDaysLeft > 0 ? `Refit · ${ac.refitDaysLeft} days left` : 'Design cabin'}</Button>
         <Button onClick={() => setAboutOpen(true)}>About the {t.name}</Button>
         <Button variant="ghost" onClick={() => setConfirm(true)}>{leased ? 'Return lease' : `Sell aircraft · ${formatMoney(value)}`}</Button>
       </div>
       <AircraftDetails typeId={ac.typeId} open={aboutOpen} onOpenChange={setAboutOpen} />
-      <CabinEditor open={cabinOpen} onOpenChange={setCabinOpen} typeId={ac.typeId} initial={ac.cabin} confirmLabel="Save cabin" onConfirm={setCabin} />
+      <CabinDesigner open={cabinOpen} onOpenChange={setCabinOpen} typeId={ac.typeId} initial={current} mode={{ kind: 'refit', current }} onConfirm={setCabin} />
       <Modal open={confirm} onOpenChange={setConfirm} title={leased ? 'Return this lease?' : 'Sell this aircraft?'}
         description={routes.length ? 'These routes will be suspended until you assign another aircraft:' : leased ? 'The aircraft goes back to the lessor. No refund.' : `You'll receive ${formatMoney(value)}.`}
         footer={<><Button variant="ghost" onClick={() => setConfirm(false)}>Keep aircraft</Button><Button variant="danger" onClick={remove}>{leased ? 'Return lease' : 'Sell aircraft'}</Button></>}>

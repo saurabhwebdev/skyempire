@@ -246,7 +246,7 @@ export interface World {
 }
 
 export interface GameState {
-  schemaVersion: 2;
+  schemaVersion: 3;
   seed: number;
   rngState: number;
   day: number;

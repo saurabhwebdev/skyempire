@@ -7,12 +7,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useGameStore, useUi } from '../../store';
 import { fakeView } from '../../testing';
 import { AircraftInspector } from './AircraftInspector';
-import { CabinEditor } from './CabinEditor';
-import { FleetTray } from './FleetTray';
+import { aircraftStatus, FleetTray } from './FleetTray';
+import { standardProduct } from '@skyempire/sim';
 
 const ac: Aircraft = {
   id: 'ac1', typeId: 'A20N', ownerId: 'al_player', ownership: 'leased', ageDays: 400, condition: 92, flightHours: 900, hoursSinceA: 0,
-  hoursSinceC: 0, cabin: { economy: 194, premium: 0, business: 0 }, status: 'active', maintenanceDaysLeft: 0, bookValue: 0,
+  hoursSinceC: 0, cabin: { economy: 194, premium: 0, business: 0 }, product: standardProduct(), dense: false, refitDaysLeft: 0, status: 'active', maintenanceDaysLeft: 0, bookValue: 0,
 };
 const wrap = (ui: React.ReactNode) => render(<TooltipProvider><Toaster>{ui}</Toaster></TooltipProvider>);
 
@@ -42,13 +42,7 @@ describe('Fleet', () => {
     expect(screen.getByRole('dialog')).toHaveTextContent('LHR → CDG');
   });
 
-  it('blocks a cabin with too many seats', async () => {
-    const user = userEvent.setup();
-    const onConfirm = vi.fn();
-    wrap(<CabinEditor open typeId="A20N" initial={{ economy: 194, premium: 0, business: 0 }} confirmLabel="Lease for $862k/mo" onConfirm={onConfirm} onOpenChange={() => {}} />);
-    await user.click(screen.getByLabelText('Business seats'));
-    await user.keyboard('{Shift>}{ArrowUp}{/Shift}');
-    expect(screen.getByText('Too many seats — max 194 seat units')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Lease for $862k/mo' })).toBeDisabled();
+  it('shows a running refit as the aircraft status', () => {
+    expect(aircraftStatus({ ...ac, refitDaysLeft: 4 }, 0)).toEqual({ text: 'Refit · 4d', idle: false });
   });
 });

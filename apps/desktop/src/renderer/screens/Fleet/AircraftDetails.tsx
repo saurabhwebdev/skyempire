@@ -17,7 +17,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 export function AircraftDetails({ typeId, open, onOpenChange, actions }: { typeId: string; open: boolean; onOpenChange(o: boolean): void; actions?: ReactNode }) {
   const t = catalog.aircraftTypes[typeId]!;
   const d = detailsOf(typeId);
-  const presets = d ? cabinPresets(t, d.abreast) : [];
+  const presets = d ? cabinPresets(t) : [];
   const [preset, setPreset] = useState<string>(presets[1]?.id ?? 'economy');
   const shown = presets.find((p) => p.id === preset) ?? presets[0];
   const ff = d ? `${MONTHS[Number(d.firstFlight.slice(5, 7)) - 1]} ${d.firstFlight.slice(0, 4)}` : '';
@@ -69,7 +69,7 @@ export function AircraftDetails({ typeId, open, onOpenChange, actions }: { typeI
                 ))}
               </div>
             </div>
-            <SeatMap cabin={shown.cabin} abreast={d.abreast} className="mt-3" />
+            <SeatMap typeId={typeId} config={shown.config} className="mt-3" />
             <p className="mt-1 text-[11px] text-faint">A typical layout for this aircraft, not a specific airline's seat map. You choose your own when you lease or buy.</p>
           </section>
         )}

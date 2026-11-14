@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { Toaster, TooltipProvider } from '@skyempire/ui';
 import type { Aircraft, Route } from '@skyempire/shared';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { standardProduct } from '@skyempire/sim';
 import { useGameStore, useUi } from '../../store';
 import { fakeView } from '../../testing';
 import { NetworkTray } from './NetworkTray';
@@ -11,7 +12,7 @@ import { RouteEditor } from './RouteEditor';
 
 const ac: Aircraft = {
   id: 'ac1', typeId: 'A20N', ownerId: 'al_player', ownership: 'leased', ageDays: 0, condition: 100, flightHours: 0, hoursSinceA: 0,
-  hoursSinceC: 0, cabin: { economy: 194, premium: 0, business: 0 }, status: 'active', maintenanceDaysLeft: 0, bookValue: 0,
+  hoursSinceC: 0, cabin: { economy: 194, premium: 0, business: 0 }, product: standardProduct(), dense: false, refitDaysLeft: 0, status: 'active', maintenanceDaysLeft: 0, bookValue: 0,
 };
 const route = (o: Partial<Route> = {}): Route => ({
   id: 'r1', airlineId: 'al_player', from: 'LHR', to: 'CDG', fares: { economy: 90, premium: 160, business: 300 },

@@ -5,7 +5,7 @@ export function fakeView(p: Partial<Airline> = {}, v: Partial<ClientView> = {}):
   const player: Airline = {
     id: 'al_player', name: 'Test Air', code: 'TST', colors: { primary: '#3366ff', secondary: '#ffffff' }, logoShape: 'wing',
     isPlayer: true, personality: null, cash: 50_000_000, loans: [], baseIds: ['LHR'], homeBaseId: 'LHR', reputation: 50,
-    serviceLevel: 3, marketingPerMonth: 0, tier: 'startup', completedObjectives: [], daysInsolvent: 0, bankrupt: false,
+    cabinTemplates: [], marketingPerMonth: 0, tier: 'startup', completedObjectives: [], daysInsolvent: 0, bankrupt: false,
     creditRating: 'B', totals: { pax: 0, revenue360: Array(12).fill(0) }, nextAiDecisionDay: 0, ...p,
   };
   return {

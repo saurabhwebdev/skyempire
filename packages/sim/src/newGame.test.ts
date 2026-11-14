@@ -1,5 +1,6 @@
 import type { NewGameOptions } from '@skyempire/shared';
 import { describe, expect, it } from 'vitest';
+import { CURRENT_SCHEMA } from './migrate';
 import { newGame } from './newGame';
 import { catalog } from './testing';
 
@@ -13,6 +14,7 @@ const opts = (o: Partial<NewGameOptions> = {}): NewGameOptions => ({
 });
 
 describe('newGame', () => {
+  it('starts on the current save format', () => expect(newGame(opts(), catalog).schemaVersion).toBe(CURRENT_SCHEMA));
   it('is deterministic', () => expect(newGame(opts(), catalog)).toEqual(newGame(opts(), catalog)));
   it('creates 20 airlines with exactly one player', () => {
     const s = newGame(opts(), catalog);

@@ -10,7 +10,7 @@ win.on('pageerror', (e) => console.log('[pageerror]', e.message));
 await win.setViewportSize({ width: 1440, height: 900 });
 await win.evaluate(async () => {
   await window.game.newGame({ seed: 4, regionId: 'world', difficulty: 'normal', homeBaseId: 'LHR', airline: { name: 'Albion Skyways', code: 'AS1', colors: { primary: '#2f6fed', secondary: '#ffffff' }, logoShape: 'wing' } });
-  for (let i = 0; i < 3; i++) await window.game.command({ type: 'leaseAircraft', typeId: 'A20N', cabin: { economy: 194, premium: 0, business: 0 } });
+  for (let i = 0; i < 3; i++) await window.game.command({ type: 'leaseAircraft', typeId: 'A20N', config: { seats: { economy: 194, premium: 0, business: 0 }, product: { economy: { seat: 'standard', ife: 'none', meal: 'snack', amenityKit: false, lounge: false }, premium: { seat: 'recliner', ife: 'none', meal: 'hot', amenityKit: false, lounge: false }, business: { seat: 'angled', ife: 'none', meal: 'dining', amenityKit: false, lounge: false } }, dense: false } });
   const v = await window.game.view();
   const legs = [['LHR', 'MAD', 14], ['LHR', 'FCO', 10], ['LHR', 'EDI', 21]];
   for (let i = 0; i < legs.length; i++) {

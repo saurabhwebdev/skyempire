@@ -1,6 +1,5 @@
 import { formatMoney } from '@skyempire/shared';
-import { BALANCE } from '@skyempire/sim';
-import { Button, cn, Meter, NumberInput, Panel, useToast } from '@skyempire/ui';
+import { Button, Meter, NumberInput, Panel, useToast } from '@skyempire/ui';
 import { useState } from 'react';
 import { catalog } from '../../lib/catalog';
 import { useGameStore } from '../../store';
@@ -8,7 +7,6 @@ import { LogoMark } from '../NewAirline/LogoPreview';
 import { AirlineLogo } from '../../components/AirlineLogo';
 import { useGameStore as useStore } from '../../store';
 
-const SERVICE = ['', 'Basic', 'Simple', 'Standard', 'Premium', 'Luxury'];
 const TIER = { startup: 'Startup', regional: 'Regional', national: 'National', global: 'Global' };
 
 export function Airline() {
@@ -56,18 +54,9 @@ export function Airline() {
           <li>30% punctuality</li><li>25% service & comfort</li><li>15% fair prices</li><li>15% young fleet</li><li>15% marketing</li>
         </ul>
       </Panel>
-      <Panel title="Service level">
-        <p className="mb-3 text-[13px] text-muted">Applies to every flight. Better service raises quality and reputation but costs more per passenger.</p>
-        <div role="radiogroup" aria-label="Service level" className="grid grid-cols-5 gap-2">
-          {[1, 2, 3, 4, 5].map((lv) => (
-            <button key={lv} type="button" role="radio" aria-checked={al.serviceLevel === lv}
-              onClick={() => send({ type: 'setServiceLevel', level: lv as 1 | 2 | 3 | 4 | 5 }, `Service set to ${SERVICE[lv]}`)}
-              className={cn('flex flex-col items-center gap-1 rounded-lg border p-2 text-[13px]', al.serviceLevel === lv ? 'border-accent bg-surface-2' : 'border-border hover:border-border-strong')}>
-              <span className="font-semibold">{SERVICE[lv]}</span>
-              <span className="num text-faint">${BALANCE.serviceCostPerPax[lv]}/pax</span>
-            </button>
-          ))}
-        </div>
+      <Panel title="Cabins and service">
+        <p className="text-[13px] text-muted">Each aircraft has its own cabin: seats, legroom, screens, meals and extras for every class. Better products raise quality, fares and reputation, but cost more to fit and to run.</p>
+        <p className="mt-2 text-[13px] text-muted">Open an aircraft in your fleet and choose <span className="text-text">Design cabin</span>, or design it when you lease or buy.</p>
       </Panel>
       <Panel title="Marketing">
         <div className="flex items-end gap-2">

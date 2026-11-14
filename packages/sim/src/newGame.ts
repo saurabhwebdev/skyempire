@@ -1,3 +1,4 @@
+import { CURRENT_SCHEMA } from './migrate';
 import { isReservedAirline } from '@skyempire/data';
 import type { Airline, AirlineData, Catalog, GameState, NewGameOptions } from '@skyempire/shared';
 import { PERSONALITIES } from './ai/personalities';
@@ -60,7 +61,7 @@ export function newGame(opts: NewGameOptions, catalog: Catalog): GameState {
   const rng = new Rng(opts.seed);
   const cash = BALANCE.startingCash[difficulty];
   const state: GameState = {
-    schemaVersion: 2,
+    schemaVersion: CURRENT_SCHEMA,
     seed: opts.seed,
     rngState: 0,
     day: 0,

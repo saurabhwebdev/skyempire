@@ -10,8 +10,8 @@ win.on('pageerror', (e) => console.log('[pageerror]', e.message));
 await win.setViewportSize({ width: 1440, height: 900 });
 await win.evaluate(async () => {
   await window.game.newGame({ seed: 4, regionId: 'world', difficulty: 'normal', homeBaseId: 'DEL', airline: { name: 'Saffron Air', code: 'S4F', colors: { primary: '#e08a1e', secondary: '#ffffff' }, logoShape: 'circle' } });
-  await window.game.command({ type: 'leaseAircraft', typeId: 'A20N', cabin: { economy: 194, premium: 0, business: 0 } });
-  await window.game.command({ type: 'leaseAircraft', typeId: 'AT76', cabin: { economy: 78, premium: 0, business: 0 } });
+  await window.game.command({ type: 'leaseAircraft', typeId: 'A20N', config: { seats: { economy: 194, premium: 0, business: 0 }, product: { economy: { seat: 'standard', ife: 'none', meal: 'snack', amenityKit: false, lounge: false }, premium: { seat: 'recliner', ife: 'none', meal: 'hot', amenityKit: false, lounge: false }, business: { seat: 'angled', ife: 'none', meal: 'dining', amenityKit: false, lounge: false } }, dense: false } });
+  await window.game.command({ type: 'leaseAircraft', typeId: 'AT76', config: { seats: { economy: 78, premium: 0, business: 0 }, product: { economy: { seat: 'standard', ife: 'none', meal: 'snack', amenityKit: false, lounge: false }, premium: { seat: 'recliner', ife: 'none', meal: 'hot', amenityKit: false, lounge: false }, business: { seat: 'angled', ife: 'none', meal: 'dining', amenityKit: false, lounge: false } }, dense: false } });
 });
 await win.reload();
 await win.waitForTimeout(1200);

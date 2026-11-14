@@ -11,7 +11,7 @@ const out = await win.evaluate(async () => {
   const fleet = ['A20N', 'A20N', 'A21N', 'A20N', 'AT76'];
   for (const t of fleet) {
     const seats = { A20N: 194, A21N: 244, AT76: 78 }[t];
-    await g.command({ type: 'leaseAircraft', typeId: t, cabin: { economy: seats, premium: 0, business: 0 } });
+    await g.command({ type: 'leaseAircraft', typeId: t, config: { seats: { economy: seats, premium: 0, business: 0 }, product: { economy: { seat: 'standard', ife: 'none', meal: 'snack', amenityKit: false, lounge: false }, premium: { seat: 'recliner', ife: 'none', meal: 'hot', amenityKit: false, lounge: false }, business: { seat: 'angled', ife: 'none', meal: 'dining', amenityKit: false, lounge: false } }, dense: false } });
   }
   const v = await g.view();
   const legs = [['MAD', 14], ['FCO', 12], ['BCN', 12], ['ATH', 7], ['EDI', 21]];
