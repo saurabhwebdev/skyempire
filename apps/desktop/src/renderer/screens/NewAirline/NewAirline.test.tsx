@@ -2,7 +2,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Toaster, TooltipProvider } from '@skyempire/ui';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { NewAirline, suggestCode } from './NewAirline';
 
 const wrap = () => render(<TooltipProvider><Toaster><NewAirline /></Toaster></TooltipProvider>);
@@ -31,5 +31,23 @@ describe('NewAirline', () => {
     await user.clear(screen.getByLabelText('Airline name'));
     await user.type(screen.getByLabelText('Airline name'), 'Albion Skyways');
     expect(next).toBeEnabled();
+  });
+
+  it('lets you pick the airline type, and warns that cargo-only is for good', async () => {
+    const user = userEvent.setup();
+    const newGame = vi.fn().mockRejectedValue(new Error('stop here'));
+    window.game = { newGame } as unknown as typeof window.game;
+    wrap();
+    await user.type(screen.getByLabelText('Airline name'), 'Albion Freight');
+    await user.click(screen.getByRole('button', { name: 'Choose a hub' }));
+    await user.type(screen.getByLabelText('Search airports'), 'LEJ');
+    await user.keyboard('{Enter}');
+    await user.click(screen.getByRole('button', { name: 'Choose difficulty' }));
+    const kinds = screen.getByRole('radiogroup', { name: 'Airline type' });
+    expect(screen.getByRole('radio', { name: /^Passenger\b(?! \+)/ })).toHaveAttribute('aria-checked', 'true');
+    await user.click(screen.getByRole('radio', { name: /Cargo only/ }));
+    expect(kinds).toHaveTextContent(/can never fly passengers/);
+    await user.click(screen.getByRole('button', { name: 'Found airline' }));
+    expect(newGame).toHaveBeenCalledWith(expect.objectContaining({ airlineKind: 'cargo', homeBaseId: 'LEJ' }));
   });
 });

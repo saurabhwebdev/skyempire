@@ -1,5 +1,5 @@
 import { isReservedAirline, loadCatalog } from '@skyempire/data';
-import type { Airport, Difficulty, LogoShape } from '@skyempire/shared';
+import type { AirlineKind, Airport, Difficulty, LogoShape } from '@skyempire/shared';
 import { formatMoney, formatPax } from '@skyempire/shared';
 import { Button, cn, Combobox, useToast } from '@skyempire/ui';
 import { ArrowLeft } from 'lucide-react';
@@ -41,6 +41,12 @@ function nearbyRivals(a: Airport): number {
   }).length;
 }
 
+const KINDS: { id: AirlineKind; title: string; text: string }[] = [
+  { id: 'passenger', title: 'Passenger', text: 'Fly people. Your airliners also sell cargo in their holds.' },
+  { id: 'combination', title: 'Passenger + Cargo', text: 'Fly people and run freighters too, like Lufthansa or Emirates.' },
+  { id: 'cargo', title: 'Cargo only', text: 'Freighters only, like FedEx or Cargolux. Move tonnes, not people.' },
+];
+
 export function NewAirline() {
   const setScreen = useUi((s) => s.setScreen);
   const toast = useToast();
@@ -53,6 +59,7 @@ export function NewAirline() {
   const [secondary, setSecondary] = useState('#ffffff');
   const [hub, setHub] = useState<Airport | null>(null);
   const [difficulty, setDifficulty] = useState<Difficulty>('normal');
+  const [kind, setKind] = useState<AirlineKind>('passenger');
   const [busy, setBusy] = useState(false);
 
   const effectiveCode = codeTouched ? code : suggestCode(name, (c) => isReservedAirline('', c));
@@ -78,6 +85,7 @@ export function NewAirline() {
         seed: Math.floor(Math.random() * 2 ** 31),
         regionId: 'world',
         difficulty,
+        airlineKind: kind,
         homeBaseId: hub.id,
         airline: { name: name.trim(), code: effectiveCode, colors: { primary, secondary }, logoShape: shape },
         startYear: new Date().getFullYear(),
@@ -189,7 +197,18 @@ export function NewAirline() {
 
         {step === 2 && (
           <section className="flex flex-col gap-5">
-            <h1 className="text-[32px] font-semibold tracking-[-0.02em]">How tough should it be?</h1>
+            <h1 className="text-[32px] font-semibold tracking-[-0.02em]">What kind of airline?</h1>
+            <div className="grid gap-3 md:grid-cols-3" role="radiogroup" aria-label="Airline type">
+              {KINDS.map((k) => (
+                <button key={k.id} type="button" role="radio" aria-checked={kind === k.id} onClick={() => setKind(k.id)}
+                  className={cn('rounded-lg border bg-surface-1 p-4 text-left transition-colors', kind === k.id ? 'border-accent' : 'border-border hover:border-border-strong')}>
+                  <span className="font-semibold">{k.title}</span>
+                  <p className="text-[13px] text-muted">{k.text}</p>
+                </button>
+              ))}
+              {kind === 'cargo' && <p role="note" className="text-[13px] text-warning md:col-span-3">This is for good: a cargo airline can never fly passengers.</p>}
+            </div>
+            <h2 className="text-[20px] font-semibold tracking-[-0.01em]">How tough should it be?</h2>
             <div className="flex flex-col gap-3" role="radiogroup" aria-label="Difficulty">
               {DIFFICULTIES.map((d) => (
                 <button key={d.id} type="button" role="radio" aria-checked={difficulty === d.id} onClick={() => setDifficulty(d.id)}
@@ -201,7 +220,7 @@ export function NewAirline() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted">
-                {name.trim()} · <span className="font-mono">{effectiveCode}</span> · {hub?.city} · {formatMoney({ easy: 80e6, normal: 50e6, hard: 25e6 }[difficulty])}
+                {name.trim()} · <span className="font-mono">{effectiveCode}</span> · {KINDS.find((k) => k.id === kind)!.title} · {hub?.city} · {formatMoney({ easy: 80e6, normal: 50e6, hard: 25e6 }[difficulty])}
               </span>
               <Button variant="primary" loading={busy} onClick={found}>Found airline</Button>
             </div>

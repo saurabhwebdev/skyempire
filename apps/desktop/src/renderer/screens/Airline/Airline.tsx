@@ -9,6 +9,8 @@ import { useGameStore as useStore } from '../../store';
 
 const TIER = { startup: 'Startup', regional: 'Regional', national: 'National', global: 'Global' };
 
+const KIND_LABEL = { passenger: 'Passenger', combination: 'Passenger + Cargo', cargo: 'Cargo only' } as const;
+
 export function Airline() {
   const view = useGameStore((s) => s.view)!;
   const al = view.player;
@@ -53,6 +55,25 @@ export function Airline() {
         <ul className="mt-3 grid grid-cols-2 gap-1 text-[13px] text-muted">
           <li>30% punctuality</li><li>25% service & comfort</li><li>15% fair prices</li><li>15% young fleet</li><li>15% marketing</li>
         </ul>
+      </Panel>
+      <Panel title="Cargo">
+        <p className="mb-3 text-[13px]"><span className="text-muted">Airline type: </span><span className="font-semibold">{KIND_LABEL[al.kind ?? 'passenger']}</span></p>
+        {al.kind !== 'cargo' && (
+          <label className="mb-3 flex items-start gap-2 text-[13px]">
+            <input type="checkbox" checked={al.bellyCargo !== false} className="mt-0.5 size-4 accent-[var(--color-accent)]"
+              aria-label="Sell cargo in passenger holds" aria-describedby="belly-hint"
+              onChange={(e) => send({ type: 'setBellyCargo', on: e.target.checked }, e.target.checked ? 'Belly cargo on' : 'Belly cargo off')} />
+            <span>Sell cargo in passenger holds<span id="belly-hint" className="block text-muted">Extra revenue on every passenger flight. Set it per route in the route editor.</span></span>
+          </label>
+        )}
+        {al.dgLicence
+          ? <p className="text-[13px] text-success">You can carry dangerous goods (batteries, chemicals), which pay 40% more.</p>
+          : (
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-[13px] text-muted">Dangerous goods (batteries, chemicals) pay 40% more but need a licence.</p>
+              <Button size="sm" onClick={() => send({ type: 'buyDgLicence' }, 'Dangerous-goods licence granted')}>Get the licence · $250k</Button>
+            </div>
+          )}
       </Panel>
       <Panel title="Cabins and service">
         <p className="text-[13px] text-muted">Each aircraft has its own cabin: seats, legroom, screens, meals and extras for every class. Better products raise quality, fares and reputation, but cost more to fit and to run.</p>
