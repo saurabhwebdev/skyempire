@@ -40,6 +40,27 @@ describe('routeDayCosts', () => {
     expect(Math.abs(cb.crew - ca.crew * 0.9)).toBeLessThanOrEqual(2); // per-leg rounding
     expect(cb.fuel).toBe(ca.fuel);
   });
+  it('meals, kits and lounges cost per passenger; buy on board earns', () => {
+    const a = setup(false);
+    const ac = a.s.aircraft[[...a.legs.keys()][0]!]!;
+    const cost = (meal: 'snack' | 'hot' | 'buyOnBoard') => {
+      ac.product = { ...ac.product, economy: { ...ac.product.economy, meal } };
+      return routeDayCosts(a.route, a.s, catalog, a.legs, pax, false).service;
+    };
+    expect(cost('snack')).toBe(200 * 3);
+    expect(cost('hot')).toBe(200 * 9);
+    expect(cost('buyOnBoard')).toBe(-200 * 3);
+  });
+  it('Wi-Fi costs per block hour, and heavier cabins burn more fuel', () => {
+    const a = setup(false);
+    const ac = a.s.aircraft[[...a.legs.keys()][0]!]!;
+    const before = routeDayCosts(a.route, a.s, catalog, a.legs, pax, false);
+    ac.product = { ...ac.product, economy: { ...ac.product.economy, ife: 'wifi' } };
+    const wifi = routeDayCosts(a.route, a.s, catalog, a.legs, pax, false);
+    expect(wifi.service - before.service).toBeGreaterThanOrEqual(2 * 60);
+    ac.product = { ...ac.product, economy: { ...ac.product.economy, ife: 'premium' } };
+    expect(routeDayCosts(a.route, a.s, catalog, a.legs, pax, false).fuel).toBeGreaterThan(before.fuel);
+  });
   it('a closed airport means no variable costs', () => {
     const a = setup(false);
     expect(routeDayCosts(a.route, a.s, catalog, a.legs, pax, true)).toEqual({ fuel: 0, crew: 0, maintenance: 0, fees: 0, service: 0 });

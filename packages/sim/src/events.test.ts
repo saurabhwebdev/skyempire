@@ -9,7 +9,7 @@ function simulate(days: number, seed: number) {
   const s = playerGame('FRA', 1);
   const rng = new Rng(seed);
   const started: Record<string, number> = {};
-  let fuelOutOfRange = 0;
+  let fuelOutOfRange = 0, maxSpikes = 0;
   for (let d = 0; d < days; d++) {
     s.day = d;
     const before = new Set(s.events.map((e) => e.id));
@@ -17,13 +17,17 @@ function simulate(days: number, seed: number) {
     stepMarket(s, catalog, rng);
     for (const e of s.events) if (!before.has(e.id)) started[e.kind] = (started[e.kind] ?? 0) + 1;
     const spike = s.events.some((e) => e.kind === 'fuelSpike');
+    maxSpikes = Math.max(maxSpikes, s.events.filter((e) => e.kind === 'fuelSpike').length);
     if (!spike && (s.market.fuelPricePerKg < BALANCE.fuelPriceMin || s.market.fuelPricePerKg > BALANCE.fuelPriceMax)) fuelOutOfRange++;
   }
-  return { s, started, fuelOutOfRange };
+  return { s, started, fuelOutOfRange, maxSpikes };
 }
 
 describe('events and market', () => {
   const { started, fuelOutOfRange } = simulate(3600, 5);
+  it('fuel spikes never stack', () => {
+    for (const seed of [1, 2, 3, 4, 5, 6, 7, 8]) expect(simulate(3600, seed).maxSpikes, `seed ${seed}`).toBeLessThanOrEqual(1);
+  });
   it('fuel spikes happen about once a year', () => {
     expect(started.fuelSpike ?? 0).toBeGreaterThanOrEqual(5);
     expect(started.fuelSpike ?? 0).toBeLessThanOrEqual(15);

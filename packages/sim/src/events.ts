@@ -41,7 +41,8 @@ export function rollEvents(state: GameState, catalog: Catalog, rng: Rng): Notifi
     return e;
   };
 
-  if (rng.chance(1 / 360)) {
+  // One spike at a time: stacked spikes would multiply fuel to 3× and beyond.
+  if (rng.chance(1 / 360) && !state.events.some((e) => e.kind === 'fuelSpike')) {
     const m = Math.round(rng.range(1.3, 1.8) * 100) / 100;
     const days = rng.int(30, 120);
     state.market.fuelPricePerKg = Math.round(state.market.fuelPricePerKg * m * 10000) / 10000;

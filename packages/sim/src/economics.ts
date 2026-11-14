@@ -5,6 +5,7 @@ import { flightDistanceKm } from './routing';
 import { effectiveFare } from './fares';
 import { blockHours } from './ops';
 import { PERSONALITIES } from './ai/personalities';
+import { fuelFactor, ifeCostPerBlockHour, perPaxServiceCost } from './cabin';
 
 /** Round trips flown today: weekly round trips spread deterministically across the 7-day week. */
 export function flightsToday(rtpw: number, day: number): number {
@@ -45,16 +46,26 @@ export function routeDayCosts(
   const factor = al.baseIds.includes(a.id) && al.baseIds.includes(b.id) ? BALANCE.basePairDiscount : 1;
   const style = al.personality ? PERSONALITIES[al.personality] : null;
   const out = { ...zero };
+  // Per-passenger service cost per class, averaged over the seats each aircraft flies today.
+  const svc = { economy: { cost: 0, seats: 0 }, premium: { cost: 0, seats: 0 }, business: { cost: 0, seats: 0 } };
+  let connectivity = 0;
   for (const [acId, legs] of legsByAircraft) {
     const ac = state.aircraft[acId];
     if (!ac || legs <= 0) continue;
     const t = catalog.aircraftTypes[ac.typeId]!;
+    const config = { seats: ac.cabin, product: ac.product, dense: ac.dense };
+    for (const c of CABIN_CLASSES) {
+      svc[c].cost += perPaxServiceCost(ac.product, c) * ac.cabin[c] * legs;
+      svc[c].seats += ac.cabin[c] * legs;
+    }
+    connectivity += ifeCostPerBlockHour(config) * blockHours(dist, t.cruiseKmh) * legs;
+    const fuelMul = fuelFactor(config, t);
     // Legs alternate direction: half land at b, half at a.
     const toB = Math.ceil(legs / 2), toA = legs - toB;
     for (const [arrival, n] of [[b, toB], [a, toA]] as const) {
       if (n === 0) continue;
       const c = legCost(t, ac.ageDays / 360, dist, state.market.fuelPricePerKg, arrival, factor, style?.crewCost ?? 1, style?.maintCost ?? 1);
-      out.fuel += c.fuel * n;
+      out.fuel += Math.round(c.fuel * fuelMul) * n;
       out.crew += c.crew * n;
       out.maintenance += c.maintenance * n;
       out.fees += c.fees * n;
@@ -64,7 +75,6 @@ export function routeDayCosts(
   out.fees += Math.round(((a.paxFee + b.paxFee) / 2) * totalPax * BALANCE.paxFeeShare);
   const ticketRevenue = CABIN_CLASSES.reduce((s, c) => s + pax[c] * effectiveFare(route, c, state.day), 0);
   out.fees += Math.round(BALANCE.distributionShare * ticketRevenue);
-  const perPax = BALANCE.serviceCostPerPax[al.serviceLevel]!;
-  out.service = Math.round(CABIN_CLASSES.reduce((s, c) => s + pax[c] * perPax * BALANCE.serviceClassMultiplier[c], 0));
+  out.service = Math.round(CABIN_CLASSES.reduce((s, c) => s + pax[c] * (svc[c].seats > 0 ? svc[c].cost / svc[c].seats : 0), 0) + connectivity);
   return out;
 }

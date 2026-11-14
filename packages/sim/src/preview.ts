@@ -5,8 +5,21 @@ import { BALANCE } from './config/balance';
 import { hoursByAircraft, pairKey, revenueOf, routeOps, simulatePair, totalSeats } from './daySim';
 import { refFare } from './demand';
 import { routeDayCosts } from './economics';
+import { perPaxServiceCost } from './cabin';
 import { distanceKm } from './geo';
 import { flightDistanceKm } from './routing';
+
+/** Seat-weighted per-passenger service cost of a class across the given aircraft. */
+function classServiceCost(s: GameState, aircraftIds: string[], cls: CabinClass): number {
+  let cost = 0, seats = 0;
+  for (const id of aircraftIds) {
+    const ac = s.aircraft[id];
+    if (!ac) continue;
+    cost += perPaxServiceCost(ac.product, cls) * ac.cabin[cls];
+    seats += ac.cabin[cls];
+  }
+  return seats > 0 ? cost / seats : 0;
+}
 
 const FARE_STEPS = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6];
 
@@ -63,7 +76,7 @@ export function preview(state: GameState, airlineId: string, cmd: Command, catal
     for (const k of FARE_STEPS) {
       route.fares = { ...suggested, [cls]: Math.round(ref * k) } as Record<CabinClass, number>;
       const e = evaluate(s, routeId, catalog);
-      const perPax = BALANCE.serviceCostPerPax[s.airlines[airlineId]!.serviceLevel]! * BALANCE.serviceClassMultiplier[cls];
+      const perPax = classServiceCost(s, route.assignments.map((a) => a.aircraftId), cls);
       const value = e.pax[cls] * (route.fares[cls] - perPax);
       if (value > best.value + 1e-6) best = { fare: route.fares[cls], value };
     }

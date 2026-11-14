@@ -12,6 +12,7 @@ import { distanceKm } from './geo';
 import { onTimeFor } from './maintenance';
 import { blockHours, roundTripHours, seatUnits, slotCapacity } from './ops';
 import { offerQuality } from './quality';
+import { productScore } from './cabin';
 import { weatherAt, weatherEffect, type WeatherEffect } from './weather';
 import { flightDistanceKm } from './routing';
 import { banMessage, isBanned, tensionDemandFactor } from './tensions';
@@ -42,7 +43,10 @@ export interface RouteOps {
   /** Seats per direction per class today. */
   seats: Cabin;
   weeklyFrequency: number;
-  quality: number;
+  /** Offer quality per class (0–100), seat-weighted across the route's aircraft. */
+  quality: Cabin;
+  /** Seat-weighted mean of the class qualities (for reputation). */
+  qualityMean: number;
   onTime: number;
   blockH: number;
   /** Weather extras today: de-icing plus passenger care for cancelled or pre-cancelled seats. */
@@ -71,7 +75,7 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
   const roundTrips = new Map<string, number>();
   const seats = emptyCabin();
   let rangeBlocked: string | null = null;
-  let weeklyFrequency = 0, condSum = 0, utilSum = 0, qualSum = 0, penaltySum = 0, n = 0, blockH = 0, weatherFees = 0;
+  let weeklyFrequency = 0, condSum = 0, utilSum = 0, penaltySum = 0, n = 0, blockH = 0, weatherFees = 0;
   // Share of flights the weather cancels at one end: its own cancellations, or what reduced capacity can't handle.
   const endCancel = (ap: typeof a, eff: WeatherEffect) => {
     if (eff.capacityCut <= 0) return eff.cancelShare;
@@ -87,7 +91,7 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
     blockH = blockHours(dist, t.cruiseKmh);
     const outOfRange = t.rangeKm < dist;
     // Flights a cyclone would cancel still count as scheduled (stranded passengers cost money); strikes ground everything.
-    const flying = !struck && !blocked && !outOfRange && ac.status === 'active';
+    const flying = !struck && !blocked && !outOfRange && ac.status === 'active' && !(ac.refitDaysLeft > 0);
     if (outOfRange && !blocked && !rangeBlocked) rangeBlocked = `Detour exceeds ${t.name} range`;
     const scheduled = flying ? (average ? asg.roundTripsPerWeek / 7 : flightsToday(asg.roundTripsPerWeek, state.day)) : 0;
     const acSeats = CABIN_CLASSES.reduce((s, c) => s + ac.cabin[c], 0);
@@ -119,17 +123,24 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
     : n
     ? Math.max(40, onTimeFor(condSum / n, congestion, utilSum / n, isStormAffected(state, a.id) || isStormAffected(state, b.id)) - penaltySum / n)
     : BALANCE.baseOnTime;
+  // Quality per class: each aircraft's offer, weighted by the seats it puts in that class.
+  const quality = emptyCabin(), qualSeats = emptyCabin();
   for (const asg of route.assignments) {
     const ac = state.aircraft[asg.aircraftId];
     if (!ac) continue;
     const t = catalog.aircraftTypes[ac.typeId]!;
-    qualSum += offerQuality({
-      comfort: t.comfort, ageYears: ac.ageDays / 360, seatUnitsRatio: seatUnits(ac.cabin) / t.maxSeats,
-      serviceLevel: al.serviceLevel, onTime,
-    });
+    for (const cls of CABIN_CLASSES) {
+      const w = ac.cabin[cls] * asg.roundTripsPerWeek;
+      if (w <= 0) continue;
+      quality[cls] += w * offerQuality({ comfort: t.comfort, ageYears: ac.ageDays / 360, productScore: productScore(ac.product, cls, ac.dense, blockHours(dist, t.cruiseKmh)), onTime });
+      qualSeats[cls] += w;
+    }
   }
+  for (const cls of CABIN_CLASSES) quality[cls] = qualSeats[cls] > 0 ? quality[cls] / qualSeats[cls] : 50;
+  const allSeats = CABIN_CLASSES.reduce((s, c) => s + qualSeats[c], 0);
+  const qualityMean = allSeats > 0 ? CABIN_CLASSES.reduce((s, c) => s + quality[c] * qualSeats[c], 0) / allSeats : 50;
   return {
-    route, closed, roundTrips, seats, weeklyFrequency, quality: n ? qualSum / n : 50, onTime, blockH, weatherFees: Math.round(weatherFees),
+    route, closed, roundTrips, seats, weeklyFrequency, quality, qualityMean, onTime, blockH, weatherFees: Math.round(weatherFees),
     detourKm: flight.detourKm, blocked: blocked ?? rangeBlocked,
   };
 }
@@ -162,7 +173,7 @@ export function simulatePair(ops: RouteOps[], state: GameState, catalog: Catalog
         .filter((x) => x.weeklyFrequency > 0)
         .map((x) => ({
           airlineId: x.route.airlineId, routeId: x.route.id, fare: effectiveFare(x.route, cls, state.day), weeklyFrequency: x.weeklyFrequency,
-          quality: x.quality, reputation: state.airlines[x.route.airlineId]!.reputation, stops: 0, seats: x.seats[cls],
+          quality: x.quality[cls], reputation: state.airlines[x.route.airlineId]!.reputation, stops: 0, seats: x.seats[cls],
         }));
       const withSeats = offers.filter((x) => x.seats > 0);
       if (withSeats.length === 0) continue;
