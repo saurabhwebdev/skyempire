@@ -1,4 +1,4 @@
-import type { Catalog, ClientView, Command, CommandResult, GameState, NewGameOptions, PreviewResult, TickSummary } from '@skyempire/shared';
+import type { Catalog, ClientView, Command, CommandResult, GameState, NewGameOptions, PreviewResult, TickSummary, WeatherCondition } from '@skyempire/shared';
 import { applyCommand, buildClientView, distanceKm, newGame, preview, tick } from '@skyempire/sim';
 import { baseDemandBothWays } from './demandInfo';
 
@@ -10,7 +10,9 @@ export type SimRequest =
   | { kind: 'preview'; cmd: Command }
   | { kind: 'routeDemand'; from: string; to: string }
   | { kind: 'view' }
-  | { kind: 'snapshot' };
+  | { kind: 'snapshot' }
+  | { kind: 'weatherPoints' }
+  | { kind: 'setLiveWeather'; data: Record<number, Record<string, WeatherCondition>> };
 
 export interface SimResponses {
   newGame: ClientView;
@@ -21,6 +23,8 @@ export interface SimResponses {
   routeDemand: PreviewResult;
   view: ClientView;
   snapshot: GameState;
+  weatherPoints: { day: number; points: { id: string; lat: number; lon: number }[] };
+  setLiveWeather: { ok: true };
 }
 
 export interface SimHandler {
@@ -73,6 +77,20 @@ export function createSimHandler(catalog: Catalog): SimHandler {
     },
     view: () => view(),
     snapshot: () => structuredClone(need()),
+    weatherPoints: () => {
+      const s = need();
+      const ids = new Set<string>(s.airlines[s.playerId]!.baseIds);
+      for (const r of Object.values(s.routes)) if (r.status === 'active') ids.add(r.from).add(r.to);
+      const points = [...ids].map((id) => catalog.airports[id]).filter((a) => !!a).map((a) => ({ id: a!.id, lat: a!.lat, lon: a!.lon }));
+      return { day: s.day, points };
+    },
+    setLiveWeather: (r) => {
+      const s = need();
+      const live = s.world.liveWeather;
+      for (const [day, byAirport] of Object.entries(r.data)) live[Number(day)] = { ...live[Number(day)], ...byAirport };
+      for (const day of Object.keys(live)) if (Number(day) < s.day) delete live[Number(day)];
+      return { ok: true };
+    },
   };
 
   return {

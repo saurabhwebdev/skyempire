@@ -46,3 +46,21 @@ describe('sim worker handler', () => {
     expect(d.distanceKm).toBeGreaterThan(300);
   });
 });
+
+describe('live weather input', () => {
+  it('lists the airports in use and merges forecasts, dropping past days', async () => {
+    const { loadCatalog } = await import('@skyempire/data');
+    const { createSimHandler } = await import('./simHandler');
+    const h = createSimHandler(loadCatalog('world'));
+    h.handle({ kind: 'newGame', opts: { seed: 1, regionId: 'world', difficulty: 'normal', homeBaseId: 'LHR', aiCount: 2, airline: { name: 'Weather Test Air', code: 'W1T', colors: { primary: '#123456', secondary: '#ffffff' }, logoShape: 'circle' } } });
+    const pts = h.handle({ kind: 'weatherPoints' });
+    expect(pts.points.some((p) => p.id === 'LHR')).toBe(true);
+    h.handle({ kind: 'setLiveWeather', data: { 1: { LHR: 'snow' }, 2: { LHR: 'fog' } } });
+    h.handle({ kind: 'tick' });
+    h.handle({ kind: 'tick' });
+    const s = h.handle({ kind: 'snapshot' });
+    h.handle({ kind: 'setLiveWeather', data: { 5: { LHR: 'rain' } } });
+    expect(Object.keys(h.handle({ kind: 'snapshot' }).world.liveWeather)).toEqual(['2', '5']);
+    expect(s.world.liveWeather[2]).toEqual({ LHR: 'fog' });
+  });
+});

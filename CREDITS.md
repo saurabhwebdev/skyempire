@@ -11,7 +11,9 @@ Airline logos are **not** distributed with the game. Players can choose to downl
 | Country shapes (map) | [Natural Earth](https://www.naturalearthdata.com/) 1:50m | Public domain |
 | Airline IDs, codes, countries | [Wikidata](https://www.wikidata.org/) | CC0 |
 | Airline list, real routes (2014 snapshot) | [OpenFlights](https://openflights.org/data) | ODbL 1.0 |
-| Aircraft specifications | Manufacturers' public specification pages (Airbus, Boeing, ATR, Embraer, De Havilland Canada), Wikidata | Facts; cited per aircraft in `packages/data/src/aircraft.json` |
+| Aircraft specifications | Manufacturers' public specification pages (Airbus, Boeing, ATR, Embraer, De Havilland Canada, Bombardier/MHI RJ, COMAC), Wikidata | Facts; cited per aircraft in `packages/data/src/aircraft.json` |
+| Live weather forecasts | [Open-Meteo](https://open-meteo.com/) (weather data by Open-Meteo.com) | CC BY 4.0 |
+| Public holidays, festival dates | [date-holidays](https://github.com/commenthol/date-holidays) (used at build time) | ISC |
 | Aircraft silhouettes | Drawn by SkyEmpire from published dimensions | MIT (this project) |
 | Fuel burn, lease, maintenance and crew costs | SkyEmpire estimates from published industry figures | — |
 | Brand colors | Approximations chosen by SkyEmpire | — |

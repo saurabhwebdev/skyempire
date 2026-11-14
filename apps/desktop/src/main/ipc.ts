@@ -7,6 +7,7 @@ import { loadCatalog } from '@skyempire/data';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { countLogos, downloadLogos } from './logos';
+import { LiveWeather } from './weather';
 import type { SimHost } from './simHost';
 
 export interface GameSession {
@@ -29,10 +30,27 @@ export function registerIpc(win: BrowserWindow, host: SimHost, store: SaveStore,
     store.writeSnapshot(saveId, state, kind);
   };
 
+  const liveWeather = new LiveWeather((url, init) => fetch(url, init));
+  let weatherBusy = false;
+  const refreshWeather = async () => {
+    if (!settings.liveWeather || weatherBusy || !saveId) return;
+    weatherBusy = true;
+    try {
+      const { day, points } = await host.request({ kind: 'weatherPoints' });
+      const data = await liveWeather.refresh(points, day);
+      if (data) await host.request({ kind: 'setLiveWeather', data });
+    } catch (e) {
+      console.warn('Live weather skipped', e);
+    } finally {
+      weatherBusy = false;
+    }
+  };
+
   const loop = new GameLoop(
     { tick: () => host.request({ kind: 'tick' }) },
     (push) => {
       send(IPC.tick, push);
+      void refreshWeather();
       if (!saveId || !push.summary) return;
       try {
         store.appendDaily(saveId, push.summary.daily);

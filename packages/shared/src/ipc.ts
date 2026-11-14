@@ -25,6 +25,8 @@ export interface Settings {
   colorBlindRivals: boolean;
   /** Show weather on the map. */
   mapWeather: boolean;
+  /** Use real forecasts from Open-Meteo when online. */
+  liveWeather: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -37,6 +39,7 @@ export const DEFAULT_SETTINGS: Settings = {
   tutorialDone: false,
   colorBlindRivals: false,
   mapWeather: true,
+  liveWeather: true,
 };
 
 export interface TickPush {

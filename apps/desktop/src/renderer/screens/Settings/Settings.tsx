@@ -25,6 +25,7 @@ export function SettingsDialog({ open, onOpenChange }: { open: boolean; onOpenCh
         <Switch label="Reduce motion" hint="Removes route and panel animations." checked={settings.reduceMotion} onChange={(v) => update({ reduceMotion: v })} />
         <Switch label="Performance mode" hint="Turns off blur and map animations on slower PCs." checked={settings.performanceMode} onChange={(v) => update({ performanceMode: v })} />
         <Switch label="Pause on major events" hint="Fuel spikes, recessions and strikes at your bases." checked={settings.autoPauseMajor} onChange={(v) => update({ autoPauseMajor: v })} />
+        <Switch label="Live weather" hint="Real forecasts from Open-Meteo when you're online. Off: realistic simulated weather." checked={settings.liveWeather} onChange={(v) => update({ liveWeather: v })} />
         <Switch label="Color-blind friendly rivals" hint="Use a validated palette instead of airline brand colors on the map." checked={settings.colorBlindRivals} onChange={(v) => update({ colorBlindRivals: v })} />
         <div className="flex items-center justify-between py-3">
           <span className="font-semibold">Autosave every</span>
@@ -37,7 +38,7 @@ export function SettingsDialog({ open, onOpenChange }: { open: boolean; onOpenCh
         </div>
         <LogoPackSection />
         <div className="py-3 text-[13px] text-muted">
-          <p className="font-semibold text-text">About SkyEmpire 0.1</p>
+          <p className="font-semibold text-text">About SkyEmpire 0.2</p>
           <p>SkyEmpire is not affiliated with any airline or aircraft manufacturer. Names are used for identification only.</p>
           <p className="mt-1">Data: OurAirports, GeoNames, World Bank, Natural Earth, Wikidata, OpenFlights. See CREDITS.md.</p>
         </div>
