@@ -10,7 +10,7 @@ export function fakeView(p: Partial<Airline> = {}, v: Partial<ClientView> = {}):
   };
   return {
     day: 10, startYear: 2026, player, aircraft: [], routes: [], rivals: [], rivalRoutes: [],
-    market: { fuelPricePerKg: 0.95, economyIndex: 1, usedListings: [] }, events: [], slotsFree: {}, objectives: [], gameOver: null, upcomingPeaks: [], weather: { today: {}, forecast: {} },
+    market: { fuelPricePerKg: 0.95, economyIndex: 1, usedListings: [] }, events: [], slotsFree: {}, objectives: [], gameOver: null, upcomingPeaks: [], weather: { today: {}, forecast: {} }, tensions: [], routeStatus: {},
     finance: { companyValue: player.cash, availableCredit: 20_000_000, monthlyFixed: 1_000_000 }, ...v,
   };
 }

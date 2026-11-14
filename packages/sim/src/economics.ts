@@ -1,7 +1,7 @@
 import type { AircraftType, Airport, Cabin, Catalog, GameState, Route } from '@skyempire/shared';
 import { CABIN_CLASSES } from '@skyempire/shared';
 import { BALANCE } from './config/balance';
-import { distanceKm } from './geo';
+import { flightDistanceKm } from './routing';
 import { effectiveFare } from './fares';
 import { blockHours } from './ops';
 import { PERSONALITIES } from './ai/personalities';
@@ -41,7 +41,7 @@ export function routeDayCosts(
   if (closed) return zero;
   const al = state.airlines[route.airlineId]!;
   const a = catalog.airports[route.from]!, b = catalog.airports[route.to]!;
-  const dist = distanceKm(a, b);
+  const dist = flightDistanceKm(state, catalog, a.id, b.id).km;
   const factor = al.baseIds.includes(a.id) && al.baseIds.includes(b.id) ? BALANCE.basePairDiscount : 1;
   const style = al.personality ? PERSONALITIES[al.personality] : null;
   const out = { ...zero };

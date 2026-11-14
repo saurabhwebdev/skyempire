@@ -79,6 +79,9 @@ export interface Catalog {
   airlines: AirlineData[];
   realRoutes: { airlineIata: string; from: string; to: string }[];
   holidays: HolidayData;
+  airspace: AirspaceRegion[];
+  /** ISO 3166 alpha-2 → English short name (Natural Earth). */
+  countryNames: Record<string, string>;
 }
 
 export interface Aircraft {

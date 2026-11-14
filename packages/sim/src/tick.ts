@@ -9,6 +9,7 @@ import { refFare } from './demand';
 import { hoursByAircraft, pairKey, revenueOf, routeOps, simulatePair, totalSeats, type RouteOps } from './daySim';
 import { routeDayCosts } from './economics';
 import { rollEvents } from './events';
+import { rollTensions } from './tensions';
 import { applyMonthly, companyValue, creditRating, dailyInterest, debtOf, updateSolvency } from './finance';
 import { distanceKm } from './geo';
 import { nextId } from './ids';
@@ -52,6 +53,7 @@ export function tick(input: GameState, commands: QueuedCommand[], catalog: Catal
 
   // 2. World: events, market
   notes.push(...rollEvents(s, catalog, rng));
+  notes.push(...rollTensions(s, catalog, rng));
   stepMarket(s, catalog, rng);
 
   // 3. AI decisions

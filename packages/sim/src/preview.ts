@@ -6,6 +6,7 @@ import { hoursByAircraft, pairKey, revenueOf, routeOps, simulatePair, totalSeats
 import { refFare } from './demand';
 import { routeDayCosts } from './economics';
 import { distanceKm } from './geo';
+import { flightDistanceKm } from './routing';
 
 const FARE_STEPS = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6];
 
@@ -80,5 +81,6 @@ export function preview(state: GameState, airlineId: string, cmd: Command, catal
     demandPerDay: Math.round(e.demand),
     competitors: e.competitors,
     distanceKm: Math.round(dist),
+    detourKm: flightDistanceKm(s, catalog, route.from, route.to).detourKm,
   };
 }

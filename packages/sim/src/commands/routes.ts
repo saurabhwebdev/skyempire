@@ -1,5 +1,6 @@
 import type { Assignment, Catalog, Command, CommandResult, GameState } from '@skyempire/shared';
-import { distanceKm } from '../geo';
+import { flightDistanceKm } from '../routing';
+import { banMessage, isBanned } from '../tensions';
 import { nextId } from '../ids';
 import { aircraftHoursUsed, roundTripHours, slotCapacity, slotsNeeded } from '../ops';
 import { BALANCE } from '../config/balance';
@@ -16,7 +17,11 @@ export function validateAssignments(
   const a = catalog.airports[from], b = catalog.airports[to];
   if (!a) return fail(ERR.unknownAirport(from));
   if (!b) return fail(ERR.unknownAirport(to));
-  const dist = distanceKm(a, b);
+  const banned = isBanned(state, a.country, b.country);
+  if (banned) return fail(banMessage(catalog, banned));
+  const flight = flightDistanceKm(state, catalog, a.id, b.id);
+  if (flight.blocked) return fail(flight.blocked);
+  const dist = flight.km;
   const seen = new Set<string>();
   for (const asg of assignments) {
     if (seen.has(asg.aircraftId)) return fail(ERR.duplicateAssignment);

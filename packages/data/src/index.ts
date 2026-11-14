@@ -22,6 +22,8 @@ export function loadCatalog(regionId: 'world' = 'world'): Catalog {
     airlines: airlines as AirlineData[],
     realRoutes: routes,
     holidays: holidays as HolidayData,
+    airspace: airspace as AirspaceRegion[],
+    countryNames: Object.fromEntries((basemap as { features: { properties: { iso: string; name: string } }[] }).features.filter((f) => f.properties.iso !== '-99').map((f) => [f.properties.iso, f.properties.name])),
   };
   return cached;
 }

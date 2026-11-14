@@ -13,6 +13,8 @@ import { onTimeFor } from './maintenance';
 import { blockHours, roundTripHours, seatUnits, slotCapacity } from './ops';
 import { offerQuality } from './quality';
 import { weatherAt, weatherEffect, type WeatherEffect } from './weather';
+import { flightDistanceKm } from './routing';
+import { banMessage, isBanned, tensionDemandFactor } from './tensions';
 
 export const emptyCabin = (): Cabin => ({ economy: 0, premium: 0, business: 0 });
 export const pairKey = (a: string, b: string) => (a < b ? `${a}-${b}` : `${b}-${a}`);
@@ -45,12 +47,19 @@ export interface RouteOps {
   blockH: number;
   /** Weather extras today: de-icing plus passenger care for cancelled or pre-cancelled seats. */
   weatherFees: number;
+  /** Extra km flown around closed airspace. */
+  detourKm: number;
+  /** Why the route (or some of its aircraft) can't fly today: a ban, no way around closed airspace, or out of range. */
+  blocked: string | null;
 }
 
 /** What a route operates today. `average` = typical day (rtpw / 7) for previews. */
 export function routeOps(route: Route, state: GameState, catalog: Catalog, hours: Map<string, number>, average: boolean): RouteOps {
   const a = catalog.airports[route.from]!, b = catalog.airports[route.to]!;
-  const dist = distanceKm(a, b);
+  const flight = flightDistanceKm(state, catalog, a.id, b.id);
+  const dist = flight.km;
+  const ban = isBanned(state, a.country, b.country);
+  const blocked = ban ? banMessage(catalog, ban) : flight.blocked;
   // Weather applies to real days only; previews show a typical day.
   const wa = average ? 'clear' : weatherAt(state, catalog, a.id, state.day);
   const wb = average ? 'clear' : weatherAt(state, catalog, b.id, state.day);
@@ -59,6 +68,7 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
   const al = state.airlines[route.airlineId]!;
   const roundTrips = new Map<string, number>();
   const seats = emptyCabin();
+  let rangeBlocked: string | null = null;
   let weeklyFrequency = 0, condSum = 0, utilSum = 0, qualSum = 0, penaltySum = 0, n = 0, blockH = 0, weatherFees = 0;
   // Share of flights the weather cancels at one end: its own cancellations, or what reduced capacity can't handle.
   const endCancel = (ap: typeof a, eff: WeatherEffect) => {
@@ -73,7 +83,9 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
     weeklyFrequency += asg.roundTripsPerWeek;
     const t = catalog.aircraftTypes[ac.typeId]!;
     blockH = blockHours(dist, t.cruiseKmh);
-    const flying = !closed && ac.status === 'active';
+    const outOfRange = t.rangeKm < dist;
+    const flying = !closed && !blocked && !outOfRange && ac.status === 'active';
+    if (outOfRange && !blocked && !rangeBlocked) rangeBlocked = `Detour exceeds ${t.name} range`;
     const scheduled = flying ? (average ? asg.roundTripsPerWeek / 7 : flightsToday(asg.roundTripsPerWeek, state.day)) : 0;
     const acSeats = CABIN_CLASSES.reduce((s, c) => s + ac.cabin[c], 0);
     const util = (hours.get(ac.id) ?? 0) / BALANCE.weeklyHours;
@@ -113,7 +125,10 @@ export function routeOps(route: Route, state: GameState, catalog: Catalog, hours
       serviceLevel: al.serviceLevel, onTime,
     });
   }
-  return { route, closed, roundTrips, seats, weeklyFrequency, quality: n ? qualSum / n : 50, onTime, blockH, weatherFees: Math.round(weatherFees) };
+  return {
+    route, closed, roundTrips, seats, weeklyFrequency, quality: n ? qualSum / n : 50, onTime, blockH, weatherFees: Math.round(weatherFees),
+    detourKm: flight.detourKm, blocked: blocked ?? rangeBlocked,
+  };
 }
 
 export interface PairResult {
@@ -133,7 +148,7 @@ export function simulatePair(ops: RouteOps[], state: GameState, catalog: Catalog
   const doy = dateOf(state.day, state.world.startYear).dayOfYear;
   let demandTotal = 0;
   for (const [o, d] of [[A, B], [B, A]] as const) {
-    const base = baseDemand(o, d, doy, state.market.economyIndex);
+    const base = baseDemand(o, d, doy, state.market.economyIndex) * tensionDemandFactor(state, o, d);
     demandTotal += base;
     const split = classSplit(o, d);
     const hol = holidayDemandFactors(o, d, state.day, state.world.startYear, catalog);

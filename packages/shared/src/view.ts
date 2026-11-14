@@ -1,4 +1,4 @@
-import type { ActiveEvent, Aircraft, Airline, CabinClass, GameState, Money, PersonalityId, Route, WeatherCondition } from './types';
+import type { ActiveEvent, Aircraft, Airline, CabinClass, GameState, Money, PersonalityId, Route, TensionKind, WeatherCondition } from './types';
 
 export interface Notification {
   id: string;
@@ -49,6 +49,8 @@ export interface PreviewResult {
   demandPerDay?: number;
   competitors?: number;
   distanceKm?: number;
+  /** Extra km around closed airspace. */
+  detourKm?: number;
 }
 
 export interface RivalSummary {
@@ -71,6 +73,18 @@ export interface UpcomingPeakView {
   peak: number;
 }
 
+export interface TensionView {
+  id: string;
+  kind: TensionKind;
+  regionId?: string;
+  countries?: [string, string];
+  country?: string;
+  startDay: number;
+  endDay: number;
+  active: boolean;
+  label: string;
+}
+
 export interface ClientView {
   day: number;
   startYear: number;
@@ -87,6 +101,10 @@ export interface ClientView {
   finance: { companyValue: Money; availableCredit: Money; monthlyFixed: Money };
   /** Festivals in the player's markets over the next 60 days. */
   upcomingPeaks: UpcomingPeakView[];
+  /** Warned and active geopolitical events (generic, region-level). */
+  tensions: TensionView[];
+  /** Player route id → detour and why it can't fly (if so). */
+  routeStatus: Record<string, { detourKm: number; blocked: string | null }>;
   weather: {
     /** Airports served by anyone with weather other than clear today. */
     today: Record<string, WeatherCondition>;
